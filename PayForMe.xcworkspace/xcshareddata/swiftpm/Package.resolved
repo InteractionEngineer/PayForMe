@@ -1,12 +1,13 @@
 {
+  "originHash" : "07ab1d97001a5cb88c6ba268e55e0b0c409783fd7807f68a8d37691c1887acd1",
   "pins" : [
     {
       "identity" : "carbode-barcode-scanner-for-swiftui",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
       "state" : {
-        "revision" : "6167624ec47174900434f1c03dfa0b2dd5d19c0d",
-        "version" : "2.2.3"
+        "revision" : "d0192bd6ccc61e426eb7a301f16521f1da05dc66",
+        "version" : "2.2.4"
       }
     },
     {
@@ -14,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/groue/GRDB.swift.git",
       "state" : {
-        "revision" : "fead2ea634c1bf7dd81a3e02f796154992165ffd",
-        "version" : "5.24.0"
+        "revision" : "04e73c26c4ce8218ab85aaf791942bb0b204f330",
+        "version" : "7.4.1"
       }
     },
     {
@@ -28,5 +29,5 @@
       }
     }
   ],
-  "version" : 2
+  "version" : 3
 }

@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -795,7 +795,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 109;
 				DEVELOPMENT_ASSET_PATHS = "\"PayForMe/Preview Content\"";
-				DEVELOPMENT_TEAM = L79BTFY6FV;
+				DEVELOPMENT_TEAM = 22BT3L9N5V;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = PayForMe/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -819,7 +819,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 109;
 				DEVELOPMENT_ASSET_PATHS = "\"PayForMe/Preview Content\"";
-				DEVELOPMENT_TEAM = L79BTFY6FV;
+				DEVELOPMENT_TEAM = 22BT3L9N5V;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = PayForMe/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -928,7 +928,7 @@
 			repositoryURL = "https://github.com/groue/GRDB.swift.git";
 			requirement = {
 				kind = upToNextMajorVersion;
-				minimumVersion = 5.0.2;
+				minimumVersion = 7.4.0;
 			};
 		};
 		658FC553252727C1004A49AA /* XCRemoteSwiftPackageReference "CarBode-Barcode-Scanner-For-SwiftUI" */ = {
