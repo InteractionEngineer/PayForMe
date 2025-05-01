@@ -1,9 +1,8 @@
 //
 //  BillsList.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 26.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import SwiftUI

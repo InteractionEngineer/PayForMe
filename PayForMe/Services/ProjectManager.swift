@@ -1,9 +1,8 @@
 //
 //  DataManager.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Camille Mainz on 04.02.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Combine

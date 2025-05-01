@@ -3,7 +3,6 @@
 //  PayForMe
 //
 //  Created by Max Tharr on 08.11.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import SlickLoadingSpinner

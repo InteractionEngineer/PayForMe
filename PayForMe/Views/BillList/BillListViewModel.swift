@@ -1,9 +1,8 @@
 //
 //  BillListViewModel.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 23.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Combine

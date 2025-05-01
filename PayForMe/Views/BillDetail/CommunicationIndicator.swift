@@ -3,7 +3,6 @@
 //  PayForMe
 //
 //  Created by Max Tharr on 25.02.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import SwiftUI

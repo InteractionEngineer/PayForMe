@@ -3,7 +3,6 @@
 //  PayForMeUITests
 //
 //  Created by Max Tharr on 13.03.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import XCTest
