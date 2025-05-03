@@ -1,11 +1,11 @@
 # PayForMe
 iOS client for Cospend on Nextcloud & iHateMoney.org
-Download from the [Apple App Store](https://apps.apple.com/us/app/payforme/id1500428306?l=de&ls=1){:target="_blank"}.
+Download from the [Apple App Store](https://apps.apple.com/us/app/payforme/id1500428306?l=de&ls=1).
 
-Open beta with new features via [TestFlight](https://testflight.apple.com/join/nCDuHtjh){:target="_blank"}.
+Open beta with new features via [TestFlight](https://testflight.apple.com/join/nCDuHtjh).
 
 Using SwiftUI and Combine.
-Inspired by [Moneybuster](https://gitlab.com/eneiluj/moneybuster){:target="_blank"}.
+Inspired by [Moneybuster](https://gitlab.com/eneiluj/moneybuster).
 
 ## Open Source
 PayForMe is an open source project, which means the code is freely available and anyone can contribute to its development. The project is developed in my free time and contributions are always welcome!
@@ -38,4 +38,4 @@ Ways to contribute:
 
 If you want to localize PayForMe into your language you are very welcome! If unfamiliar, here is a short guide:
 
-To add a new localization, fork the project on github, download it, open it in XCode and then navigate to the Project/Info settings, and add a new localization file there. It is recommended but not necessary to use [iOSLocalizationEditor](https://github.com/igorkulman/iOSLocalizationEditor){:target="_blank"} then to easily translate all strings. Afterwards, commit and push you changes and open a pull request to the main repository.
+To add a new localization, fork the project on github, download it, open it in XCode and then navigate to the Project/Info settings, and add a new localization file there. It is recommended but not necessary to use [iOSLocalizationEditor](https://github.com/igorkulman/iOSLocalizationEditor) then to easily translate all strings. Afterwards, commit and push you changes and open a pull request to the main repository.
