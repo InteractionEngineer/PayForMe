@@ -1,5 +1,6 @@
 # PayForMe
 iOS client for Cospend on Nextcloud & iHateMoney.org
+
 Download from the [Apple App Store](https://apps.apple.com/us/app/payforme/id1500428306?l=de&ls=1).
 
 Open beta with new features via [TestFlight](https://testflight.apple.com/join/nCDuHtjh).
