@@ -151,7 +151,7 @@ class NetworkService {
     private func baseURLFor(_ project: Project, suffix: String) -> URL {
         var url = project.url
             .appendingPathComponent(project.backend.staticPath)
-            .appendingPathComponent(project.token.lowercased())
+            .appendingPathComponent(project.token)
         if project.backend == .cospend {
             url = url.appendingPathComponent(project.password)
         }
