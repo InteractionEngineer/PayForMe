@@ -64,19 +64,20 @@ struct BillDetailView: View {
         .navigationBarTitle(navBarTitle, displayMode: .inline)
     }
 
-    func sendBillToServer() async {
+    func sendBillToServer() {
         guard let newBill = viewModel.createBill() else {
             print("Could not create bill")
             return
         }
         sendingInProgress = .connecting
-        await ProjectManager.shared.saveBill(newBill)
-        sendingInProgress = .success
-        ProjectManager.shared.loadBillsAndMembers()
-        showModal.toggle()
-        DispatchQueue.main.async {
-            self.presentationMode.wrappedValue.dismiss()
-        }
+        ProjectManager.shared.saveBill(newBill, completion: {
+            self.sendingInProgress = .success
+            ProjectManager.shared.loadBillsAndMembers()
+            self.showModal.toggle()
+            DispatchQueue.main.async {
+                self.presentationMode.wrappedValue.dismiss()
+            }
+        })
     }
 }
 
