@@ -178,40 +178,93 @@ extension StringProtocol {
 
 typealias ProjectData = (server: URL?, project: String?, passwd: String?)
 
-extension URL {
-    func decodeMoneyBusterString() -> ProjectData {
-        guard absoluteString.hasPrefix("https://net.eneiluj.moneybuster.cospend/"),
-              pathComponents.count >= 3, pathComponents.count <= 4 else { return (nil, nil, nil) }
-        return (URL(string: "https://" + pathComponents[1]), pathComponents[2], pathComponents[safe: 3])
+enum URLDecodingError: Error, LocalizedError {
+    case invalidURLFormat
+    case missingHost
+    case invalidScheme
+    case invalidPathComponentCount
+    case invalidMoneyBusterPrefix
+    
+    var errorDescription: String? {
+        switch self {
+        case .invalidURLFormat:
+            return NSLocalizedString("The URL has an invalid format.", comment: "")
+        case .missingHost:
+            return NSLocalizedString("The URL does not contain a host.", comment: "")
+        case .invalidScheme:
+            return NSLocalizedString("The URL has an invalid scheme.", comment: "")
+        case .invalidPathComponentCount:
+            return NSLocalizedString("The URL has an invalid number of path components.", comment: "")
+        case .invalidMoneyBusterPrefix:
+            return NSLocalizedString("The MoneyBuster URL has an invalid prefix.", comment: "")
+        }
     }
 }
 
 extension URL {
-    func decodeCospendString() -> ProjectData {
-        guard let host = host,
-              let scheme = scheme,
-              scheme.localizedCaseInsensitiveContains("cospend")
-        else {
-            return (nil, nil, nil)
+    func decodeMoneyBusterString() -> Result<ProjectData, Error> {
+        guard absoluteString.hasPrefix("https://net.eneiluj.moneybuster.cospend/") else {
+            return .failure(URLDecodingError.invalidMoneyBusterPrefix)
+        }
+        
+        guard pathComponents.count >= 3, pathComponents.count <= 4 else {
+            return .failure(URLDecodingError.invalidPathComponentCount)
+        }
+        
+        guard let serverURL = URL(string: "https://" + pathComponents[1]) else {
+            return .failure(URLDecodingError.invalidURLFormat)
+        }
+        
+        let projectData = ProjectData(
+            server: serverURL,
+            project: pathComponents[2],
+            passwd: pathComponents[safe: 3]
+        )
+        
+        return .success(projectData)
+    }
+}
+
+extension URL {
+    func decodeCospendString() -> Result<ProjectData, Error> {
+        guard let host = host else {
+            return .failure(URLDecodingError.missingHost)
+        }
+        
+        guard let scheme = scheme, scheme.localizedCaseInsensitiveContains("cospend") else {
+            return .failure(URLDecodingError.invalidScheme)
         }
         
         var hostString = "https://\(host)"
         
-        if let port = port {hostString += ":\(port)"}
+        if let port = port {
+            hostString += ":\(port)"
+        }
         
         if pathComponents.count > 3 {
             hostString += "/" + pathComponents[1..<(pathComponents.count - 2)].joined(separator: "/")
         }
         
-        return (URL(string: hostString),
-                pathComponents[safe: pathComponents.count - 2],
-                pathComponents.last)
+        guard let serverURL = URL(string: hostString) else {
+            return .failure(URLDecodingError.invalidURLFormat)
+        }
+        
+        let projectData = ProjectData(
+            server: serverURL,
+            project: pathComponents[safe: pathComponents.count - 2],
+            passwd: pathComponents.last
+        )
+        
+        return .success(projectData)
     }
 }
 
 extension URL {
-    func decodeQRCode() -> ProjectData {
-        guard let scheme = scheme else { return (nil, nil, nil) }
+    func decodeQRCode() -> Result<ProjectData, Error> {
+        guard let scheme = scheme else {
+            return .failure(URLDecodingError.invalidScheme)
+        }
+        
         return scheme.contains("cospend") ? decodeCospendString() : decodeMoneyBusterString()
     }
 }

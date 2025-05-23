@@ -43,13 +43,22 @@ class ProjectManager: ObservableObject {
     }
 
     func openedByURL(url: URL) {
-        let data = url.decodeCospendString()
-        guard let _ = data.server,
-              let _ = data.project
-        else {
+        let result = url.decodeCospendString()
+        
+        switch result {
+        case .success(let data):
+            guard let _ = data.server,
+                  let _ = data.project
+            else {
+                return
+            }
+            openedByURL = url
+            
+        case .failure(let error):
+            print("Failed to decode URL: \(error.localizedDescription)")
+            // Optional: Handle the error, e.g., show an alert
             return
         }
-        openedByURL = url
     }
 
     // MARK: Server Communication

@@ -58,17 +58,24 @@ class AddProjectManualViewModel: ObservableObject {
         }
 
         // If it is a moneybuster URL
-        let (mUrl, mName, mPassword) = url.decodeQRCode()
-        if let url = mUrl, let name = mName {
-            serverAddress = url.absoluteString
-            projectName = name
-            if let password = mPassword {
-                projectPassword = password
+        let result = url.decodeQRCode()
+        
+        switch result {
+        case .success(let projectData):
+            if let url = projectData.server, let name = projectData.project {
+                serverAddress = url.absoluteString
+                projectName = name
+                if let password = projectData.passwd {
+                    projectPassword = password
+                }
+                return
             }
-            return
+        case .failure(let error):
+            print("Failed to decode URL: \(error.localizedDescription)")
+            // Optional: Handle the error, e.g., show an alert
         }
-        // If it is another url
-
+        
+        // If it is another url or decoding failed
         let pathComponents = url.pathComponents
         let pureUrl = url.deletingPathExtension().absoluteString
         let trimmIndices = url.absoluteString.indices(of: "/")

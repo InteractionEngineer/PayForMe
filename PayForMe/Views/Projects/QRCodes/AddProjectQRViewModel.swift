@@ -70,7 +70,7 @@ class AddProjectQRViewModel: ObservableObject {
                     }
                 }
             }
-            print("fail")
+            print("Authentication failed, your provided password might be incorrect.")
             return withAnimation {
                 .failure
             }
@@ -80,7 +80,7 @@ class AddProjectQRViewModel: ObservableObject {
     }
 
     var urlString: String {
-        url?.absoluteString ?? "URL wrong, please scan right barcode"
+        url?.absoluteString ?? "The link provided by this QR code (\(scannedCode ?? URL(string: "unreadble")!)) is invalid."
     }
 
     var foundCode: AnyPublisher<URL, Never> {
@@ -92,41 +92,50 @@ class AddProjectQRViewModel: ObservableObject {
     var foundCodeSink: AnyCancellable {
         foundCode
             .sink { codedUrl in
-                let projectData = codedUrl.decodeQRCode()
-                guard let url = projectData.server, let token = projectData.project else { return }
-                if let password = projectData.passwd {
-                    self.isTestingSubject.send(.connecting)
-                    let project = Project(name: token, password: password, token: token, backend: .cospend, url: url)
-                    Task(priority: .userInitiated) {
-                        do {
-                            let apiProject = try await NetworkService.shared.getProjectName(project)
-                            try ProjectManager.shared.addProject(apiProject)
-                            self.isTestingSubject.send(.success)
-                        } catch {
-                            print(codedUrl)
-                            print()
-                            print(error)
-                            self.isTestingSubject.send(.failure)
+                let result = codedUrl.decodeQRCode()
+                
+                switch result {
+                case .success(let projectData):
+                    guard let url = projectData.server, let token = projectData.project else {
+                        self.isTestingSubject.send(.failure)
+                        // TODO: add error message "Missing server URL or project ID"
+                        return
+                    }
+                    
+                    if let password = projectData.passwd {
+                        self.isTestingSubject.send(.connecting)
+                        let project = Project(name: token, password: password, token: token, backend: .cospend, url: url)
+                        Task(priority: .userInitiated) {
+                            do {
+                                let apiProject = try await NetworkService.shared.getProjectName(project)
+                                try ProjectManager.shared.addProject(apiProject)
+                                self.isTestingSubject.send(.success)
+                            } catch {
+                                print(codedUrl)
+                                print()
+                                print(error)
+                                self.isTestingSubject.send(.failure)
+                                // TODO: add error message "Failed to connect: \(error.localizedDescription)"
+                            }
+                        }
+                    } else {
+                        withAnimation {
+                            self.url = url
+                            self.name = token
+                            self.askForPassword.toggle()
                         }
                     }
-//                    NetworkService.shared.testProject(project)
-//                        .asUIPublisher
-//                        .sink(receiveValue: {
-//                            project, code in
-//                            if code == 200 {
-//                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now().advanced(by: .seconds(1))) {
-//                                    ProjectManager.shared.addProject(project)
-//                                }
-//                                self.isTestingSubject.send(.success)
-//                            } else {
-//                                self.isTestingSubject.send(.failure)
-//                            }
-//                        }).store(in: &self.subscriptions)
-                } else {
-                    withAnimation {
-                        self.url = url
-                        self.name = token
-                        self.askForPassword.toggle()
+                    
+                case .failure(let error):
+                    print(codedUrl)
+                    print()
+                    print(error)
+                    self.isTestingSubject.send(.failure)
+                    
+                    if let decodingError = error as? URLDecodingError {
+                        // TODO: Add error message that relates to the url decoding error
+                    } else {
+                        // TODO: Add generic error message for any other cases
                     }
                 }
             }
