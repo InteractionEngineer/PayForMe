@@ -94,14 +94,24 @@ class NetworkService {
         return Project(name: apiProject.name, password: project.password, token: project.token, backend: project.backend, url: project.url)
     }
 
-    func postBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
+    func post(bill: Bill) async throws {
         let request = buildURLRequest("bills", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "POST")
-        return sendBillPublisher(request: request)
+        try await sendWithOutResponseData(request: request)
     }
 
-    func updateBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
+    func update(bill: Bill) async throws {
         let request = buildURLRequest("bills/\(bill.id)", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "PUT")
-        return sendBillPublisher(request: request)
+        try await sendWithOutResponseData(request: request)
+    }
+
+    private func sendWithOutResponseData(request: URLRequest) async throws {
+        let (_, response) = try await URLSession.shared.data(for: request)
+        guard let response = response as? HTTPURLResponse else {
+            throw HTTPError.generalFailure
+              }
+        if response.statusCode / 100 == 2 {
+            throw HTTPError.statuscode(code: response.statusCode)
+        }
     }
 
     func deleteBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
