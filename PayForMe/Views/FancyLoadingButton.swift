@@ -15,13 +15,17 @@ struct FancyLoadingButton: View {
 
     var add: Bool
 
-    var action: () -> Void
+    var action: () async -> Void
     var text: String
 
     var body: some View {
         switch isLoading {
         case .notStarted:
-            return Button(action: action) {
+            return Button(action: {
+                Task {
+                    await action()
+                }
+            }) {
                 if add {
                     Image(systemName: "plus")
                 } else {
