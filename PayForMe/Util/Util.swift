@@ -198,6 +198,8 @@ extension URL {
         
         var hostString = "https://\(host)"
         
+        if let port = port {hostString += ":\(port)"}
+        
         if pathComponents.count > 3 {
             for i in 1..<pathComponents.count - 2 {
                 hostString += "/"
