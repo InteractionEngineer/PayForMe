@@ -200,10 +200,7 @@ extension URL {
         if let port = port {hostString += ":\(port)"}
         
         if pathComponents.count > 3 {
-            for i in 1..<pathComponents.count - 2 {
-                hostString += "/"
-                hostString += pathComponents[i]
-            }
+            hostString += "/" + pathComponents[1..<(pathComponents.count - 2)].joined(separator: "/")
         }
         
         return (URL(string: hostString),
