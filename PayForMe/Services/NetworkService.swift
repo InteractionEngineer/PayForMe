@@ -87,7 +87,7 @@ class NetworkService {
         let request = buildURLRequest("", params: [:], project: project)
         let (data, response) = try await URLSession.shared.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode / 100 == 2 else {
-            throw HTTPError.statuscode
+            throw HTTPError.generalFailure
         }
         let apiProject = try JSONDecoder().decode(APIProject.self, from: data)
 
@@ -207,7 +207,8 @@ class NetworkService {
     }
 
     enum HTTPError: LocalizedError {
-        case statuscode
+        case statuscode(code: Int)
+        case generalFailure
     }
 
     enum ServerError: LocalizedError {
