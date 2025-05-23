@@ -10,8 +10,8 @@
 #     https://docs.fastlane.tools/plugins/available-plugins
 #
 
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
+opt_out_usage
+update_fastlane
 
 default_platform(:ios)
 
@@ -43,7 +43,6 @@ platform :ios do
     frameit
     capture_screenshots(
       dark_mode: false,
-      clear_previous_screenshots: false,
       output_directory: "screenshots/lightmode"
     )
     frameit

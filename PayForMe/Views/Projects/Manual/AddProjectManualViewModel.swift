@@ -1,9 +1,8 @@
 //
 //  AddServerModel.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Camille Mainz on 05.02.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Combine
@@ -34,7 +33,7 @@ class AddProjectManualViewModel: ObservableObject {
         validatedInput.map { _ in LoadingState.connecting }.assign(to: &$validationProgress)
         validatedServer.map { $0 == 200 ? LoadingState.success : LoadingState.failure }.assign(to: &$validationProgress)
         errorTextPublisher.assign(to: &$errorText)
-        serverCheckUnsupportedPorts.assign(to: &$errorText)
+        serverCheckUnsupportedProtocoll.assign(to: &$errorText)
     }
 
     func reset() {
@@ -45,7 +44,9 @@ class AddProjectManualViewModel: ObservableObject {
 
     func addProject() {
         guard let project = lastProjectTestedSuccessfully else { return }
-        if !ProjectManager.shared.addProject(project) {
+        do {
+            try ProjectManager.shared.addProject(project)
+        } catch {
             errorText = "Project already exists!"
         }
     }
@@ -94,12 +95,10 @@ class AddProjectManualViewModel: ObservableObject {
             }.eraseToAnyPublisher()
     }
 
-    var serverCheckUnsupportedPorts: AnyPublisher<String, Never> {
+    var serverCheckUnsupportedProtocoll: AnyPublisher<String, Never> {
         serverAddressFormatted
             .map {
-                $0.contains("http://") ||
-                    String($0.suffix(from: $0.index($0.startIndex, offsetBy: 6))).contains(":") ?
-                    "PayForMe doesn't support http or custom ports" : ""
+                $0.contains("http://") ? "PayForMe doesn't support http" : ""
             }
             .removeDuplicates()
             .eraseToAnyPublisher()
@@ -111,6 +110,7 @@ class AddProjectManualViewModel: ObservableObject {
             projectName = components[4]
         }
         if components.count == 5 {
+            projectPassword = "no-pass"
             projectName = components[4]
         }
     }
@@ -131,10 +131,10 @@ class AddProjectManualViewModel: ObservableObject {
     var validatedInput: AnyPublisher<Project, Never> {
         return Publishers.CombineLatest3(validatedAddress, $projectName, $projectPassword)
             .debounce(for: 1, scheduler: DispatchQueue.main)
-            .compactMap { server, name, password in
-                if let address = server.address, address.isValidURL, !name.isEmpty, !password.isEmpty {
+            .compactMap { server, token, password in
+                if let address = server.address, address.isValidURL, !token.isEmpty, !password.isEmpty {
                     guard let url = URL(string: address) else { return nil }
-                    return Project(name: name.lowercased(), password: password, backend: server.0, url: url)
+                    return Project(name: token, password: password, token: token, backend: server.0, url: url)
                 } else {
                     return nil
                 }
@@ -146,11 +146,17 @@ class AddProjectManualViewModel: ObservableObject {
     private var validatedServer: AnyPublisher<Int, Never> {
         validatedInput.flatMap {
             project in
-            NetworkService.shared.foundProjectStatusCode(project)
-        }
-        .map { project, code in
-            self.lastProjectTestedSuccessfully = project
-            return code
+            Future { promise in
+                Task {
+                    do {
+                        let testedProject = try await NetworkService.shared.getProjectName(project)
+                        self.lastProjectTestedSuccessfully = testedProject
+                        promise(.success(200))
+                    } catch {
+                        promise(.success(-1))
+                    }
+                }
+            }
         }
         .removeDuplicates()
         .receive(on: RunLoop.main)

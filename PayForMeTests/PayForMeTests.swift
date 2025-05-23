@@ -3,13 +3,11 @@
 //  PayForMeTests
 //
 //  Created by Max Tharr on 03.10.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import XCTest
 
 class AddProjectManuallyTests: XCTestCase {
-
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
@@ -29,5 +27,4 @@ class AddProjectManuallyTests: XCTestCase {
             // Put the code you want to measure the time of here.
         }
     }
-
 }

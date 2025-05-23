@@ -3,7 +3,6 @@
 //  PayForMe
 //
 //  Created by Max Tharr on 03.10.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import SwiftUI
@@ -16,23 +15,29 @@ struct FloatingAddButtonViewModifier: ViewModifier {
             .sheet(isPresented: $sheetToggle) {
                 AddBillView(showModal: $sheetToggle)
             }
-            .overlay(FloatingAddButtonView(sheetToggle: $sheetToggle).padding(32), alignment: .bottom)
+            .overlay(FloatingAddButtonView(sheetToggle: $sheetToggle).padding(10), alignment: .bottom)
     }
 }
 
 private struct FloatingAddButtonView: View {
     @Binding var sheetToggle: Bool
+    
+    let size = 70.0
 
     var body: some View {
         Button(action: {
             sheetToggle.toggle()
         }) {
-            Image(systemName: "plus")
-                .resizable()
-                .frame(width: 50, height: 50)
-                .foregroundColor(Color.blue)
-                .shadow(color: Color(red: 0.53, green: 0.53, blue: 0.53), radius: 3, x: 2, y: 2)
-        }
+            Label("Add Bill", systemImage: "bag.badge.plus")
+                .padding(10)
+                .font(.headline)
+                .background(Color.accentColor)
+                .foregroundColor(.white)
+                .cornerRadius(20)
+                    .shadow(radius: /*@START_MENU_TOKEN@*/8/*@END_MENU_TOKEN@*/)
+                    
+            }
+        
         .accessibility(identifier: "Add Bill")
         .accessibility(label: Text("Add Bill"))
     }
@@ -40,15 +45,30 @@ private struct FloatingAddButtonView: View {
 
 struct FloatingAddButtonViewModifier_Previews: PreviewProvider {
     static var previews: some View {
+        FloatingAddButtonView(sheetToggle: .constant(true))
         let viewModel = BillListViewModel()
-        previewProject.bills = [previewBills, previewBills, previewBills].flatMap { $0 }
         previewProject.members = previewPersons
         viewModel.currentProject = previewProject
-
-        return NavigationView {
-            BillList(viewModel: viewModel)
+        previewProjects.forEach { project in
+            try? ProjectManager.shared.addProject(project)
         }
-        // .modifier(FloatingAddButtonViewModifier())
+        ProjectManager.shared.currentProject = previewProject
+
+        //return NavigationView {
+        return TabView {
+            BillList(viewModel: viewModel)
+                .tabItem {
+                    Image(systemName: "rectangle.stack")
+                }
+            BillList(viewModel: viewModel)
+                .tabItem {
+                    Image(systemName: "arrow.right.arrow.left")
+                }
+            BillList(viewModel: viewModel)
+                .tabItem {
+                    Image(systemName: "gear")
+                }
+        }
         .navigationViewStyle(StackNavigationViewStyle())
         .preferredColorScheme(.dark)
     }

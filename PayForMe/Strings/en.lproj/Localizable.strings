@@ -5,8 +5,14 @@
 
 "Add Project" = "Add Project";
 
+
+"Add a default payer for new bills (e.g. yourself)" = "Add a default payer for new bills (e.g. yourself)";
+
 /* AddMemberView.swift */
 "Add member" = "Add member";
+
+/*  */
+"Add project" = "Add project";
 
 
 "All" = "All";
@@ -18,6 +24,9 @@
 "Bills" = "Bills";
 
 
+"Changed date" = "Changed date";
+
+
 "Cospend is a NextCloud app" = "Cospend is a NextCloud app";
 
 /* Error messages */
@@ -25,6 +34,9 @@
 
 
 "Create Bill" = "Create Bill";
+
+/* BillDetailView.swift */
+"Date" = "Date";
 
 
 "Delete" = "Delete";
@@ -43,6 +55,12 @@
 
 
 "Enter project password" = "Enter project password";
+
+
+"Expense date" = "Expense date";
+
+/*  */
+"Finding Server" = "Finding server";
 
 
 "Go to settings" = "Go to settings";
@@ -68,15 +86,20 @@
 
 "Owers" = "Owers";
 
+
+"Paste Link" = "Paste Link";
+
 /* BillDetail.swift */
 "Payer" = "Payer";
 
 /* ProjectQRPermissionCheckerView.swift */
 "Please allow us to use the camera in order to scan the Cospend QR code" = "Please allow us to use the camera in order to scan the Cospend QR code";
 
-"Projects" = "Projects";
 
 "Project ID & Password" = "Project ID & Password";
+
+
+"Projects" = "Projects";
 
 /* AddProjectQRView.swift */
 "Scan the Cospend QR code to proceed" = "Scan the Cospend QR code to proceed";

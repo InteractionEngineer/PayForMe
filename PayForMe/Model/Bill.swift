@@ -1,9 +1,8 @@
 //
 //  Bill.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 21.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Foundation
@@ -44,7 +43,7 @@ struct Bill: Codable, Identifiable, Hashable {
     }
 
     static func newBill() -> Bill {
-        Bill(id: -1, amount: 0, what: "", date: Date(), payer_id: 0, owers: [], repeat: "n")
+        Bill(id: -1, amount: 0, what: "", date: Date(), payer_id: -1, owers: [], repeat: "n")
     }
 }
 

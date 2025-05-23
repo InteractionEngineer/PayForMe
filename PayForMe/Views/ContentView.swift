@@ -1,9 +1,8 @@
 //
 //  ContentView.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 21.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Foundation
@@ -65,7 +64,7 @@ enum tabBarItems: Int {
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
         previewProjects.forEach {
-            ProjectManager.shared.addProject($0)
+            try! ProjectManager.shared.addProject($0)
         }
         ProjectManager.shared.currentProject = previewProject
         return ContentView()

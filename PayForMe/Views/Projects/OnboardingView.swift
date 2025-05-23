@@ -1,9 +1,8 @@
 //
 //  AddProjectView.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Camille Mainz on 14.02.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import SwiftUI

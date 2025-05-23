@@ -1,9 +1,8 @@
 //
 //  CospendNetworkservice.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 21.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Combine
@@ -73,8 +72,8 @@ class NetworkService {
             .eraseToAnyPublisher()
     }
 
-    func foundProjectStatusCode(_ project: Project) -> AnyPublisher<(Project, Int), Never> {
-        let request = buildURLRequest("members", params: [:], project: project)
+    func testProject(_ project: Project) -> AnyPublisher<(Project, Int), Never> {
+        let request = buildURLRequest("dummy", params: [:], project: project)
         let requestPub = URLSession.shared.dataTaskPublisher(for: request)
             .tryMap { _, response -> Int in
                 guard let httpResponse = response as? HTTPURLResponse else { print("Network Error"); return -1 }
@@ -84,23 +83,30 @@ class NetworkService {
         return Publishers.CombineLatest(Just(project), requestPub).eraseToAnyPublisher()
     }
 
-    func createProjectPublisher(_ project: Project, email: String) -> AnyPublisher<Bool, Never> {
-        let params = ["name": project.name, "id": project.name, "password": project.password, "contact_email": email]
-        let request = buildURLRequest("", params: params, project: project, httpMethod: "POST")
+    func getProjectName(_ project: Project) async throws -> Project {
+        let request = buildURLRequest("", params: [:], project: project)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode / 100 == 2 else {
+            throw HTTPError.statuscode
+        }
+        let apiProject = try JSONDecoder().decode(APIProject.self, from: data)
 
-        return URLSession.shared.dataTaskPublisher(for: request)
-            .tryMap { data, response -> Bool in
-                guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode / 100 == 2 else {
-                    throw HTTPError.generalFailure
-                }
-                guard let responseString = String(data: data, encoding: .utf8) else {
-                    return false
-                }
+        return Project(name: apiProject.name, password: project.password, token: project.token, backend: project.backend, url: project.url)
+    }
 
-                return responseString.contains(project.name)
-            }
-            .replaceError(with: false)
-            .eraseToAnyPublisher()
+    func postBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
+        let request = buildURLRequest("bills", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "POST")
+        return sendBillPublisher(request: request)
+    }
+
+    func updateBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
+        let request = buildURLRequest("bills/\(bill.id)", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "PUT")
+        return sendBillPublisher(request: request)
+    }
+
+    func deleteBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
+        let request = buildURLRequest("bills/\(bill.id)", params: [:], project: currentProject, httpMethod: "DELETE")
+        return sendBillPublisher(request: request)
     }
 
     private func sendBillPublisher(request: URLRequest) -> AnyPublisher<Bool, Never> {
@@ -113,31 +119,6 @@ class NetworkService {
             }
             .replaceError(with: false)
             .eraseToAnyPublisher()
-    }
-
-    func post(bill: Bill) async throws {
-        let request = buildURLRequest("bills", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "POST")
-        try await sendWithOutResponseData(request: request)
-    }
-
-    func update(bill: Bill) async throws {
-        let request = buildURLRequest("bills/\(bill.id)", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "PUT")
-        try await sendWithOutResponseData(request: request)
-    }
-
-    private func sendWithOutResponseData(request: URLRequest) async throws {
-        let (_, response) = try await URLSession.shared.data(for: request)
-        guard let response = response as? HTTPURLResponse else {
-            throw HTTPError.generalFailure
-        }
-        if response.statusCode / 100 == 2 {
-            throw HTTPError.statuscode(code: response.statusCode)
-        }
-    }
-
-    func deleteBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
-        let request = buildURLRequest("bills/\(bill.id)", params: [:], project: currentProject, httpMethod: "DELETE")
-        return sendBillPublisher(request: request)
     }
 
     func createMemberPublisher(name: String) -> AnyPublisher<Bool, Never> {
@@ -167,21 +148,17 @@ class NetworkService {
             .eraseToAnyPublisher()
     }
 
-    private func baseURLFor(_ project: Project) -> URL {
-        switch project.backend {
-        case .cospend:
-            return project.url.appendingPathComponent("\(cospendStaticPath)/")
-        case .iHateMoney:
-            return project.url.appendingPathComponent("\(iHateMoneyStaticPath)")
-        }
-    }
-
     private func baseURLFor(_ project: Project, suffix: String) -> URL {
-        switch project.backend {
-        case .cospend:
-            return baseURLFor(project).appendingPathComponent("\(project.name.lowercased())/\(project.password)/\(suffix)")
-        case .iHateMoney:
-            return baseURLFor(project).appendingPathComponent("\(project.name.lowercased())/\(suffix)")
+        var url = project.url
+            .appendingPathComponent(project.backend.staticPath)
+            .appendingPathComponent(project.token)
+        if project.backend == .cospend {
+            url = url.appendingPathComponent(project.password)
+        }
+        if suffix.isEmpty {
+            return url
+        } else {
+            return url.appendingPathComponent(suffix)
         }
     }
 
@@ -190,11 +167,7 @@ class NetworkService {
         let requestURL: URL
         var request: URLRequest
 
-        if !suffix.isEmpty {
-            baseURL = baseURLFor(project, suffix: suffix)
-        } else {
-            baseURL = baseURLFor(project)
-        }
+        baseURL = baseURLFor(project, suffix: suffix)
 
         if let cospendParams = params as? [String: String], project.backend == .cospend, !params.isEmpty {
             var urlComponents = URLComponents(url: baseURL, resolvingAgainstBaseURL: false)
@@ -208,10 +181,8 @@ class NetworkService {
         request = URLRequest(url: requestURL)
 
         if project.backend == .iHateMoney {
-            if !suffix.isEmpty {
-                guard let authString = "\(project.name):\(project.password)".data(using: .utf8)?.base64EncodedString() else { fatalError("error generating authString. THIS SHOULD NOT HAPPEN") }
-                request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
-            }
+            guard let authString = "\(project.token):\(project.password)".data(using: .utf8)?.base64EncodedString() else { fatalError("error generating authString. THIS SHOULD NOT HAPPEN") }
+            request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
 
             if !params.isEmpty {
                 request.httpBody = try? JSONSerialization.data(withJSONObject: params)
@@ -224,13 +195,12 @@ class NetworkService {
 
         return request
     }
-}
 
-enum HTTPError: LocalizedError {
-    case statuscode(code: Int)
-    case generalFailure
-}
+    enum HTTPError: LocalizedError {
+        case statuscode
+    }
 
-enum ServerError: LocalizedError {
-    case noIdReturned
+    enum ServerError: LocalizedError {
+        case noIdReturned
+    }
 }

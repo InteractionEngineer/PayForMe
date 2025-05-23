@@ -3,7 +3,6 @@
 //  PayForMeUITests
 //
 //  Created by Max Tharr on 13.03.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import XCTest
@@ -22,30 +21,29 @@ class PayForMeUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testScreenshots() {
+    func testScreenshots() async throws {
         let app = XCUIApplication()
-        Snapshot.setLanguage(app)
-        setupSnapshot(app)
+        await Snapshot.setLanguage(app)
+        await setupSnapshot(app)
         app.launchArguments += ["UI-Testing"]
         app.launch()
         let tabBarsQuery = app.tabBars
-        snapshot("Bill List")
+        await snapshot("Bill List")
         tabBarsQuery.children(matching: .button).element(boundBy: 1).tap()
-        snapshot("Balance List")
+        await snapshot("Balance List")
         tabBarsQuery.children(matching: .button).element(boundBy: 2).tap()
-        snapshot("Known Projects")
+        await snapshot("Known Projects")
         tabBarsQuery.children(matching: .button).element(boundBy: 1).tap()
         app.buttons["Add Bill"].tap()
-        snapshot("Add Bill")
-                
+        await snapshot("Add Bill")
     }
-    
-    func testScreenshotsEmpty() {
+
+    func testScreenshotsEmpty() async throws {
         let app = XCUIApplication()
-        Snapshot.setLanguage(app)
-        setupSnapshot(app)
-        app.launchArguments += ["UI-Testing","Onboarding"]
+        await Snapshot.setLanguage(app)
+        await setupSnapshot(app)
+        app.launchArguments += ["UI-Testing", "Onboarding"]
         app.launch()
-        snapshot("Onboarding")
+        await snapshot("Onboarding")
     }
 }

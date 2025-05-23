@@ -1,9 +1,8 @@
 //
 //  DataManager.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Camille Mainz on 04.02.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Combine
@@ -55,21 +54,6 @@ class ProjectManager: ObservableObject {
 
     // MARK: Server Communication
 
-    private func createProjectOnServer(_ project: Project, email: String, completion: @escaping () -> Void) {
-        cancellable?.cancel()
-        cancellable = nil
-
-        cancellable = NetworkService.shared.createProjectPublisher(project, email: email)
-            .sink { success in
-                if success {
-                    print("Project \(project.name) created successfully")
-                } else {
-                    print("Error creating project \(project.name)")
-                }
-                completion()
-            }
-    }
-
     func loadBillsAndMembers() {
         let project = currentProject
 
@@ -86,21 +70,30 @@ class ProjectManager: ObservableObject {
             .assign(to: &$currentProject)
     }
 
-    private func updateBill(bill: Bill) async {
-        do {
-            try await NetworkService.shared.update(bill: bill)
-        } catch {
-            // TODO:
-            print("Error posting bill")
-        }
-    }
+    private func sendBillToServer(bill: Bill, update: Bool, completion: @escaping () -> Void) {
+        cancellable?.cancel()
+        cancellable = nil
 
-    private func createBill(bill: Bill) async {
-        do {
-            try await NetworkService.shared.post(bill: bill)
-        } catch {
-            // TODO:
-            print("Error posting bill")
+        if update {
+            cancellable = NetworkService.shared.updateBillPublisher(bill: bill)
+                .sink { success in
+                    if success {
+                        print("Bill id\(bill.id) updated")
+                    } else {
+                        print("error updating bill id\(bill.id)")
+                    }
+                    completion()
+                }
+        } else {
+            cancellable = NetworkService.shared.postBillPublisher(bill: bill)
+                .sink { success in
+                    if success {
+                        print("Bill posted")
+                    } else {
+                        print("Error posting bill")
+                    }
+                    completion()
+                }
         }
     }
 
@@ -162,29 +155,24 @@ class ProjectManager: ObservableObject {
     }
 }
 
+enum StoringError: Error {
+    case couldNotSave
+}
+
 extension ProjectManager {
-    func createProject(_ project: Project, email: String, completion: @escaping () -> Void) {
-        guard !projects.contains(project) else { print("project duplicate"); return }
-        let inceptedCompletion = {
-            self.addProject(project)
-            completion()
-        }
-
-        createProjectOnServer(project, email: email, completion: inceptedCompletion)
-    }
-
-    func addProject(_ project: Project) -> Bool {
+    func addProject(_ project: Project) throws {
         guard storageService.saveProject(project: project) else {
-            return false
+            throw StoringError.couldNotSave
         }
-        projects = storageService.loadProjects()
+        DispatchQueue.main.async { [self] in
+            projects = storageService.loadProjects()
 
-        if projects.count == 1 {
-            setCurrentProject(project)
+            if projects.count == 1 {
+                setCurrentProject(project)
+            }
+            openedByURL = nil
+            print("project added")
         }
-        openedByURL = nil
-        print("project added")
-        return true
     }
 
     func deleteProject(_ project: Project) {
@@ -197,6 +185,8 @@ extension ProjectManager {
             if let nextProject = projects.first {
                 setCurrentProject(nextProject)
             }
+        } else {
+            currentProject = demoProject
         }
     }
 
@@ -204,18 +194,18 @@ extension ProjectManager {
         projects.forEach { deleteProject($0) }
     }
 
-    func prepareUITest() {
+    func prepareUITest() throws {
         projects.forEach { deleteProject($0) }
-        addProject(demoProject)
+        try addProject(demoProject)
     }
 
-    func saveBill(_ bill: Bill) async {
-        if bill.id != -1, currentProject.bills.contains(where: {
+    func saveBill(_ bill: Bill, completion: @escaping () -> Void) {
+        if bill.id != -1, let _ = currentProject.bills.firstIndex(where: {
             $0.id == bill.id
         }) {
-            await createBill(bill: bill)
+            sendBillToServer(bill: bill, update: true, completion: completion)
         } else {
-            await updateBill(bill: bill)
+            sendBillToServer(bill: bill, update: false, completion: completion)
         }
     }
 
@@ -248,5 +238,9 @@ extension ProjectManager {
         currentProject = project
         loadBillsAndMembers()
         defaults.set(project.id, forKey: "projectID")
+    }
+
+    func updateProject(project: Project) {
+        storageService.updateProject(project: project)
     }
 }

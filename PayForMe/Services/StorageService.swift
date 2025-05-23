@@ -1,9 +1,8 @@
 //
 //  StorageService.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 22.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Foundation
@@ -22,8 +21,9 @@ class StorageService {
 
     init() {
         do {
-            dbQueue = try DatabaseQueue(path: databasePath.appendingPathComponent("payforme.sqlite").path)
-            try dbQueue.write { db in
+            var migrator = DatabaseMigrator()
+
+            migrator.registerMigration("v1", migrate: { db in
                 try db.create(table: "storedProject", ifNotExists: true) { table in
                     table.autoIncrementedPrimaryKey("id")
                     table.column("name")
@@ -31,7 +31,25 @@ class StorageService {
                     table.column("url")
                     table.column("backend")
                 }
+            })
+            migrator.registerMigration("v2", migrate: { db in
+                try db.alter(table: "storedProject", body: { table in
+                    table.add(column: "token")
+                })
+                try db.execute(sql: "UPDATE storedProject SET token = name;")
+
+            })
+            migrator.registerMigration("v3") { db in
+                try db.alter(table: "storedProject", body: { table in
+                    table.add(column: "me")
+                })
             }
+            // #if DEBUG
+            //// Speed up development by nuking the database when migrations change
+            // migrator.eraseDatabaseOnSchemaChange = true
+            // #endif
+            dbQueue = try DatabaseQueue(path: databasePath.appendingPathComponent("payforme.sqlite").path)
+            try migrator.migrate(dbQueue)
         } catch {
             print("Storage couldn't be initialized \(error.localizedDescription)")
             fatalError()
@@ -56,6 +74,21 @@ class StorageService {
         } catch {
             print("Couldn't store projects \(error.localizedDescription)")
             return false
+        }
+    }
+
+    func updateProject(project: Project) {
+        let storedProject = StoredProject(project: project)
+        do {
+            _ = try dbQueue.write { db -> Bool in
+                if try StoredProject.fetchAll(db).contains(storedProject) {
+                    try storedProject.save(db)
+                    return true
+                }
+                return false
+            }
+        } catch {
+            print("Couldn't updates projects \(error.localizedDescription)")
         }
     }
 
@@ -120,6 +153,6 @@ private class OldProject: Codable, Identifiable {
     var bills: [Bill]
 
     func toProject() -> StoredProject {
-        return StoredProject(name: name, password: password, url: url, backend: backend)
+        return StoredProject(name: name, password: password, token: name, url: url, backend: backend)
     }
 }

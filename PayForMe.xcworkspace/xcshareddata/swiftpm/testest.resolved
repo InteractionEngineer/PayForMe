@@ -1,0 +1,34 @@
+{
+  "object" : {
+  "pins" : [
+    {
+      "identity" : "carbode-barcode-scanner-for-swiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
+      "state" : {
+        "revision" : "6167624ec47174900434f1c03dfa0b2dd5d19c0d",
+        "version" : "2.2.3"
+      }
+    },
+    {
+      "identity" : "grdb.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/groue/GRDB.swift.git",
+      "state" : {
+        "revision" : "fead2ea634c1bf7dd81a3e02f796154992165ffd",
+        "version" : "5.24.0"
+      }
+    },
+    {
+      "identity" : "slickloadingspinner",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Hustenbonbon/SlickLoadingSpinner.git",
+      "state" : {
+        "revision" : "c1b125fabf245717df0a44655cd8a96b603ee55e",
+        "version" : "2.0.1"
+      }
+    }
+  ],
+  }
+  "version" : 1
+}

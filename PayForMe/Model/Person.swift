@@ -1,9 +1,8 @@
 //
 //  Person.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 26.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Foundation
@@ -36,4 +35,12 @@ let previewPersons = [
     2: Person(id: 2, weight: 1, name: "Schiggy", activated: true, color: PersonColor(r: 60, g: 110, b: 186)),
     3: Person(id: 3, weight: 1, name: "Bisasam", activated: true),
     4: Person(id: 4, weight: 1, name: "Glumanda", activated: true),
+]
+let previewManyPersons = [
+    1: previewPerson,
+    2: Person(id: 2, weight: 1, name: "Schiggy", activated: true, color: PersonColor(r: 60, g: 110, b: 186)),
+    3: Person(id: 3, weight: 1, name: "Bisasam", activated: true),
+    4: Person(id: 4, weight: 1, name: "Glumanda", activated: true),
+    5: Person(id: 5, weight: 1, name: "Fukano", activated: true),
+    6: Person(id: 6, weight: 1, name: "Relaxo", activated: true),
 ]

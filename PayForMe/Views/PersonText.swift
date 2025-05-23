@@ -1,9 +1,8 @@
 //
 //  PersonText.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 20.02.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import SwiftUI

@@ -1,34 +1,33 @@
 {
-  "object": {
-    "pins": [
-      {
-        "package": "CarBode",
-        "repositoryURL": "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
-        "state": {
-          "branch": null,
-          "revision": "4c1c711ed29f1d7f7cda558c2dc90bfcb4a0f916",
-          "version": "2.0.1"
-        }
-      },
-      {
-        "package": "GRDB",
-        "repositoryURL": "https://github.com/groue/GRDB.swift.git",
-        "state": {
-          "branch": null,
-          "revision": "948e91126a70ae703e5fe600ca3183161009bc4b",
-          "version": "5.0.2"
-        }
-      },
-      {
-        "package": "SlickLoadingSpinner",
-        "repositoryURL": "https://github.com/Hustenbonbon/SlickLoadingSpinner.git",
-        "state": {
-          "branch": null,
-          "revision": "c1b125fabf245717df0a44655cd8a96b603ee55e",
-          "version": "2.0.1"
-        }
+  "originHash" : "07ab1d97001a5cb88c6ba268e55e0b0c409783fd7807f68a8d37691c1887acd1",
+  "pins" : [
+    {
+      "identity" : "carbode-barcode-scanner-for-swiftui",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/heart/CarBode-Barcode-Scanner-For-SwiftUI",
+      "state" : {
+        "revision" : "d0192bd6ccc61e426eb7a301f16521f1da05dc66",
+        "version" : "2.2.4"
       }
-    ]
-  },
-  "version": 1
+    },
+    {
+      "identity" : "grdb.swift",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/groue/GRDB.swift.git",
+      "state" : {
+        "revision" : "04e73c26c4ce8218ab85aaf791942bb0b204f330",
+        "version" : "7.4.1"
+      }
+    },
+    {
+      "identity" : "slickloadingspinner",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/Hustenbonbon/SlickLoadingSpinner.git",
+      "state" : {
+        "revision" : "c1b125fabf245717df0a44655cd8a96b603ee55e",
+        "version" : "2.0.1"
+      }
+    }
+  ],
+  "version" : 3
 }

@@ -1,9 +1,8 @@
 //
 //  OnboardingView.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 21.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Combine
@@ -27,10 +26,17 @@ struct AddProjectManualView: View {
             .pickerStyle(SegmentedPickerStyle())
             .padding(EdgeInsets(top: 8, leading: 8, bottom: 0, trailing: 8))
             if viewmodel.projectType == .cospend {
-                Button("Paste Link") {
-                    pasteLink()
+                if #available(iOS 16.0, *) {
+                    PasteButton(payloadType: String.self) { strings in
+                        pasteLink(pasteString: strings[0])
+                    }
+                    .padding(.top, 10)
+                } else {
+                    Button("Paste Link") {
+                        pasteLink()
+                    }
+                    .padding(.top, 10)
                 }
-                .padding(.top, 10)
             }
             Form {
                 Section(
@@ -74,6 +80,10 @@ struct AddProjectManualView: View {
     func addButton() {
         viewmodel.addProject()
         presentationMode.wrappedValue.dismiss()
+    }
+    
+    private func pasteLink(pasteString: String) {
+        viewmodel.pasteAddress(address: pasteString)
     }
 
     private func pasteLink() {

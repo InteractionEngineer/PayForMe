@@ -5,8 +5,14 @@
 
 "Add Project" = "Přidat projekt";
 
+/*  */
+"Add a default payer for new bills (e.g. yourself)" = "Přidání výchozího plátce pro nové účty (např. sebe).";
+
 /* AddMemberView.swift */
 "Add member" = "Přidat člena";
+
+/*  */
+"Add project" = "Přidat projekt";
 
 
 "All" = "Vše";
@@ -17,6 +23,9 @@
 
 "Bills" = "Účty";
 
+/*  */
+"Changed date" = "Změněné datum";
+
 
 "Cospend is a NextCloud app" = "Cospend je NextCloud aplikace";
 
@@ -25,6 +34,9 @@
 
 
 "Create Bill" = "Vytvořit účet";
+
+/*  */
+"Date" = "Datum";
 
 
 "Delete" = "Smazat";
@@ -43,6 +55,12 @@
 
 
 "Enter project password" = "Zadejte heslo k projektu";
+
+/*  */
+"Expense date" = "Datum výdaje";
+
+/*  */
+"Finding Server" = "Vyhledání serveru";
 
 
 "Go to settings" = "Jít do nastavení";
@@ -68,15 +86,20 @@
 
 "Owers" = "Dlužníci";
 
+
+"Paste Link" = "Vložit odkaz";
+
 /* BillDetail.swift */
 "Payer" = "Plátce";
 
 /* ProjectQRPermissionCheckerView.swift */
 "Please allow us to use the camera in order to scan the Cospend QR code" = "Pokud chcete naskenovat QR kód z Cospend, povolte použití kamery zařízení";
 
-"Projects" = "Projekty";
 
 "Project ID & Password" = "Identif. projektu a heslo";
+
+
+"Projects" = "Projekty";
 
 /* AddProjectQRView.swift */
 "Scan the Cospend QR code to proceed" = "Pokud chcete pokračovat, naskenujte QR kód z Cospend";

@@ -3,11 +3,11 @@
 //  PayForMe
 //
 //  Created by Max Tharr on 02.10.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Combine
 import Foundation
+import GRDB
 import SlickLoadingSpinner
 import SwiftUI
 
@@ -48,25 +48,34 @@ class AddProjectQRViewModel: ObservableObject {
                 .compactMap { $0.isEmpty ? nil : $0 }
                 .removeDuplicates()
         )
-        .map { url, name, password in
+        .map { url, token, password in
             self.isTestingSubject.send(.connecting)
-            print("\(url) \(name) \(password)")
-            return Project(name: name, password: password, backend: .cospend, url: url)
+            print("\(url) \(token) \(password)")
+            return Project(name: "", password: password, token: token, backend: .cospend, url: url)
         }
         .flatMap { project in
-            NetworkService.shared.foundProjectStatusCode(project)
+            NetworkService.shared.testProject(project)
         }
-        .map { project, statusCode in
+        .tryMap { project, statusCode in
             if statusCode == 200 {
-                ProjectManager.shared.addProject(project)
-                return withAnimation {
-                    .success
+                do {
+                    try ProjectManager.shared.addProject(project)
+                    return withAnimation {
+                        .success
+                    }
+                } catch {
+                    print(error)
+                    return withAnimation {
+                        .failure
+                    }
                 }
             }
+            print("fail")
             return withAnimation {
                 .failure
             }
         }
+        .replaceError(with: withAnimation { .failure })
         .eraseToAnyPublisher()
     }
 
@@ -84,27 +93,39 @@ class AddProjectQRViewModel: ObservableObject {
         foundCode
             .sink { codedUrl in
                 let projectData = codedUrl.decodeQRCode()
-                guard let url = projectData.server, let name = projectData.project else { return }
+                guard let url = projectData.server, let token = projectData.project else { return }
                 if let password = projectData.passwd {
                     self.isTestingSubject.send(.connecting)
-                    let project = Project(name: name, password: password, backend: .cospend, url: url)
-                    NetworkService.shared.foundProjectStatusCode(project)
-                        .asUIPublisher
-                        .sink(receiveValue: {
-                            project, code in
-                            if code == 200 {
-                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now().advanced(by: .seconds(1))) {
-                                    ProjectManager.shared.addProject(project)
-                                }
-                                self.isTestingSubject.send(.success)
-                            } else {
-                                self.isTestingSubject.send(.failure)
-                            }
-                        }).store(in: &self.subscriptions)
+                    let project = Project(name: token, password: password, token: token, backend: .cospend, url: url)
+                    Task(priority: .userInitiated) {
+                        do {
+                            let apiProject = try await NetworkService.shared.getProjectName(project)
+                            try ProjectManager.shared.addProject(apiProject)
+                            self.isTestingSubject.send(.success)
+                        } catch {
+                            print(codedUrl)
+                            print()
+                            print(error)
+                            self.isTestingSubject.send(.failure)
+                        }
+                    }
+//                    NetworkService.shared.testProject(project)
+//                        .asUIPublisher
+//                        .sink(receiveValue: {
+//                            project, code in
+//                            if code == 200 {
+//                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now().advanced(by: .seconds(1))) {
+//                                    ProjectManager.shared.addProject(project)
+//                                }
+//                                self.isTestingSubject.send(.success)
+//                            } else {
+//                                self.isTestingSubject.send(.failure)
+//                            }
+//                        }).store(in: &self.subscriptions)
                 } else {
                     withAnimation {
                         self.url = url
-                        self.name = name
+                        self.name = token
                         self.askForPassword.toggle()
                     }
                 }

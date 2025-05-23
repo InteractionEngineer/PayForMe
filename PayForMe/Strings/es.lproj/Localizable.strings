@@ -5,6 +5,9 @@
 
 "Add Project" = "Añadir el proyecto";
 
+/*  */
+"Add a default payer for new bills (e.g. yourself)" = "Añadir un pagador por defecto para las nuevas facturas (por ejemplo, usted mismo)";
+
 
 "Add member" = "Añadir un membro";
 
@@ -18,7 +21,10 @@
 "Bills" = "Cuentas";
 
 /*  */
-"Cospend is a NextCloud app" = "";
+"Changed date" = "Fecha modificada";
+
+/*  */
+"Cospend is a NextCloud app" = "Cospend es una aplicación de NextCloud";
 
 
 "Could not find server" = "Servidor no encontrado";
@@ -26,8 +32,17 @@
 
 "Create Bill" = "Crear la factura";
 
+/*  */
+"Date" = "Fecha";
+
 
 "Delete" = "Eliminar";
+
+/*  */
+"Delete Bill" = "Borrar factura";
+
+/*  */
+"Do you really want to erase the bill from the server?" = "¿De verdad quieres borrar la factura del servidor?";
 
 
 "Edit Bill" = "Editar la factura";
@@ -38,11 +53,20 @@
 
 "Enter project password" = "Entrar la contraseña del proyecto";
 
+/*  */
+"Expense date" = "Fecha de gasto";
+
 
 "Finding Server" = "Encontrando el proyecto";
 
+/*  */
+"Go to settings" = "Ir a la configuración";
+
 
 "How much" = "¿Cuanto?";
+
+/*  */
+"If you want to scan your project as a QR code, you need to allow this app to use your camera. Otherwise please navigate back and fill out the information manually." = "Si desea escanear su proyecto como un código QR, debe permitir que esta aplicación utilice su cámara. De lo contrario, vuelve atrás y rellena la información manualmente.";
 
 
 "Known Projects" = "Lista de proyectos";
@@ -60,12 +84,24 @@
 "Owers" = "Prestatarios";
 
 
+"Paste Link" = "Pegar enlace";
+
+
 "Payer" = "Pagador";
+
+/*  */
+"Please allow us to use the camera in order to scan the Cospend QR code" = "Permítanos utilizar la cámara para escanear el código QR de Cospend.";
 
 
 "Project ID & Password" = "ID del proyecto y contraseña";
 
-/* 
+/*  */
+"Projects" = "Proyectos";
+
+/*  */
+"Scan the Cospend QR code to proceed" = "Escanee el código QR de Cospend para continuar";
+
+/*
   Localizable.strings
   PayForMe
 
@@ -74,14 +110,35 @@
  */
 "Server Address" = "Dirreción del servidor";
 
+/*  */
+"Server Address (Optional)" = "Dirección del servidor (opcional)";
+
 
 "Submit" = "Seguir";
+
+/*  */
+"Sure" = "Claro";
+
+/*  */
+"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually." = "Para empezar a compartir gastos con amigos, debes añadir un proyecto de Cospend o iHateMoney. \Los proyectos de Cospend se pueden añadir mediante un código QR o rellenando manualmente la información, para iHateMoney es necesario rellenar la información manualmente.";
+
+/*  */
+"To use iHateMoney, host an own instance or register at" = "Para utilizar iHateMoney, aloje una instancia propia o regístrese en";
+
+/*  */
+"Type password here" = "Escriba aquí la contraseña";
+
+/*  */
+"URL wrong, please scan right barcode" = "URL incorrecta, por favor, escanee el código de barras correcto";
 
 
 "Unauthorized: Wrong project id/pw" = "No autorizado: Proyecto o contraseña invorrecta";
 
 
 "Update Bill" = "Actualizar la factura";
+
+/*  */
+"Welcome to PayForMe!" = "¡Bienvenido a PayForMe!";
 
 
 "What was paid" = "¿Qué se pagó?";

@@ -2,29 +2,22 @@
 
 # A list of devices you want to take the screenshots from
 devices([
-  "iPhone 8 Plus",
-  "iPhone 12 Pro Max"
+  "iPhone 16"
 ])
 
 workspace("PayForMe.xcworkspace")
 
-scheme("PayForMeUITests")
-
-ios_version("14.2")
+ios_version("18.4")
 
 languages([
-  "en-US",
-  "de-DE",
-  "fr-FR",
-  "es-ES"
-#  ["pt", "pt_BR"] # Portuguese with Brazilian locale
+  "en-US"
 ])
 
 # The name of the scheme which contains the UI Tests
 scheme("PayForMeUITests")
 
 # Where should the resulting screenshots be stored?
-# output_directory("./screenshots")
+output_directory("./screenshots")
 
 # remove the '#' to clear all previously generated screenshots before creating new ones
 clear_previous_screenshots(true)

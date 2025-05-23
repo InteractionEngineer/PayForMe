@@ -1,9 +1,8 @@
 //
 //  ServerList.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 22.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import AVFoundation
@@ -21,7 +20,7 @@ struct ProjectList: View {
             VStack {
                 List {
                     ForEach(manager.projects) { project in
-                        listRow(project: project)
+                        ProjectListEntry(project: project, currentProject: manager.currentProject, shareProject: self.$shareProject)
                     }
                     .onDelete(perform: deleteProject)
                 }
@@ -56,33 +55,6 @@ struct ProjectList: View {
         .navigationViewStyle(StackNavigationViewStyle())
     }
 
-    private func listRow(project: Project) -> some View {
-        Button(action: {
-            self.manager.setCurrentProject(project)
-        }, label: {
-            HStack {
-                VStack(alignment: .leading) {
-                    Text(project.name)
-                    Text(project.backend == .cospend ? "Cospend" : "iHateMoney").font(.caption).foregroundColor(Color.gray)
-                }
-                if self.manager.currentProject == project {
-                    Image(systemName: "checkmark").padding(.trailing)
-                }
-                Spacer()
-                if project.backend == .cospend {
-                    Button(action: {
-                        self.shareProject = project
-                    }, label: {
-                        HStack(spacing: 5) {
-                            Image(systemName: "square.and.arrow.up")
-                            Image(systemName: "qrcode")
-                        }
-                    })
-                }
-            }
-        })
-    }
-
     private enum AddingProjectMethod: Int, CaseIterable, Identifiable {
         var id: Int {
             switch self {
@@ -96,8 +68,10 @@ struct ProjectList: View {
     }
 
     func deleteProject(at offsets: IndexSet) {
-        for index in offsets {
-            manager.deleteProject(manager.projects[index])
+        DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(500)) {
+            for index in offsets {
+                manager.deleteProject(manager.projects[index])
+            }
         }
     }
 
@@ -108,9 +82,6 @@ struct ProjectList: View {
 
 struct ServerList_Previews: PreviewProvider {
     static var previews: some View {
-        ProjectManager.shared.addProject(previewProjects[0])
-        ProjectManager.shared.addProject(previewProjects[1])
-        ProjectManager.shared.addProject(previewProjects[2])
         return ProjectList()
     }
 }

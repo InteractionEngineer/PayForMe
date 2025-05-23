@@ -1,9 +1,8 @@
 //
 //  BalanceList.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 29.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import SwiftUI
@@ -21,7 +20,6 @@ struct BalanceList: View {
     var body: some View {
         NavigationView {
             mainView
-                .navigationBarItems(trailing: !addingUser ? FancyButton(add: true, action: showAddUser, text: "") : nil)
                 .navigationBarTitle("Members")
                 .onAppear {
                     ProjectManager.shared.loadBillsAndMembers()
@@ -29,6 +27,7 @@ struct BalanceList: View {
         }.navigationViewStyle(StackNavigationViewStyle())
     }
 
+    @ViewBuilder
     var mainView: some View {
         VStack(alignment: .center) {
             if addingUser {
@@ -39,6 +38,7 @@ struct BalanceList: View {
         }
     }
 
+    @ViewBuilder
     var list: some View {
         List {
             ForEach(viewModel.balances.sorted(by: balanceSort(_:_:))) {
@@ -89,7 +89,7 @@ struct BalanceList_Previews: PreviewProvider {
         let vm = BalanceViewModel()
         vm.currentProject = previewProject
         vm.setBalances()
-        return BalanceList(viewModel: vm, addingUser: true)
+        return BalanceList(viewModel: vm, addingUser: false)
     }
 }
 

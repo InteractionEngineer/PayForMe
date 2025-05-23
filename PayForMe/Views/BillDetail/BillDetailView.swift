@@ -1,9 +1,8 @@
 //
 //  AddBillView.swift
-//  iWontPayAnyway
+//  PayForMe
 //
 //  Created by Max Tharr on 23.01.20.
-//  Copyright © 2020 Mayflower GmbH. All rights reserved.
 //
 
 import Combine
@@ -37,7 +36,7 @@ struct BillDetailView: View {
         VStack {
             Form {
                 Section(header: Text("Payer")) {
-                    WhoPaidView(members: Array(viewModel.currentProject.members.values), selectedPayer: self.$viewModel.selectedPayer).onAppear {
+                    WhoPaidView(members: Array(viewModel.currentProject.members.values).sorted{ $0.name < $1.name }, selectedPayer: self.$viewModel.selectedPayer).onAppear {
                         if self.viewModel.currentProject.members[self.viewModel.selectedPayer] == nil {
                             guard let id = self.viewModel.currentProject.members.first?.key else { return }
                             self.viewModel.selectedPayer = id
@@ -45,6 +44,11 @@ struct BillDetailView: View {
                     }
                     TextField("What was paid", text: self.$viewModel.topic)
                     TextField("How much", text: self.$viewModel.amount).keyboardType(.decimalPad)
+                }
+                Section(header: Text("Date")) {
+                    DatePicker(selection: self.$viewModel.billDate, displayedComponents: [.date]) {
+                        Label("Bill date", systemImage: "calendar").labelStyle(.iconOnly)
+                    }
                 }
                 Section(header: Text("Owers")) {
                     PotentialOwersView(vm: viewModel.povm)
@@ -57,7 +61,6 @@ struct BillDetailView: View {
                 }
                 .padding()
         }
-        .background(Color.PFMBackground)
         .navigationBarTitle(navBarTitle, displayMode: .inline)
     }
 

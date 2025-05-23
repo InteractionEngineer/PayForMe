@@ -1,17 +1,26 @@
 # PayForMe
 iOS client for Cospend on Nextcloud & iHateMoney.org
-Download from the [Apple App Store](https://apps.apple.com/us/app/payforme/id1500428306?l=de&ls=1)
+
+Download from the [Apple App Store](https://apps.apple.com/us/app/payforme/id1500428306?l=de&ls=1).
+
+Open beta with new features via [TestFlight](https://testflight.apple.com/join/nCDuHtjh).
 
 Using SwiftUI and Combine.
-Inspired by Moneybuster (https://gitlab.com/eneiluj/moneybuster).
+Inspired by [Moneybuster](https://gitlab.com/eneiluj/moneybuster).
 
-We are currently in a kind of "open beta" v1.0 All basic functionality should work, but we are not completely stable with everthing. If you find something, please create an issue or write a mail to hustenbonbon@posteo.de!
-Contributions of all kind are welcome, please get in touch with us!
+## Open Source
+PayForMe is an open source project, which means the code is freely available and anyone can contribute to its development. The project is developed in my free time and contributions are always welcome!
 
-# Screenshots
+Ways to contribute:
+* Report bugs or suggest features via [GitHub Issues](https://github.com/InteractionEngineer/PayForMe/issues)
+* Help with localization (see below)
+* Submit code improvements through Pull Requests
+* Share the app with others who might find it useful
 
-<img src="/screenshots/lightmode/en-US/iPhone%2011-Bill%20List_framed.png?raw=true" width="200"/> <img src="/screenshots/lightmode/en-US/iPhone%2011-Balance%20List_framed.png?raw=true" width="200"/> <img src="/screenshots/lightmode/en-US/iPhone%2011-Known%20Projects_framed.png?raw=true" width="200"/> <img src="/screenshots/lightmode/en-US/iPhone%2011-Add%20Bill_framed.png?raw=true" width="200"/>
-<img src="/screenshots/darkmode/en-US/iPhone%2011-Bill%20List_framed.png?raw=true" width="200"/> <img src="/screenshots/darkmode/en-US/iPhone%2011-Balance%20List_framed.png?raw=true" width="200"/> <img src="/screenshots/darkmode/en-US/iPhone%2011-Known%20Projects_framed.png?raw=true" width="200"/> <img src="/screenshots/darkmode/en-US/iPhone%2011-Add%20Bill_framed.png?raw=true" width="200"/>
+## Screenshots
+
+<img src="/screenshots/lightmode/en-US/iPhone%2016-Bill%20List_framed.png?raw=true" width="200"/> <img src="/screenshots/lightmode/en-US/iPhone%2016-Balance%20List_framed.png?raw=true" width="200"/> <img src="/screenshots/lightmode/en-US/iPhone%2016-Known%20Projects_framed.png?raw=true" width="200"/> <img src="/screenshots/lightmode/en-US/iPhone%2016-Add%20Bill_framed.png?raw=true" width="200"/>
+<img src="/screenshots/darkmode/en-US/iPhone%2016-Bill%20List_framed.png?raw=true" width="200"/> <img src="/screenshots/darkmode/en-US/iPhone%2016-Balance%20List_framed.png?raw=true" width="200"/> <img src="/screenshots/darkmode/en-US/iPhone%2016-Known%20Projects_framed.png?raw=true" width="200"/> <img src="/screenshots/darkmode/en-US/iPhone%2016-Add%20Bill_framed.png?raw=true" width="200"/>
 
 ## Features
 * Show listed bills
@@ -22,17 +31,12 @@ Contributions of all kind are welcome, please get in touch with us!
 * Update bills
 * Delete bills
 * Clearing debt of single members
-* C̵r̵e̵a̵t̵i̵n̵g̵ ̵n̵e̵w̵ ̵p̵r̵o̵j̵e̵c̵t̵s̵ ̵o̵n̵ ̵i̵H̵a̵t̵e̵M̵o̵n̵e̵y̵
+* ~Creating new projects on iHateMoney~
 * Adding new members to a project
 
 
-# How to contribute Localization
+## How to contribute Localization
 
-If you want to localize PayForMe into your language you are very welcome! Here is a short guide how, if you localized another iOS app you should find it familiar.
+If you want to localize PayForMe into your language you are very welcome! If unfamiliar, here is a short guide:
 
-## MacOS way
-
-If you are using MacOS, there is an awesome helper app called [LocalizationEditor](https://github.com/igorkulman/iOSLocalizationEditor).
-
-To add a new localization, fork the project on github, download it, open it in XCode and then navigate to the Project/Info settings, and add a new localization file there. It is recommended, but not necessary to use LocalizationHelper then to easily translate all strings. Afterwards, commit and push you changes and open a pull request to the main repository.
-
+To add a new localization, fork the project on github, download it, open it in XCode and then navigate to the Project/Info settings, and add a new localization file there. It is recommended but not necessary to use [iOSLocalizationEditor](https://github.com/igorkulman/iOSLocalizationEditor) then to easily translate all strings. Afterwards, commit and push you changes and open a pull request to the main repository.
