@@ -10,7 +10,7 @@ import XCTest
 
 class UrlExtensionsTests: XCTestCase {
     func testCospendStringDecoding() throws {
-        let url = URL(string: "cospend://myserver.de/myproject/mypassword")!
+        let url = URL(string: "cospend://myserver.de/myproject/no-pass")!
 
         let (server, project, password) = url.decodeCospendString()
         XCTAssertNotNil(server)
@@ -19,22 +19,53 @@ class UrlExtensionsTests: XCTestCase {
 
         if let server = server, let password = password, let project = project {
             XCTAssertEqual(server.absoluteString, "https://myserver.de")
-            XCTAssertEqual(password, "mypassword")
             XCTAssertEqual(project, "myproject")
+            XCTAssertEqual(password, "no-pass")
         }
     }
 
-    func testCospendStringDecodingNoPW() throws {
-        let url = URL(string: "cospend://myserver.de/myproject")!
+    func testCospendStringDecodingForSubfolders() throws {
+        let url = URL(string: "cospend://myserver.de/folder1/folder2/myproject/mypassword")!
 
         let (server, project, password) = url.decodeCospendString()
         XCTAssertNotNil(server)
         XCTAssertNotNil(project)
-        XCTAssertNil(password)
+        XCTAssertNotNil(password)
 
-        if let server = server, let project = project {
-            XCTAssertEqual(server.absoluteString, "https://myserver.de")
+        if let server = server, let password = password, let project = project {
+            XCTAssertEqual(server.absoluteString, "https://myserver.de/folder1/folder2")
             XCTAssertEqual(project, "myproject")
+            XCTAssertEqual(password, "mypassword")
+        }
+    }
+
+    func testCospendStringDecodingForSubdomains() throws {
+        let url = URL(string: "cospend://subdomain.myserver.de/myproject/mypassword")!
+
+        let (server, project, password) = url.decodeCospendString()
+        XCTAssertNotNil(server)
+        XCTAssertNotNil(project)
+        XCTAssertNotNil(password)
+
+        if let server = server, let password = password, let project = project {
+            XCTAssertEqual(server.absoluteString, "https://subdomain.myserver.de")
+            XCTAssertEqual(project, "myproject")
+            XCTAssertEqual(password, "mypassword")
+        }
+    }
+
+    func testCospendStringDecodingForNonStandardPort() throws {
+        let url = URL(string: "cospend://myserver.de:1234/myproject/mypassword")!
+
+        let (server, project, password) = url.decodeCospendString()
+        XCTAssertNotNil(server)
+        XCTAssertNotNil(project)
+        XCTAssertNotNil(password)
+
+        if let server = server, let password = password, let project = project {
+            XCTAssertEqual(server.absoluteString, "https://myserver.de:1234")
+            XCTAssertEqual(project, "myproject")
+            XCTAssertEqual(password, "mypassword")
         }
     }
 
