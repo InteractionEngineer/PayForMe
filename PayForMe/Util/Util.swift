@@ -217,7 +217,7 @@ extension URL {
 }
 
 // Why is URL an identifier but not identifiable?
-extension URL: Identifiable {
+extension URL: @retroactive Identifiable {
     public var id: URL {
         self
     }

@@ -32,9 +32,23 @@ class NetworkService {
     func loadBillsPublisher(_ project: Project) -> AnyPublisher<[Bill], Never> {
         let request = buildURLRequest("bills", params: [:], project: project)
         return URLSession.shared.dataTaskPublisher(for: request)
+            .handleEvents(
+                receiveSubscription: { _ in
+                    self.networkActivityPublisher.send(true)
+                },
+                receiveCompletion: { _ in
+                    self.networkActivityPublisher.send(false)
+                }
+            )
             .compactMap { data, response -> Data? in
-                guard let httpResponse = response as? HTTPURLResponse else { print("Network Error"); return nil }
-                guard httpResponse.statusCode == 200 else { print("Network Error: Status code: \(httpResponse.statusCode) \(httpResponse.description)"); return nil }
+                guard let httpResponse = response as? HTTPURLResponse else { 
+                    print("Network Error: No HTTP response")
+                    return nil 
+                }
+                guard httpResponse.statusCode == 200 else { 
+                    print("Network Error: Status code: \(httpResponse.statusCode) \(httpResponse.description)")
+                    return nil 
+                }
                 return data
             }
             .decode(type: [Bill].self, decoder: decoder)
@@ -55,9 +69,23 @@ class NetworkService {
     func loadMembersPublisher(_ project: Project) -> AnyPublisher<[Int: Person], Never> {
         let request = buildURLRequest("members", params: [:], project: project)
         return URLSession.shared.dataTaskPublisher(for: request)
+            .handleEvents(
+                receiveSubscription: { _ in
+                    self.networkActivityPublisher.send(true)
+                },
+                receiveCompletion: { _ in
+                    self.networkActivityPublisher.send(false)
+                }
+            )
             .compactMap { data, response -> Data? in
-                guard let httpResponse = response as? HTTPURLResponse else { print("Network Error"); return nil }
-                guard httpResponse.statusCode == 200 else { print("Network Error: Status code: \(httpResponse.statusCode) \(httpResponse.description)"); return nil }
+                guard let httpResponse = response as? HTTPURLResponse else { 
+                    print("Network Error: No HTTP response")
+                    return nil 
+                }
+                guard httpResponse.statusCode == 200 else { 
+                    print("Network Error: Status code: \(httpResponse.statusCode) \(httpResponse.description)")
+                    return nil 
+                }
                 return data
             }
             .decode(type: [Person].self, decoder: decoder)
@@ -69,6 +97,66 @@ class NetworkService {
                 }
                 return Dictionary(filtered.map { ($0.id, $0) }) { a, _ in a }
             }
+            .eraseToAnyPublisher()
+    }
+    
+    // MARK: - Result-based publishers for offline handling
+    
+    func loadBillsWithStatusPublisher(_ project: Project) -> AnyPublisher<Result<[Bill], Error>, Never> {
+        let request = buildURLRequest("bills", params: [:], project: project)
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .handleEvents(
+                receiveSubscription: { _ in
+                    self.networkActivityPublisher.send(true)
+                },
+                receiveCompletion: { _ in
+                    self.networkActivityPublisher.send(false)
+                }
+            )
+            .tryMap { data, response -> [Bill] in
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw NetworkError.noResponse
+                }
+                guard httpResponse.statusCode == 200 else {
+                    throw NetworkError.statusCode(httpResponse.statusCode)
+                }
+                let bills = try self.decoder.decode([Bill].self, from: data)
+                return bills.sorted {
+                    if let l1 = $0.lastchanged, let l2 = $1.lastchanged {
+                        return l1 > l2
+                    }
+                    return $0.date > $1.date
+                }
+            }
+            .map { Result.success($0) }
+            .catch { Just(Result.failure($0)) }
+            .eraseToAnyPublisher()
+    }
+    
+    func loadMembersWithStatusPublisher(_ project: Project) -> AnyPublisher<Result<[Int: Person], Error>, Never> {
+        let request = buildURLRequest("members", params: [:], project: project)
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .handleEvents(
+                receiveSubscription: { _ in
+                    self.networkActivityPublisher.send(true)
+                },
+                receiveCompletion: { _ in
+                    self.networkActivityPublisher.send(false)
+                }
+            )
+            .tryMap { data, response -> [Int: Person] in
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    throw NetworkError.noResponse
+                }
+                guard httpResponse.statusCode == 200 else {
+                    throw NetworkError.statusCode(httpResponse.statusCode)
+                }
+                let members = try self.decoder.decode([Person].self, from: data)
+                let filtered = members.filter { $0.activated }
+                return Dictionary(filtered.map { ($0.id, $0) }) { a, _ in a }
+            }
+            .map { Result.success($0) }
+            .catch { Just(Result.failure($0)) }
             .eraseToAnyPublisher()
     }
 
@@ -195,9 +283,152 @@ class NetworkService {
 
         return request
     }
+    
+    // MARK: - Async/Await Methods for Sync
+    
+    func loadBills(_ project: Project) async throws -> [Bill] {
+        let request = buildURLRequest("bills", params: [:], project: project)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.noResponse
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            throw NetworkError.statusCode(httpResponse.statusCode)
+        }
+        
+        let bills = try decoder.decode([Bill].self, from: data)
+        return bills.sorted {
+            if let l1 = $0.lastchanged, let l2 = $1.lastchanged {
+                return l1 > l2
+            }
+            return $0.date > $1.date
+        }
+    }
+    
+    func loadMembers(_ project: Project) async throws -> [Int: Person] {
+        let request = buildURLRequest("members", params: [:], project: project)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.noResponse
+        }
+        
+        guard httpResponse.statusCode == 200 else {
+            throw NetworkError.statusCode(httpResponse.statusCode)
+        }
+        
+        let membersArray = try decoder.decode([Person].self, from: data)
+        return Dictionary(uniqueKeysWithValues: membersArray.map { ($0.id, $0) })
+    }
+    
+    func uploadBill(_ bill: Bill, to project: Project) async throws -> Int? {
+        let isUpdate = bill.id > 0 // Positive IDs are updates, negative are new
+        let endpoint = isUpdate ? "bills/\(bill.id)" : "bills"
+        let httpMethod = isUpdate ? "PUT" : "POST"
+        
+        let request = buildURLRequest(endpoint, params: bill.paramsFor(project.backend), project: project, httpMethod: httpMethod)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.noResponse
+        }
+        
+        guard httpResponse.statusCode == 200 || httpResponse.statusCode == 201 else {
+            throw NetworkError.statusCode(httpResponse.statusCode)
+        }
+        
+        // For new bills (POST), try to extract the server-assigned ID
+        if !isUpdate && httpResponse.statusCode == 201 {
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let serverId = json["id"] as? Int {
+                    return serverId
+                }
+            } catch {
+                print("Could not parse server response for new bill ID: \(error)")
+            }
+        }
+        
+        return nil
+    }
+    
+    func uploadMember(_ member: Person, to project: Project) async throws -> Int? {
+        let isUpdate = member.id > 0 // Positive IDs are updates, negative are new
+        let endpoint = isUpdate ? "members/\(member.id)" : "members"
+        let httpMethod = isUpdate ? "PUT" : "POST"
+        
+        var params: [String: Any] = [
+            "name": member.name,
+            "weight": member.weight
+        ]
+        if isUpdate {
+            params["id"] = member.id
+        }
+        
+        let request = buildURLRequest(endpoint, params: params, project: project, httpMethod: httpMethod)
+        let (data, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.noResponse
+        }
+        
+        guard httpResponse.statusCode == 200 || httpResponse.statusCode == 201 else {
+            throw NetworkError.statusCode(httpResponse.statusCode)
+        }
+        
+        // For new members (POST), try to extract the server-assigned ID
+        if !isUpdate && httpResponse.statusCode == 201 {
+            do {
+                if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
+                   let serverId = json["id"] as? Int {
+                    return serverId
+                }
+            } catch {
+                print("Could not parse server response for new member ID: \(error)")
+            }
+        }
+        
+        return nil
+    }
+    
+    func deleteBill(_ billId: Int, from project: Project) async throws {
+        let endpoint = "bills/\(billId)"
+        let request = buildURLRequest(endpoint, params: [:], project: project, httpMethod: "DELETE")
+        let (_, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.noResponse
+        }
+        
+        guard httpResponse.statusCode == 200 || httpResponse.statusCode == 204 else {
+            throw NetworkError.statusCode(httpResponse.statusCode)
+        }
+    }
+    
+    func deleteMember(_ memberId: Int, from project: Project) async throws {
+        let endpoint = "members/\(memberId)"
+        let request = buildURLRequest(endpoint, params: [:], project: project, httpMethod: "DELETE")
+        let (_, response) = try await URLSession.shared.data(for: request)
+        
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw NetworkError.noResponse
+        }
+        
+        guard httpResponse.statusCode == 200 || httpResponse.statusCode == 204 else {
+            throw NetworkError.statusCode(httpResponse.statusCode)
+        }
+    }
 
     enum HTTPError: LocalizedError {
         case statuscode
+    }
+    
+    enum NetworkError: Error {
+        case noResponse
+        case statusCode(Int)
+        case decodingError
     }
 
     enum ServerError: LocalizedError {

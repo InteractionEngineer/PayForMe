@@ -7,7 +7,41 @@
 
 import Foundation
 
-class Project: Codable, Identifiable {
+import Combine
+
+class Project: Identifiable, ObservableObject, Codable {
+    enum CodingKeys: String, CodingKey {
+        case name, password, token, url, id, backend, members, bills, me
+    }
+
+    required convenience init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        let name = try container.decode(String.self, forKey: .name)
+        let password = try container.decode(String.self, forKey: .password)
+        let token = try container.decode(String.self, forKey: .token)
+        let url = try container.decode(URL.self, forKey: .url)
+        let id = try container.decodeIfPresent(Int.self, forKey: .id)
+        let backend = try container.decode(ProjectBackend.self, forKey: .backend)
+        let members = try container.decode([Int: Person].self, forKey: .members)
+        let bills = try container.decode([Bill].self, forKey: .bills)
+        let me = try container.decodeIfPresent(Int.self, forKey: .me)
+        self.init(name: name, password: password, token: token, backend: backend, url: url, id: id, me: me)
+        self.members = members
+        self.bills = bills
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(name, forKey: .name)
+        try container.encode(password, forKey: .password)
+        try container.encode(token, forKey: .token)
+        try container.encode(url, forKey: .url)
+        try container.encode(id, forKey: .id)
+        try container.encode(backend, forKey: .backend)
+        try container.encode(members, forKey: .members)
+        try container.encode(bills, forKey: .bills)
+        try container.encode(me, forKey: .me)
+    }
     let name: String
     let password: String
     let token: String
@@ -15,8 +49,8 @@ class Project: Codable, Identifiable {
     let id: Int?
     let backend: ProjectBackend
 
-    var members: [Int: Person]
-    var bills: [Bill]
+    @Published var members: [Int: Person]
+    @Published var bills: [Bill]
     var me: Int?
 
     convenience init(name: String, password: String, token: String, backend: ProjectBackend, url: URL) {
@@ -30,8 +64,8 @@ class Project: Codable, Identifiable {
         self.backend = backend
         self.url = url
         self.id = id
-        members = [:]
-        bills = []
+        self.members = [:]
+        self.bills = []
         self.me = me
     }
 }

@@ -29,7 +29,9 @@ struct BalanceList: View {
 
     @ViewBuilder
     var mainView: some View {
-        VStack(alignment: .center) {
+        VStack(alignment: .center, spacing: 0) {
+            OfflineStatusView()
+            
             if addingUser {
                 AddMemberView(memberName: $memberName, addMemberAction: submitUser, cancelButtonAction: cancelAddUser)
             }
@@ -51,6 +53,9 @@ struct BalanceList: View {
                     BalanceCell(balance: balance)
                 }
             }
+        }
+        .refreshable {
+            await ProjectManager.shared.syncData()
         }
     }
 

@@ -46,6 +46,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneDidBecomeActive(_: UIScene) {
         // Called when the scene has moved from an inactive state to an active state.
         // Use this method to restart any tasks that were paused (or not yet started) when the scene was inactive.
+        
+        // Automatically sync data when app becomes active for transparent offline experience
+        Task {
+            await ProjectManager.shared.syncData()
+        }
     }
 
     func sceneWillResignActive(_: UIScene) {
@@ -56,6 +61,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_: UIScene) {
         // Called as the scene transitions from the background to the foreground.
         // Use this method to undo the changes made on entering the background.
+        
+        // Sync data when returning from background
+        Task {
+            await ProjectManager.shared.syncData()
+        }
     }
 
     func sceneDidEnterBackground(_: UIScene) {

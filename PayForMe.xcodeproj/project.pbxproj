@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+	BILLMERGE_TESTS_BUILD /* BillMergeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BILLMERGE_TESTS_REF /* BillMergeTests.swift */; };
 		481FB4FB23E964C8003BD108 /* ProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481FB4FA23E964C8003BD108 /* ProjectManager.swift */; };
 		481FB4FD23EAD78F003BD108 /* AddProjectManualViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481FB4FC23EAD78F003BD108 /* AddProjectManualViewModel.swift */; };
 		489995DA23F6EC6F008B7E38 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489995D923F6EC6F008B7E38 /* OnboardingView.swift */; };
@@ -27,6 +28,7 @@
 		654754BC2528750A00A82EB6 /* FloatingAddButtonViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754BB2528750A00A82EB6 /* FloatingAddButtonViewModifier.swift */; };
 		654754C0252889B200A82EB6 /* ProjectQRPermissionCheckerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754BF252889B200A82EB6 /* ProjectQRPermissionCheckerView.swift */; };
 		654754C8252899FF00A82EB6 /* FancyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754C7252899FF00A82EB6 /* FancyButton.swift */; };
+		654754CA25289A0200A82EB6 /* OfflineStatusView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754C925289A0200A82EB6 /* OfflineStatusView.swift */; };
 		654754E42528B29F00A82EB6 /* AddProjectManuallyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754E32528B29F00A82EB6 /* AddProjectManuallyTests.swift */; };
 		654754F22528BB7700A82EB6 /* ShareProjectQRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754F12528BB7600A82EB6 /* ShareProjectQRCode.swift */; };
 		655DD2AE2993DACB00E06675 /* ProjectListEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 655DD2AD2993DACB00E06675 /* ProjectListEntry.swift */; };
@@ -81,6 +83,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+	BILLMERGE_TESTS_REF /* BillMergeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillMergeTests.swift; sourceTree = "<group>"; };
 		481FB4FA23E964C8003BD108 /* ProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectManager.swift; sourceTree = "<group>"; };
 		481FB4FC23EAD78F003BD108 /* AddProjectManualViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectManualViewModel.swift; sourceTree = "<group>"; };
 		489995D923F6EC6F008B7E38 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -101,6 +104,7 @@
 		654754BB2528750A00A82EB6 /* FloatingAddButtonViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingAddButtonViewModifier.swift; sourceTree = "<group>"; };
 		654754BF252889B200A82EB6 /* ProjectQRPermissionCheckerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectQRPermissionCheckerView.swift; sourceTree = "<group>"; };
 		654754C7252899FF00A82EB6 /* FancyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyButton.swift; sourceTree = "<group>"; };
+		654754C925289A0200A82EB6 /* OfflineStatusView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OfflineStatusView.swift; sourceTree = "<group>"; };
 		654754E12528B29F00A82EB6 /* PayForMeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PayForMeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		654754E32528B29F00A82EB6 /* AddProjectManuallyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectManuallyTests.swift; sourceTree = "<group>"; };
 		654754E52528B29F00A82EB6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -204,6 +208,7 @@
 				6596D4E223ED9C520079DD5B /* BillDetail */,
 				65662A0623D7320000303207 /* ContentView.swift */,
 				654754C7252899FF00A82EB6 /* FancyButton.swift */,
+				654754C925289A0200A82EB6 /* OfflineStatusView.swift */,
 				650504A023FEA461000E5F9C /* PersonText.swift */,
 				48E7F75A2403FD6B000CE4E6 /* FancyLoadingButton.swift */,
 			);
@@ -213,9 +218,10 @@
 		654754E22528B29F00A82EB6 /* PayForMeTests */ = {
 			isa = PBXGroup;
 			children = (
-				654754E32528B29F00A82EB6 /* AddProjectManuallyTests.swift */,
-				654754E52528B29F00A82EB6 /* Info.plist */,
-				6523FC4B25580EEF00BCD843 /* UrlExtensionsTests.swift */,
+				   654754E32528B29F00A82EB6 /* AddProjectManuallyTests.swift */,
+				   654754E52528B29F00A82EB6 /* Info.plist */,
+				   6523FC4B25580EEF00BCD843 /* UrlExtensionsTests.swift */,
+				   BILLMERGE_TESTS_REF /* BillMergeTests.swift */,
 			);
 			path = PayForMeTests;
 			sourceTree = "<group>";
@@ -522,8 +528,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				654754E42528B29F00A82EB6 /* AddProjectManuallyTests.swift in Sources */,
-				6523FC4C25580EEF00BCD843 /* UrlExtensionsTests.swift in Sources */,
+				   654754E42528B29F00A82EB6 /* AddProjectManuallyTests.swift in Sources */,
+				   6523FC4C25580EEF00BCD843 /* UrlExtensionsTests.swift in Sources */,
+				   BILLMERGE_TESTS_BUILD /* BillMergeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -532,6 +539,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				654754C8252899FF00A82EB6 /* FancyButton.swift in Sources */,
+				654754CA25289A0200A82EB6 /* OfflineStatusView.swift in Sources */,
 				656E8CB423D9C3DA00B3ED10 /* BillDetailView.swift in Sources */,
 				481FB4FB23E964C8003BD108 /* ProjectManager.swift in Sources */,
 				654754F22528BB7700A82EB6 /* ShareProjectQRCode.swift in Sources */,

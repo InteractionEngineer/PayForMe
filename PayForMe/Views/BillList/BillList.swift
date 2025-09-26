@@ -16,11 +16,18 @@ struct BillList: View {
 
     var body: some View {
         NavigationView {
-            List {
-                iOS15ListContent
+            VStack(spacing: 0) {
+                OfflineStatusView()
+                
+                List {
+                    iOS15ListContent
+                }
+                .refreshable {
+                    await ProjectManager.shared.syncData()
+                }
+                .addFloatingAddButton()
+                .id(viewModel.currentProject.bills)
             }
-            .addFloatingAddButton()
-            .id(viewModel.currentProject.bills)
             .navigationBarTitle("Bills")
             .alert(item: $deleteAlert) { index in
                 Alert(title: Text("Delete Bill"),
@@ -71,7 +78,7 @@ struct BillList: View {
     }
 }
 
-extension IndexSet: Identifiable {
+extension IndexSet: @retroactive Identifiable {
     public var id: Int {
         hashValue
     }
