@@ -5,26 +5,50 @@
 //  Created by Max Tharr on 03.10.20.
 //
 
-import AVFoundation
-import CarBode
 import SwiftUI
+import CoreImage.CIFilterBuiltins
+import UIKit
 
 struct ShareProjectQRCode: View {
     let project: Project
 
-    @State var dataString = ""
+    private static let context = CIContext()
+
+    private var dataString: String {
+        let server = project.url.relativeString
+            .replacingOccurrences(of: "https://", with: "")
+        return "cospend://\(server)/\(project.token)/\(project.password)"
+    }
+
+    private var qrCodeImage: UIImage {
+        generateQRCode(from: dataString)
+    }
 
     var body: some View {
         VStack {
             Text(dataString).font(.caption)
-            CarBode.CBBarcodeView(data: $dataString, barcodeType: .constant(.qrCode), orientation: .constant(.up), onGenerated: nil)
-                .aspectRatio(contentMode: .fit)
+
+            Image(uiImage: qrCodeImage)
+                .interpolation(.none)
+                .resizable()
+                .scaledToFit()
         }
         .padding()
-        .onAppear {
-            let server = project.url.relativeString.replacingOccurrences(of: "https://", with: "")
-            dataString = "cospend://\(server)/\(project.token.lowercased())/\(project.password)"
+    }
+
+    private func generateQRCode(from string: String) -> UIImage {
+        let filter = CIFilter.qrCodeGenerator()
+        filter.message = Data(string.utf8)
+
+        guard let outputImage = filter.outputImage else {
+            return UIImage(systemName: "xmark.circle") ?? UIImage()
         }
+
+        guard let cgImage = Self.context.createCGImage(outputImage, from: outputImage.extent) else {
+            return UIImage(systemName: "xmark.circle") ?? UIImage()
+        }
+
+        return UIImage(cgImage: cgImage)
     }
 }
 
