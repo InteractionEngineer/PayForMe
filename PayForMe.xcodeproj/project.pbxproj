@@ -14,6 +14,7 @@
 		48CC8F7423F5C16D00DCE3D8 /* AddBillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CC8F7323F5C16D00DCE3D8 /* AddBillView.swift */; };
 		48CF709B240FF82000770B97 /* AddMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CF709A240FF82000770B97 /* AddMemberView.swift */; };
 		48E7F75B2403FD6B000CE4E6 /* FancyLoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E7F75A2403FD6B000CE4E6 /* FancyLoadingButton.swift */; };
+		62A13D412FA3AB760036EE34 /* ShareProjectQRCodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62A13D402FA3AB700036EE34 /* ShareProjectQRCodeViewModel.swift */; };
 		650059FC23DDE1C300D1D599 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650059FB23DDE1C300D1D599 /* Person.swift */; };
 		65005A0223DDFB1A00D1D599 /* WhoPaidView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65005A0123DDFB1A00D1D599 /* WhoPaidView.swift */; };
 		65005A0423DE0C5C00D1D599 /* BillList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65005A0323DE0C5C00D1D599 /* BillList.swift */; };
@@ -88,6 +89,7 @@
 		48CC8F7323F5C16D00DCE3D8 /* AddBillView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddBillView.swift; sourceTree = "<group>"; };
 		48CF709A240FF82000770B97 /* AddMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMemberView.swift; sourceTree = "<group>"; };
 		48E7F75A2403FD6B000CE4E6 /* FancyLoadingButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyLoadingButton.swift; sourceTree = "<group>"; };
+		62A13D402FA3AB700036EE34 /* ShareProjectQRCodeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareProjectQRCodeViewModel.swift; sourceTree = "<group>"; };
 		650059FB23DDE1C300D1D599 /* Person.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Person.swift; sourceTree = "<group>"; };
 		65005A0123DDFB1A00D1D599 /* WhoPaidView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WhoPaidView.swift; sourceTree = "<group>"; };
 		65005A0323DE0C5C00D1D599 /* BillList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillList.swift; sourceTree = "<group>"; };
@@ -332,6 +334,7 @@
 				489995D923F6EC6F008B7E38 /* OnboardingView.swift */,
 				6523FC56255818F800BCD843 /* Manual */,
 				654754F12528BB7600A82EB6 /* ShareProjectQRCode.swift */,
+				62A13D402FA3AB700036EE34 /* ShareProjectQRCodeViewModel.swift */,
 				6523FC502558153600BCD843 /* AddPasswordView.swift */,
 			);
 			path = Projects;
@@ -571,6 +574,7 @@
 				65662A2423D83ED100303207 /* StorageService.swift in Sources */,
 				655DD2AE2993DACB00E06675 /* ProjectListEntry.swift in Sources */,
 				656E8CB823D9FDA300B3ED10 /* BillListViewModel.swift in Sources */,
+				62A13D412FA3AB760036EE34 /* ShareProjectQRCodeViewModel.swift in Sources */,
 				65C9E2D023E1B96B00814B37 /* BalanceViewModel.swift in Sources */,
 				65662A0723D7320000303207 /* ContentView.swift in Sources */,
 				65005A0223DDFB1A00D1D599 /* WhoPaidView.swift in Sources */,
