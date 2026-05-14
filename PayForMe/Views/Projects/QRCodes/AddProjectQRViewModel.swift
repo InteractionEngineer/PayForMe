@@ -85,7 +85,6 @@ class AddProjectQRViewModel: ObservableObject {
     var foundCode: AnyPublisher<URL, Never> {
         $scannedCode
             .compactMap { $0 }
-            .removeDuplicates()
             .eraseToAnyPublisher()
     }
 
