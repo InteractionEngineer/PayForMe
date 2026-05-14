@@ -4,4 +4,7 @@
    <FileRef
       location = "container:PayForMe.xcodeproj">
    </FileRef>
+   <FileRef
+      location = "group:PayForMeTests/PayForMe.xctestplan">
+   </FileRef>
 </Workspace>

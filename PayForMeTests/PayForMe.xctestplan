@@ -1,0 +1,36 @@
+{
+  "configurations" : [
+    {
+      "id" : "BF36D582-8014-44F6-AF21-D9C7ADB659E5",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true,
+    "targetForVariableExpansion" : {
+      "containerPath" : "container:PayForMe.xcodeproj",
+      "identifier" : "656629FE23D7320000303207",
+      "name" : "PayForMe"
+    }
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:PayForMe.xcodeproj",
+        "identifier" : "656A2AD3241BB4F300786A1E",
+        "name" : "PayForMeUITests"
+      }
+    },
+    {
+      "target" : {
+        "containerPath" : "container:PayForMe.xcodeproj",
+        "identifier" : "654754E02528B29F00A82EB6",
+        "name" : "PayForMeTests"
+      }
+    }
+  ],
+  "version" : 1
+}
