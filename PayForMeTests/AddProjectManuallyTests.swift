@@ -1,110 +1,144 @@
 //
-//  PayForMeTests.swift
+//  AddProjectManuallyTests.swift
 //  PayForMeTests
 //
-//  Created by Max Tharr on 03.10.20.
+//  Tests for AddProjectManualViewModel — the view model that drives the manual
+//  project-add flow (the "Enter server URL" screen).
+//
+//  WHY THIS MATTERS:
+//  Adding a new project is the very first thing a new user does. If URL parsing
+//  is broken, the app is completely unusable. Cospend URLs are especially tricky:
+//  they embed the project name and password inside the URL path, so users often
+//  paste a full URL like:
+//
+//    https://cloud.example.com/index.php/apps/cospend/myproject/mypassword
+//
+//  The ViewModel must strip the Nextcloud-specific path, keep only the server
+//  root, and auto-fill the project name and password fields. Without this, the
+//  user would have to know and type all three values separately.
+//
+//  NOTE ON TIMING:
+//  serverAddressFormatted fires synchronously (no debounce) — 1-second timeout is fine.
+//  validatedInput has a 1-second debounce — tests that subscribe to it need 2 seconds.
 //
 
 import Combine
-@testable import PayForMe
 import XCTest
+@testable import PayForMe
 
 class AddProjectManuallyTests: XCTestCase {
+
+    // XCTest creates a new instance per test method, so viewmodel is always fresh.
     var viewmodel = AddProjectManualViewModel()
     var subscriptions = Set<AnyCancellable>()
-
-    override func setUpWithError() throws {
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
 
     override func tearDownWithError() throws {
         subscriptions.removeAll()
     }
 
-    func testHTTPSPrefix() throws {
+    // MARK: - URL normalization (serverAddressFormatted)
+
+    func testHTTPSPrefix_addsMissingScheme() throws {
+        // Users who copy-paste a server address from a browser's address bar often
+        // omit the scheme. The ViewModel must prepend "https://" automatically.
         viewmodel.serverAddress = "myserver.de"
-        let exp = expectation(description: "With https")
+        let exp = expectation(description: "https:// prefix added")
         viewmodel.serverAddressFormatted.sink { formatted in
-            XCTAssertEqual("https://myserver.de", formatted)
+            XCTAssertEqual(formatted, "https://myserver.de")
             exp.fulfill()
         }.store(in: &subscriptions)
         waitForExpectations(timeout: 1)
     }
 
-    func testHTTPSPrefix2() throws {
+    func testHTTPSPrefix_doesNotDoubleAdd() throws {
+        // If the user already typed the scheme, it must not be duplicated.
         viewmodel.serverAddress = "https://myserver.de"
-        let exp = expectation(description: "No double https")
+        let exp = expectation(description: "no double https://")
         viewmodel.serverAddressFormatted.sink { formatted in
-            XCTAssertEqual("https://myserver.de", formatted)
+            XCTAssertEqual(formatted, "https://myserver.de")
             exp.fulfill()
         }.store(in: &subscriptions)
         waitForExpectations(timeout: 1)
     }
 
-    func testSuffix() throws {
+    func testCospendSuffix_isStripped() throws {
+        // Cospend's share link includes the full Nextcloud path. We only want the
+        // server root so we can build API URLs ourselves.
         viewmodel.serverAddress = "https://myserver.de/index.php/apps/cospend/"
-        let exp = expectation(description: "Remove trunk")
+        let exp = expectation(description: "Cospend trunk removed")
         viewmodel.serverAddressFormatted.sink { formatted in
-            XCTAssertEqual("https://myserver.de", formatted)
+            XCTAssertEqual(formatted, "https://myserver.de")
             exp.fulfill()
         }.store(in: &subscriptions)
         waitForExpectations(timeout: 1)
     }
 
-    func testPreAndSuffix() throws {
+    func testPrefixAndSuffix_bothApplied() throws {
+        // The two normalizations must compose: add https://, then strip the path.
         viewmodel.serverAddress = "myserver.de/index.php/apps/cospend/"
-        let exp = expectation(description: "Remove trunk, add prefix")
+        let exp = expectation(description: "prefix added and trunk removed")
         viewmodel.serverAddressFormatted.sink { formatted in
-            XCTAssertEqual("https://myserver.de", formatted)
+            XCTAssertEqual(formatted, "https://myserver.de")
             exp.fulfill()
         }.store(in: &subscriptions)
         waitForExpectations(timeout: 1)
     }
 
-    func testAutofillName() throws {
+    // MARK: - Autofill from URL path
+
+    func testAutofill_projectNameExtracted() throws {
+        // When the URL contains the Cospend path with a project name but no
+        // password, the ViewModel must extract the project name and use "no-pass"
+        // as the default password (Cospend's convention for passwordless projects).
         viewmodel.serverAddress = "https://myserver.de/index.php/apps/cospend/nameXY"
-        let exp1 = expectation(description: "Remove trunk, add prefix")
-        let exp2 = expectation(description: "set project")
-        let exp3 = expectation(description: "password empty")
+        let exp1 = expectation(description: "server stripped")
+        let exp2 = expectation(description: "project name filled")
+        let exp3 = expectation(description: "default password set")
         viewmodel.serverAddressFormatted.sink { formatted in
-            XCTAssertEqual("https://myserver.de", formatted)
+            XCTAssertEqual(formatted, "https://myserver.de")
             exp1.fulfill()
         }.store(in: &subscriptions)
         viewmodel.$projectName.sink { name in
-            XCTAssertEqual("nameXY", name)
+            XCTAssertEqual(name, "nameXY")
             exp2.fulfill()
         }.store(in: &subscriptions)
         viewmodel.$projectPassword.sink { password in
-            XCTAssertEqual("no-pass", password)
+            XCTAssertEqual(password, "no-pass")
             exp3.fulfill()
         }.store(in: &subscriptions)
         waitForExpectations(timeout: 1)
     }
 
-    func testAutofill() throws {
+    func testAutofill_projectNameAndPasswordExtracted() throws {
+        // When the URL contains both project name and password in the path,
+        // both fields must be auto-filled.
         viewmodel.serverAddress = "https://myserver.de/index.php/apps/cospend/nameXY/passwordXY"
-        let exp1 = expectation(description: "Remove trunk, add prefix")
-        let exp2 = expectation(description: "set project")
-        let exp3 = expectation(description: "set password")
+        let exp1 = expectation(description: "server stripped")
+        let exp2 = expectation(description: "project name filled")
+        let exp3 = expectation(description: "password filled")
         viewmodel.serverAddressFormatted.sink { formatted in
-            XCTAssertEqual("https://myserver.de", formatted)
+            XCTAssertEqual(formatted, "https://myserver.de")
             exp1.fulfill()
         }.store(in: &subscriptions)
         viewmodel.$projectName.sink { name in
-            XCTAssertEqual("nameXY", name)
+            XCTAssertEqual(name, "nameXY")
             exp2.fulfill()
         }.store(in: &subscriptions)
         viewmodel.$projectPassword.sink { password in
-            XCTAssertEqual("passwordXY", password)
+            XCTAssertEqual(password, "passwordXY")
             exp3.fulfill()
         }.store(in: &subscriptions)
         waitForExpectations(timeout: 1)
     }
 
-    func testProjectCreation() throws {
+    // MARK: - Project object creation (validatedInput)
+
+    func testProjectCreation_cospendBackend() throws {
+        // validatedInput emits a complete Project object once the debounce settles.
+        // This is the object that gets passed to NetworkService for server validation.
         viewmodel.serverAddress = "https://myserver.de/index.php/apps/cospend/nameXY/passwordXY"
         viewmodel.projectType = .cospend
-        let exp = expectation(description: "Project created")
+        let exp = expectation(description: "Project emitted")
         viewmodel.validatedInput.sink { project in
             XCTAssertEqual(project.backend, .cospend)
             XCTAssertEqual(project.name, "nameXY")
@@ -115,10 +149,12 @@ class AddProjectManuallyTests: XCTestCase {
         waitForExpectations(timeout: 2)
     }
 
-    func testProjectNewMethodCreation() throws {
+    func testProjectCreation_tokenBasedCospend() throws {
+        // Newer Cospend share links use a random token instead of a human-readable
+        // project name. The token becomes both `name` and `token` on the Project.
         viewmodel.serverAddress = "https://myserver.de/index.php/apps/cospend/02939asdasd12asdj23/no-pass"
         viewmodel.projectType = .cospend
-        let exp = expectation(description: "Project created")
+        let exp = expectation(description: "Token-based project emitted")
         viewmodel.validatedInput.sink { project in
             XCTAssertEqual(project.backend, .cospend)
             XCTAssertEqual(project.name, "02939asdasd12asdj23")

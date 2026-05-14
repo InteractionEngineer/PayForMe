@@ -14,7 +14,10 @@
 		48CC8F7423F5C16D00DCE3D8 /* AddBillView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CC8F7323F5C16D00DCE3D8 /* AddBillView.swift */; };
 		48CF709B240FF82000770B97 /* AddMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48CF709A240FF82000770B97 /* AddMemberView.swift */; };
 		48E7F75B2403FD6B000CE4E6 /* FancyLoadingButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48E7F75A2403FD6B000CE4E6 /* FancyLoadingButton.swift */; };
+		56E7DB46FDCDC5B46C475020 /* BalanceCalculationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 143F41EE78329905894C8A29 /* BalanceCalculationTests.swift */; };
+		57BC8D25B91CE40F4669650C /* TestHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0865D2DAF541B24078D1DC41 /* TestHelpers.swift */; };
 		62A13D412FA3AB760036EE34 /* ShareProjectQRCodeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 62A13D402FA3AB700036EE34 /* ShareProjectQRCodeViewModel.swift */; };
+		62C73597878BA5AD4572FE90 /* BillSortingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 92ABB02BEA28BEA7C8C64841 /* BillSortingTests.swift */; };
 		650059FC23DDE1C300D1D599 /* Person.swift in Sources */ = {isa = PBXBuildFile; fileRef = 650059FB23DDE1C300D1D599 /* Person.swift */; };
 		65005A0223DDFB1A00D1D599 /* WhoPaidView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65005A0123DDFB1A00D1D599 /* WhoPaidView.swift */; };
 		65005A0423DE0C5C00D1D599 /* BillList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65005A0323DE0C5C00D1D599 /* BillList.swift */; };
@@ -62,6 +65,9 @@
 		65C9E2D023E1B96B00814B37 /* BalanceViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C9E2CF23E1B96B00814B37 /* BalanceViewModel.swift */; };
 		65D225F32428038500C3F1EC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 65D225F52428038500C3F1EC /* Localizable.strings */; };
 		65D9094025581BE100351F4B /* AddFromURLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D9093F25581BE100351F4B /* AddFromURLView.swift */; };
+		BF4D7AF265FC4A90B1AC5AEB /* JSONDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F4D55C3EF5EFCD925428041 /* JSONDecodingTests.swift */; };
+		D279295CFA25D9CC69C6F27C /* BillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EED3194A2342518B0E74079 /* BillTests.swift */; };
+		DBBD86EF399BCF232C021935 /* NetworkRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316FBA7C0CE4ABB51EC2A121 /* NetworkRequestTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +88,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0865D2DAF541B24078D1DC41 /* TestHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
+		143F41EE78329905894C8A29 /* BalanceCalculationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BalanceCalculationTests.swift; sourceTree = "<group>"; };
+		316FBA7C0CE4ABB51EC2A121 /* NetworkRequestTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkRequestTests.swift; sourceTree = "<group>"; };
 		481FB4FA23E964C8003BD108 /* ProjectManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectManager.swift; sourceTree = "<group>"; };
 		481FB4FC23EAD78F003BD108 /* AddProjectManualViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectManualViewModel.swift; sourceTree = "<group>"; };
 		489995D923F6EC6F008B7E38 /* OnboardingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingView.swift; sourceTree = "<group>"; };
@@ -147,6 +156,9 @@
 		65D225F7242803C800C3F1EC /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		65D9093F25581BE100351F4B /* AddFromURLView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddFromURLView.swift; sourceTree = "<group>"; };
 		65FE0E8E2544968B002B80CF /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		7EED3194A2342518B0E74079 /* BillTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BillTests.swift; sourceTree = "<group>"; };
+		8F4D55C3EF5EFCD925428041 /* JSONDecodingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JSONDecodingTests.swift; sourceTree = "<group>"; };
+		92ABB02BEA28BEA7C8C64841 /* BillSortingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BillSortingTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -218,6 +230,12 @@
 				654754E32528B29F00A82EB6 /* AddProjectManuallyTests.swift */,
 				654754E52528B29F00A82EB6 /* Info.plist */,
 				6523FC4B25580EEF00BCD843 /* UrlExtensionsTests.swift */,
+				0865D2DAF541B24078D1DC41 /* TestHelpers.swift */,
+				7EED3194A2342518B0E74079 /* BillTests.swift */,
+				8F4D55C3EF5EFCD925428041 /* JSONDecodingTests.swift */,
+				143F41EE78329905894C8A29 /* BalanceCalculationTests.swift */,
+				92ABB02BEA28BEA7C8C64841 /* BillSortingTests.swift */,
+				316FBA7C0CE4ABB51EC2A121 /* NetworkRequestTests.swift */,
 			);
 			path = PayForMeTests;
 			sourceTree = "<group>";
@@ -527,6 +545,12 @@
 			files = (
 				654754E42528B29F00A82EB6 /* AddProjectManuallyTests.swift in Sources */,
 				6523FC4C25580EEF00BCD843 /* UrlExtensionsTests.swift in Sources */,
+				57BC8D25B91CE40F4669650C /* TestHelpers.swift in Sources */,
+				D279295CFA25D9CC69C6F27C /* BillTests.swift in Sources */,
+				BF4D7AF265FC4A90B1AC5AEB /* JSONDecodingTests.swift in Sources */,
+				56E7DB46FDCDC5B46C475020 /* BalanceCalculationTests.swift in Sources */,
+				62C73597878BA5AD4572FE90 /* BillSortingTests.swift in Sources */,
+				DBBD86EF399BCF232C021935 /* NetworkRequestTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
