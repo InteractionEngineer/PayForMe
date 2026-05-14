@@ -44,13 +44,12 @@ class AddProjectQRViewModel: ObservableObject {
                 .compactMap { $0 },
             $name,
             $passwordText
-                .debounce(for: 0.5, scheduler: RunLoop.main)
+                .debounce(for: 1, scheduler: RunLoop.main)
                 .compactMap { $0.isEmpty ? nil : $0 }
                 .removeDuplicates()
         )
         .map { url, token, password in
             self.isTestingSubject.send(.connecting)
-            print("\(url) \(token) \(password)")
             return Project(name: "", password: password, token: token, backend: .cospend, url: url)
         }
         .flatMap { project in
