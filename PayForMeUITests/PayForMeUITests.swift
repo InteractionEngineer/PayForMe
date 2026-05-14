@@ -21,29 +21,31 @@ class PayForMeUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testScreenshots() async throws {
+    @MainActor
+    func testScreenshots() {
         let app = XCUIApplication()
-        await Snapshot.setLanguage(app)
-        await setupSnapshot(app)
+        Snapshot.setLanguage(app)
+        setupSnapshot(app)
         app.launchArguments += ["UI-Testing"]
         app.launch()
-        let tabBarsQuery = app.tabBars
-        await snapshot("Bill List")
-        tabBarsQuery.children(matching: .button).element(boundBy: 1).tap()
-        await snapshot("Balance List")
-        tabBarsQuery.children(matching: .button).element(boundBy: 2).tap()
-        await snapshot("Known Projects")
-        tabBarsQuery.children(matching: .button).element(boundBy: 1).tap()
+        let tabBarButtons = app.tabBars.firstMatch.buttons
+        snapshot("Bill List")
+        tabBarButtons.element(boundBy: 1).tap()
+        snapshot("Balance List")
+        tabBarButtons.element(boundBy: 2).tap()
+        snapshot("Known Projects")
+        tabBarButtons.element(boundBy: 0).tap()
         app.buttons["Add Bill"].tap()
-        await snapshot("Add Bill")
+        snapshot("Add Bill")
     }
 
-    func testScreenshotsEmpty() async throws {
+    @MainActor
+    func testScreenshotsEmpty() {
         let app = XCUIApplication()
-        await Snapshot.setLanguage(app)
-        await setupSnapshot(app)
+        Snapshot.setLanguage(app)
+        setupSnapshot(app)
         app.launchArguments += ["UI-Testing", "Onboarding"]
         app.launch()
-        await snapshot("Onboarding")
+        snapshot("Onboarding")
     }
 }
