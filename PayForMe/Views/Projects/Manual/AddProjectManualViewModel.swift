@@ -146,21 +146,26 @@ class AddProjectManualViewModel: ObservableObject {
 
     private lazy var validatedServer: AnyPublisher<Int, Never> = {
         validatedInput
-            .flatMap(maxPublishers: .max(1)) { project in
-                Future { promise in
+            .map { project -> AnyPublisher<(Project?, Int), Never> in
+                Future<(Project?, Int), Never> { promise in
                     Task {
                         do {
                             let testedProject = try await NetworkService.shared.getProjectName(project)
-                            self.lastProjectTestedSuccessfully = testedProject
-                            promise(.success(200))
+                            promise(.success((testedProject, 200)))
                         } catch {
-                            promise(.success(-1))
+                            promise(.success((nil, -1)))
                         }
                     }
                 }
+                .eraseToAnyPublisher()
             }
-            .removeDuplicates()
+            .switchToLatest()
             .receive(on: RunLoop.main)
+            .handleEvents(receiveOutput: { (project, _) in
+                self.lastProjectTestedSuccessfully = project
+            })
+            .map { (_, statusCode) in statusCode }
+            .removeDuplicates()
             .share()
             .eraseToAnyPublisher()
     }()
