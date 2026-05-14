@@ -128,10 +128,10 @@ class AddProjectManualViewModel: ObservableObject {
             .eraseToAnyPublisher()
     }
 
-    var validatedInput: AnyPublisher<Project, Never> {
-        return Publishers.CombineLatest3(validatedAddress, $projectName, $projectPassword)
+    lazy var validatedInput: AnyPublisher<Project, Never> = {
+        Publishers.CombineLatest3(validatedAddress, $projectName, $projectPassword)
             .debounce(for: 1, scheduler: DispatchQueue.main)
-            .compactMap { server, token, password in
+            .compactMap { server, token, password -> Project? in
                 if let address = server.address, address.isValidURL, !token.isEmpty, !password.isEmpty {
                     guard let url = URL(string: address) else { return nil }
                     return Project(name: token, password: password, token: token, backend: server.0, url: url)
@@ -140,28 +140,30 @@ class AddProjectManualViewModel: ObservableObject {
                 }
             }
             .removeDuplicates()
+            .share()
             .eraseToAnyPublisher()
-    }
+    }()
 
-    private var validatedServer: AnyPublisher<Int, Never> {
-        validatedInput.flatMap {
-            project in
-            Future { promise in
-                Task {
-                    do {
-                        let testedProject = try await NetworkService.shared.getProjectName(project)
-                        self.lastProjectTestedSuccessfully = testedProject
-                        promise(.success(200))
-                    } catch {
-                        promise(.success(-1))
+    private lazy var validatedServer: AnyPublisher<Int, Never> = {
+        validatedInput
+            .flatMap(maxPublishers: .max(1)) { project in
+                Future { promise in
+                    Task {
+                        do {
+                            let testedProject = try await NetworkService.shared.getProjectName(project)
+                            self.lastProjectTestedSuccessfully = testedProject
+                            promise(.success(200))
+                        } catch {
+                            promise(.success(-1))
+                        }
                     }
                 }
             }
-        }
-        .removeDuplicates()
-        .receive(on: RunLoop.main)
-        .eraseToAnyPublisher()
-    }
+            .removeDuplicates()
+            .receive(on: RunLoop.main)
+            .share()
+            .eraseToAnyPublisher()
+    }()
 
     private var errorTextPublisher: AnyPublisher<String, Never> {
         validatedServer
