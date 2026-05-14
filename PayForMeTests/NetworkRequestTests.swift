@@ -70,7 +70,7 @@ class NetworkRequestTests: XCTestCase {
 
     // MARK: - Cospend: URL structure
 
-    func testCospend_loadBills_urlEmbeddsTokenAndPassword() {
+    func testCospend_loadBills_urlEmbedsTokenAndPassword() {
         let project = Project.makeCospend(token: "mytoken", password: "mypass",
                                           url: "https://cloud.example.com")
         MockURLProtocol.requestHandler = jsonHandler()
