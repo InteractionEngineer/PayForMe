@@ -44,6 +44,12 @@ class StorageService {
                     table.add(column: "me")
                 })
             }
+            migrator.registerMigration("v4") { db in
+                try db.alter(table: "storedProject", body: { table in
+                    table.add(column: "projectId")
+                })
+                try db.execute(sql: "UPDATE storedProject SET projectId = name;")
+            }
             // #if DEBUG
             //// Speed up development by nuking the database when migrations change
             // migrator.eraseDatabaseOnSchemaChange = true
@@ -153,6 +159,6 @@ private class OldProject: Codable, Identifiable {
     var bills: [Bill]
 
     func toProject() -> StoredProject {
-        return StoredProject(name: name, password: password, token: name, url: url, backend: backend)
+        return StoredProject(name: name, password: password, token: name, url: url, backend: backend, projectId: name)
     }
 }

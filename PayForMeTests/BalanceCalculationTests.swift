@@ -35,7 +35,8 @@ class BalanceCalculationTests: XCTestCase {
     private func makeProject(members: [Person], bills: [Bill]) -> Project {
         let project = Project(
             name: "test", password: "pw", token: "tok",
-            backend: .cospend, url: URL(string: "https://test.de")!
+            backend: .cospend, url: URL(string: "https://test.de")!,
+            projectId: ""
         )
         project.members = Dictionary(uniqueKeysWithValues: members.map { ($0.id, $0) })
         project.bills = bills

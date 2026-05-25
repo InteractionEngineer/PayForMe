@@ -25,7 +25,7 @@ final class ShareProjectQRCodeViewModel: ObservableObject {
     private func generate() {
         let server = project.url.relativeString
             .replacingOccurrences(of: "https://", with: "")
-        self.dataString = "cospend://\(server)/\(project.token)/\(project.password)"
+        self.dataString = "cospend://\(server)/\(project.projectId)/\(project.password)"
         self.qrCodeImage = generateQRCode(from: dataString)
     }
 

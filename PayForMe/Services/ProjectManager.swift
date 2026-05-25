@@ -44,11 +44,7 @@ class ProjectManager: ObservableObject {
 
     func openedByURL(url: URL) {
         let data = url.decodeCospendString()
-        guard let _ = data.server,
-              let _ = data.project
-        else {
-            return
-        }
+        guard data != nil else { return }
         openedByURL = url
     }
 

@@ -76,28 +76,32 @@ extension Project {
     static func makeCospend(
         token: String = "mytoken",
         password: String = "mypass",
-        url: String = "https://nextcloud.example.com"
+        url: String = "https://nextcloud.example.com",
+        projectId: String = "my-project"
     ) -> Project {
         Project(
             name: "test-project",
             password: password,
             token: token,
             backend: .cospend,
-            url: URL(string: url)!
+            url: URL(string: url)!,
+            projectId: projectId,
         )
     }
 
     static func makeIHateMoney(
         token: String = "mytoken",
         password: String = "mypass",
-        url: String = "https://ihatemoney.org"
+        url: String = "https://ihatemoney.org",
+        projectId: String = "my-project"
     ) -> Project {
         Project(
             name: "test-project",
             password: password,
             token: token,
             backend: .iHateMoney,
-            url: URL(string: url)!
+            url: URL(string: url)!,
+            projectId: projectId
         )
     }
 }

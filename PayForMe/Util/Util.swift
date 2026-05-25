@@ -176,43 +176,115 @@ extension StringProtocol {
     }
 }
 
-typealias ProjectData = (server: URL?, project: String?, passwd: String?)
+protocol ProjectData {
+    var server: URL { get }
+    var project: String { get }
+}
 
-extension URL {
-    func decodeMoneyBusterString() -> ProjectData {
-        guard absoluteString.hasPrefix("https://net.eneiluj.moneybuster.cospend/"),
-              pathComponents.count >= 3, pathComponents.count <= 4 else { return (nil, nil, nil) }
-        return (URL(string: "https://" + pathComponents[1]), pathComponents[2], pathComponents[safe: 3])
+struct ProjectDataWithToken: ProjectData {
+    var server: URL
+    var project: String
+    var token: String
+
+    init(server: URL, project: String, token: String) {
+        self.server = server
+        self.project = project
+        self.token = token
+    }
+
+}
+
+struct ProjectDataWithPassword: ProjectData {
+    var server: URL
+    var project: String
+    var password: String?
+
+    init(server: URL, project: String, password: String?) {
+        self.server = server
+        self.project = project
+        self.password = password
     }
 }
 
 extension URL {
-    func decodeCospendString() -> ProjectData {
+    func decodeMoneyBusterString() -> ProjectDataWithPassword? {
+        guard absoluteString.hasPrefix("https://net.eneiluj.moneybuster.cospend/"),
+              pathComponents.count >= 3, pathComponents.count <= 4 else {
+            return nil
+        }
+
+        guard let hostUrl = URL(string: "https://" + pathComponents[1]) else {
+            return nil
+        }
+
+        let password = pathComponents[safe: 3]
+
+        return ProjectDataWithPassword(
+            server: hostUrl,
+            project: pathComponents[2],
+            password: password
+        )
+    }
+}
+
+extension URL {
+    func decodeCospendString() -> ProjectDataWithPassword? {
         guard let host = host,
               let scheme = scheme,
               scheme.localizedCaseInsensitiveContains("cospend")
         else {
-            return (nil, nil, nil)
+            return nil
         }
-        
-        var hostString = "https://\(host)"
-        
+
+        var hostString = host
+
         if let port = port {hostString += ":\(port)"}
         
         if pathComponents.count > 3 {
             hostString += "/" + pathComponents[1..<(pathComponents.count - 2)].joined(separator: "/")
         }
-        
-        return (URL(string: hostString),
-                pathComponents[safe: pathComponents.count - 2],
-                pathComponents.last)
+
+        guard
+            let hostUrl = URL(string: "https://" + hostString),
+            let project = pathComponents[safe: pathComponents.count - 2],
+            let password = pathComponents.last
+        else { return nil }
+
+        return ProjectDataWithPassword(
+            server: hostUrl,
+            project: project,
+            password: password)
     }
 }
 
 extension URL {
-    func decodeQRCode() -> ProjectData {
-        guard let scheme = scheme else { return (nil, nil, nil) }
-        return scheme.contains("cospend") ? decodeCospendString() : decodeMoneyBusterString()
+    func decodeIHateMoenyString() -> ProjectDataWithToken? {
+        guard var host = host, let scheme = scheme, scheme.localizedCaseInsensitiveContains("ihatemoney") else {
+            return nil
+        }
+
+        let hostUrl = "https://" + host
+
+        guard
+            let url = URL(string: hostUrl),
+            let project = pathComponents[safe: pathComponents.count - 3],
+            let token = pathComponents.last
+        else { return nil}
+
+        return ProjectDataWithToken(server: url, project: project, token: token)
+    }
+}
+
+extension URL {
+    func decodeQRCode() -> ProjectData? {
+        guard let scheme = scheme else { return nil }
+        if scheme.contains("cospend") {
+            return decodeCospendString()
+        } else if scheme.contains("ihatemoney") {
+            return decodeIHateMoenyString()
+        } else {
+            return decodeMoneyBusterString()
+        }
     }
 }
 
