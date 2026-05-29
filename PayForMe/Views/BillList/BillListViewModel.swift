@@ -27,9 +27,9 @@ class BillListViewModel: ObservableObject {
     init() {
         currentProject = manager.currentProject
         cancellable = currentProjectChanged
-        $sortBy
-            .map {
-                $0.sort(bills: self.currentProject.bills)
+        Publishers.CombineLatest($sortBy, $currentProject)
+            .map { sortBy, project in
+                sortBy.sort(bills: project.bills)
             }
             .assign(to: &$sortedBills)
     }

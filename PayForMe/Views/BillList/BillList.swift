@@ -20,7 +20,6 @@ struct BillList: View {
                 iOS15ListContent
             }
             .addFloatingAddButton()
-            .id(viewModel.currentProject.bills)
             .navigationBarTitle("Bills")
             .alert(item: $deleteAlert) { index in
                 Alert(title: Text("Delete Bill"),
