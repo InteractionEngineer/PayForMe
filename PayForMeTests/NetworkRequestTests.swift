@@ -109,6 +109,24 @@ class NetworkRequestTests: XCTestCase {
                       "Cospend must embed token and password. Got: \(url)")
     }
 
+    func testCospend_loadBills_trailingSlashInServerURL_doesNotProduceDoubleSlash() {
+        let project = Project.makeCospend(token: "tok", password: "pass",
+                                          url: "https://cloud.example.com/")
+        MockURLProtocol.requestHandler = jsonHandler()
+
+        let exp = expectation(description: "request intercepted")
+        NetworkService.shared.loadBillsPublisher(project)
+            .sink { _ in exp.fulfill() }
+            .store(in: &subscriptions)
+        waitForExpectations(timeout: 2)
+
+        let url = MockURLProtocol.lastCapturedRequest?.url?.absoluteString ?? ""
+        XCTAssertFalse(url.contains("com//"),
+                       "Server URL with trailing slash must not produce a double slash. Got: \(url)")
+        XCTAssertTrue(url.contains("/index.php/apps/cospend/api/projects/tok/pass/bills"),
+                      "Cospend path must remain correct with trailing-slash server URL. Got: \(url)")
+    }
+
     // MARK: - Cospend: no auth header
 
     func testCospend_loadBills_noAuthorizationHeader() {
