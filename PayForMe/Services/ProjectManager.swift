@@ -69,6 +69,13 @@ class ProjectManager: ObservableObject {
         let billsPublisher = NetworkService.shared.loadBillsPublisher(project)
         let membersPublisher = NetworkService.shared.loadMembersPublisher(project)
 
+        var completionInvoked = false
+        let invokeCompletionOnce: () -> Void = {
+            guard !completionInvoked else { return }
+            completionInvoked = true
+            completion?()
+        }
+
         loadCancellable = Publishers.Zip(billsPublisher, membersPublisher)
             .map { bills, members in
                 project.bills = bills
@@ -76,10 +83,14 @@ class ProjectManager: ObservableObject {
                 return project
             }
             .receive(on: DispatchQueue.main)
-            .sink { [weak self] project in
-                self?.currentProject = project
-                completion?()
-            }
+            .handleEvents(receiveCancel: invokeCompletionOnce)
+            .sink(
+                receiveCompletion: { _ in invokeCompletionOnce() },
+                receiveValue: { [weak self] project in
+                    self?.currentProject = project
+                    invokeCompletionOnce()
+                }
+            )
     }
 
     private func sendBillToServer(bill: Bill, update: Bool, completion: @escaping () -> Void) {
