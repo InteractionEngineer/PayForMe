@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct PersonText: View {
-    @State
-    var person: Person
+    let person: Person
 
     var body: some View {
         Text(person.name)

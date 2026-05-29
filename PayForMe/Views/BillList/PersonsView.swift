@@ -8,11 +8,8 @@
 import SwiftUI
 
 struct PersonsView: View {
-    @Binding
-    var bill: Bill
-
-    @Binding
-    var members: [Int: Person]
+    let bill: Bill
+    let members: [Int: Person]
 
     var body: some View {
         HStack(spacing: 5) {

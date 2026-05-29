@@ -94,8 +94,7 @@ struct BalanceList_Previews: PreviewProvider {
 }
 
 struct BalanceCell: View {
-    @State
-    var balance: Balance
+    let balance: Balance
 
     var body: some View {
         HStack {

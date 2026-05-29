@@ -11,14 +11,13 @@ struct BillCell: View {
     @ObservedObject
     var viewModel: BillListViewModel
 
-    @State
-    var bill: Bill
+    let bill: Bill
 
     var body: some View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 10) {
                 Text(bill.what).font(.headline)
-                PersonsView(bill: $bill, members: $viewModel.currentProject.members)
+                PersonsView(bill: bill, members: viewModel.currentProject.members)
             }
             Spacer()
             VStack(alignment: .trailing, spacing: 10) {
