@@ -12,6 +12,7 @@ class ProjectManager: ObservableObject {
     private let defaults = UserDefaults.standard
 
     private var cancellable: Cancellable?
+    private var loadCancellable: AnyCancellable?
 
     @Published
     private(set) var projects = [Project]()
@@ -60,14 +61,16 @@ class ProjectManager: ObservableObject {
         let billsPublisher = NetworkService.shared.loadBillsPublisher(project)
         let membersPublisher = NetworkService.shared.loadMembersPublisher(project)
 
-        Publishers.Zip(billsPublisher, membersPublisher)
+        loadCancellable = Publishers.Zip(billsPublisher, membersPublisher)
             .map { bills, members in
                 project.bills = bills
                 project.members = members
                 return project
             }
             .receive(on: DispatchQueue.main)
-            .assign(to: &$currentProject)
+            .sink { [weak self] project in
+                self?.currentProject = project
+            }
     }
 
     private func sendBillToServer(bill: Bill, update: Bool, completion: @escaping () -> Void) {
@@ -235,6 +238,7 @@ extension ProjectManager {
         }) else {
             return
         }
+        loadCancellable?.cancel()
         currentProject = project
         loadBillsAndMembers()
         defaults.set(project.id, forKey: "projectID")

@@ -12,6 +12,12 @@ struct ContentView: View {
     @ObservedObject
     var manager = ProjectManager.shared
 
+    @StateObject
+    private var billListViewModel = BillListViewModel()
+
+    @StateObject
+    private var balanceViewModel = BalanceViewModel()
+
     @State
     var tabBarIndex = tabBarItems.BillList
 
@@ -36,12 +42,12 @@ struct ContentView: View {
 
     var tabBar: some View {
         TabView(selection: $tabBarIndex) {
-            BillList(viewModel: BillListViewModel())
+            BillList(viewModel: billListViewModel)
                 .tabItem {
                     Image(systemName: "rectangle.stack")
                 }
                 .tag(tabBarItems.BillList)
-            BalanceList(viewModel: BalanceViewModel())
+            BalanceList(viewModel: balanceViewModel)
                 .tabItem {
                     Image(systemName: "arrow.right.arrow.left")
                 }
