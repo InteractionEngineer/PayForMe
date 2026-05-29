@@ -27,8 +27,12 @@ class AddProjectQRViewModel: ObservableObject {
 
     init() {
         foundCodeSink.store(in: &subscriptions)
-        passwordCorrect.assign(to: &$isProject)
-        isTestingSubject.assign(to: &$isProject)
+        passwordCorrect
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$isProject)
+        isTestingSubject
+            .receive(on: DispatchQueue.main)
+            .assign(to: &$isProject)
     }
 
     convenience init(openedByURL: URL?) {
@@ -90,6 +94,7 @@ class AddProjectQRViewModel: ObservableObject {
 
     var foundCodeSink: AnyCancellable {
         foundCode
+            .receive(on: DispatchQueue.main)
             .sink { codedUrl in
                 let projectData = codedUrl.decodeQRCode()
                 guard let url = projectData.server, let token = projectData.project else { return }

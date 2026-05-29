@@ -20,7 +20,9 @@ struct BillList: View {
                 iOS15ListContent
             }
             .addFloatingAddButton()
-            .id(viewModel.currentProject.bills)
+            .refreshable {
+                await ProjectManager.shared.refresh()
+            }
             .navigationBarTitle("Bills")
             .alert(item: $deleteAlert) { index in
                 Alert(title: Text("Delete Bill"),
@@ -31,9 +33,6 @@ struct BillList: View {
                       secondaryButton: .cancel())
             }
             .listStyle(InsetGroupedListStyle())
-        }
-        .onAppear {
-            ProjectManager.shared.loadBillsAndMembers()
         }
     }
 

@@ -8,8 +8,7 @@
 import SwiftUI
 
 struct WhoPaidView: View {
-    @State
-    var members: [Person]
+    let members: [Person]
 
     @Binding
     var selectedPayer: Int

@@ -12,6 +12,7 @@ class ProjectManager: ObservableObject {
     private let defaults = UserDefaults.standard
 
     private var cancellable: Cancellable?
+    private var loadCancellable: AnyCancellable?
 
     @Published
     private(set) var projects = [Project]()
@@ -54,20 +55,42 @@ class ProjectManager: ObservableObject {
 
     // MARK: Server Communication
 
-    func loadBillsAndMembers() {
+    func refresh() async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            loadBillsAndMembers {
+                continuation.resume()
+            }
+        }
+    }
+
+    func loadBillsAndMembers(completion: (() -> Void)? = nil) {
         let project = currentProject
 
         let billsPublisher = NetworkService.shared.loadBillsPublisher(project)
         let membersPublisher = NetworkService.shared.loadMembersPublisher(project)
 
-        Publishers.Zip(billsPublisher, membersPublisher)
+        var completionInvoked = false
+        let invokeCompletionOnce: () -> Void = {
+            guard !completionInvoked else { return }
+            completionInvoked = true
+            completion?()
+        }
+
+        loadCancellable = Publishers.Zip(billsPublisher, membersPublisher)
             .map { bills, members in
                 project.bills = bills
                 project.members = members
                 return project
             }
             .receive(on: DispatchQueue.main)
-            .assign(to: &$currentProject)
+            .handleEvents(receiveCancel: invokeCompletionOnce)
+            .sink(
+                receiveCompletion: { _ in invokeCompletionOnce() },
+                receiveValue: { [weak self] project in
+                    self?.currentProject = project
+                    invokeCompletionOnce()
+                }
+            )
     }
 
     private func sendBillToServer(bill: Bill, update: Bool, completion: @escaping () -> Void) {
@@ -76,6 +99,7 @@ class ProjectManager: ObservableObject {
 
         if update {
             cancellable = NetworkService.shared.updateBillPublisher(bill: bill)
+                .receive(on: DispatchQueue.main)
                 .sink { success in
                     if success {
                         print("Bill id\(bill.id) updated")
@@ -86,6 +110,7 @@ class ProjectManager: ObservableObject {
                 }
         } else {
             cancellable = NetworkService.shared.postBillPublisher(bill: bill)
+                .receive(on: DispatchQueue.main)
                 .sink { success in
                     if success {
                         print("Bill posted")
@@ -102,6 +127,7 @@ class ProjectManager: ObservableObject {
         cancellable = nil
 
         cancellable = NetworkService.shared.deleteBillPublisher(bill: bill)
+            .receive(on: DispatchQueue.main)
             .sink { success in
                 if success {
                     print("Bill successfully deleted")
@@ -118,6 +144,7 @@ class ProjectManager: ObservableObject {
 
         if update {
             cancellable = NetworkService.shared.updateMemberPublisher(member: member)
+                .receive(on: DispatchQueue.main)
                 .sink { success in
                     if success {
                         print("Member id\(member.id) updated")
@@ -128,6 +155,7 @@ class ProjectManager: ObservableObject {
                 }
         } else {
             cancellable = NetworkService.shared.createMemberPublisher(name: member.name)
+                .receive(on: DispatchQueue.main)
                 .sink { success in
                     if success {
                         print("Member successfully created")
@@ -144,6 +172,7 @@ class ProjectManager: ObservableObject {
         cancellable = nil
 
         cancellable = NetworkService.shared.deleteMemberPublisher(member: member)
+            .receive(on: DispatchQueue.main)
             .sink { success in
                 if success {
                     print("Member id\(member.id) successfully deleted")
@@ -235,6 +264,7 @@ extension ProjectManager {
         }) else {
             return
         }
+        loadCancellable?.cancel()
         currentProject = project
         loadBillsAndMembers()
         defaults.set(project.id, forKey: "projectID")

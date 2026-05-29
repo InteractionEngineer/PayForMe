@@ -94,9 +94,9 @@ enum ProjectBackend: Int, Codable {
     var staticPath: String {
         switch self {
         case .cospend:
-            return "/index.php/apps/cospend/api/projects"
+            return "index.php/apps/cospend/api/projects"
         case .iHateMoney:
-            return "/api/projects"
+            return "api/projects"
         }
     }
 }
