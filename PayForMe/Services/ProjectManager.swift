@@ -55,7 +55,15 @@ class ProjectManager: ObservableObject {
 
     // MARK: Server Communication
 
-    func loadBillsAndMembers() {
+    func refresh() async {
+        await withCheckedContinuation { (continuation: CheckedContinuation<Void, Never>) in
+            loadBillsAndMembers {
+                continuation.resume()
+            }
+        }
+    }
+
+    func loadBillsAndMembers(completion: (() -> Void)? = nil) {
         let project = currentProject
 
         let billsPublisher = NetworkService.shared.loadBillsPublisher(project)
@@ -70,6 +78,7 @@ class ProjectManager: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { [weak self] project in
                 self?.currentProject = project
+                completion?()
             }
     }
 

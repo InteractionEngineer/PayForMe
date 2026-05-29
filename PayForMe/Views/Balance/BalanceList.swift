@@ -21,9 +21,6 @@ struct BalanceList: View {
         NavigationView {
             mainView
                 .navigationBarTitle("Members")
-                .onAppear {
-                    ProjectManager.shared.loadBillsAndMembers()
-                }
         }.navigationViewStyle(StackNavigationViewStyle())
     }
 
@@ -51,6 +48,9 @@ struct BalanceList: View {
                     BalanceCell(balance: balance)
                 }
             }
+        }
+        .refreshable {
+            await ProjectManager.shared.refresh()
         }
     }
 

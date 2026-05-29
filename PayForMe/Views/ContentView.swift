@@ -18,6 +18,9 @@ struct ContentView: View {
     @StateObject
     private var balanceViewModel = BalanceViewModel()
 
+    @Environment(\.scenePhase)
+    private var scenePhase
+
     @State
     var tabBarIndex = tabBarItems.BillList
 
@@ -37,6 +40,11 @@ struct ContentView: View {
         }
         .sheet(item: $manager.openedByURL) { url in
             AddFromURLView(viewmodel: AddProjectQRViewModel(openedByURL: url))
+        }
+        .onChange(of: scenePhase) { newPhase in
+            if newPhase == .active && !manager.projects.isEmpty {
+                manager.loadBillsAndMembers()
+            }
         }
     }
 
