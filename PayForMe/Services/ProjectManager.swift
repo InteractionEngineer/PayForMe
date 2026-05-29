@@ -88,6 +88,7 @@ class ProjectManager: ObservableObject {
 
         if update {
             cancellable = NetworkService.shared.updateBillPublisher(bill: bill)
+                .receive(on: DispatchQueue.main)
                 .sink { success in
                     if success {
                         print("Bill id\(bill.id) updated")
@@ -98,6 +99,7 @@ class ProjectManager: ObservableObject {
                 }
         } else {
             cancellable = NetworkService.shared.postBillPublisher(bill: bill)
+                .receive(on: DispatchQueue.main)
                 .sink { success in
                     if success {
                         print("Bill posted")
@@ -114,6 +116,7 @@ class ProjectManager: ObservableObject {
         cancellable = nil
 
         cancellable = NetworkService.shared.deleteBillPublisher(bill: bill)
+            .receive(on: DispatchQueue.main)
             .sink { success in
                 if success {
                     print("Bill successfully deleted")
@@ -130,6 +133,7 @@ class ProjectManager: ObservableObject {
 
         if update {
             cancellable = NetworkService.shared.updateMemberPublisher(member: member)
+                .receive(on: DispatchQueue.main)
                 .sink { success in
                     if success {
                         print("Member id\(member.id) updated")
@@ -140,6 +144,7 @@ class ProjectManager: ObservableObject {
                 }
         } else {
             cancellable = NetworkService.shared.createMemberPublisher(name: member.name)
+                .receive(on: DispatchQueue.main)
                 .sink { success in
                     if success {
                         print("Member successfully created")
@@ -156,6 +161,7 @@ class ProjectManager: ObservableObject {
         cancellable = nil
 
         cancellable = NetworkService.shared.deleteMemberPublisher(member: member)
+            .receive(on: DispatchQueue.main)
             .sink { success in
                 if success {
                     print("Member id\(member.id) successfully deleted")
