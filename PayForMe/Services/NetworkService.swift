@@ -11,6 +11,11 @@ import Foundation
 class NetworkService {
     static let shared = NetworkService()
 
+    /// `URLError.networkConnectionLost` (-1005) surfaced as a status code so the UI
+    /// can distinguish it from a generic failure. Usually caused by a server
+    /// returning an HTTP/2-illegal header such as `Upgrade` (RFC 7540 §8.1.2.2).
+    static let invalidServerResponseStatusCode = -1005
+
     private let decoder: JSONDecoder
 
     private init() {
@@ -75,11 +80,14 @@ class NetworkService {
     func testProject(_ project: Project) -> AnyPublisher<(Project, Int), Never> {
         let request = buildURLRequest("dummy", params: [:], project: project)
         let requestPub = URLSession.shared.dataTaskPublisher(for: request)
-            .tryMap { _, response -> Int in
-                guard let httpResponse = response as? HTTPURLResponse else { print("Network Error"); return -1 }
-                return httpResponse.statusCode
+            .map { _, response -> Int in
+                (response as? HTTPURLResponse)?.statusCode ?? -1
             }
-            .replaceError(with: -1)
+            .catch { (urlError: URLError) -> Just<Int> in
+                Just(urlError.code == .networkConnectionLost
+                     ? NetworkService.invalidServerResponseStatusCode
+                     : -1)
+            }
         return Publishers.CombineLatest(Just(project), requestPub).eraseToAnyPublisher()
     }
 

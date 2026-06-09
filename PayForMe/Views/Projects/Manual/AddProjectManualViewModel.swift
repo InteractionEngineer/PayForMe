@@ -152,6 +152,8 @@ class AddProjectManualViewModel: ObservableObject {
                         do {
                             let testedProject = try await NetworkService.shared.getProjectName(project)
                             promise(.success((testedProject, 200)))
+                        } catch let urlError as URLError where urlError.code == .networkConnectionLost {
+                            promise(.success((nil, NetworkService.invalidServerResponseStatusCode)))
                         } catch {
                             promise(.success((nil, -1)))
                         }
@@ -177,6 +179,8 @@ class AddProjectManualViewModel: ObservableObject {
                 switch statusCode {
                 case 200:
                     return ""
+                case NetworkService.invalidServerResponseStatusCode:
+                    return "Server returned an invalid HTTP response"
                 case -1:
                     return "Could not find server"
                 case 401:

@@ -139,3 +139,6 @@
 
 
 "What was paid" = "What was paid?";
+
+
+"Server returned an invalid HTTP response" = "Server returned an invalid HTTP response";

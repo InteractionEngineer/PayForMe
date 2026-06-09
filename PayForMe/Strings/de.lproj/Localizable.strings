@@ -136,3 +136,6 @@
 
 
 "What was paid" = "Was wurde bezahlt?";
+
+
+"Server returned an invalid HTTP response" = "Server lieferte eine ungültige HTTP-Antwort";
