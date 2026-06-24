@@ -34,12 +34,9 @@ class UrlExtensionsTests: XCTestCase {
 
         let project = url.decodeCospendString()
         XCTAssertNotNil(project)
-
-        if let server = project?.server, let password = project?.password, let project = project?.project {
-            XCTAssertEqual(server.absoluteString, "https://myserver.de")
-            XCTAssertEqual(project, "myproject")
-            XCTAssertEqual(password, "no-pass")
-        }
+        XCTAssertEqual(project?.server.absoluteString, "https://myserver.de")
+        XCTAssertEqual(project?.project, "myproject")
+        XCTAssertEqual(project?.password, "no-pass")
     }
 
     func testCospendStringDecodingForSubfolders() throws {
@@ -52,11 +49,9 @@ class UrlExtensionsTests: XCTestCase {
         let project = url.decodeCospendString()
         XCTAssertNotNil(project)
 
-        if let server = project?.server, let password = project?.password, let project = project?.project {
-            XCTAssertEqual(server.absoluteString, "https://myserver.de/folder1/folder2")
-            XCTAssertEqual(project, "myproject")
-            XCTAssertEqual(password, "mypassword")
-        }
+        XCTAssertEqual(project?.server.absoluteString, "https://myserver.de/folder1/folder2")
+        XCTAssertEqual(project?.project, "myproject")
+        XCTAssertEqual(project?.password, "mypassword")
     }
 
     func testCospendStringDecodingForSubdomains() throws {
@@ -67,11 +62,9 @@ class UrlExtensionsTests: XCTestCase {
         let project = url.decodeCospendString()
         XCTAssertNotNil(project)
 
-        if let server = project?.server, let password = project?.password, let project = project?.project {
-            XCTAssertEqual(server.absoluteString, "https://subdomain.myserver.de")
-            XCTAssertEqual(project, "myproject")
-            XCTAssertEqual(password, "mypassword")
-        }
+        XCTAssertEqual(project?.server.absoluteString, "https://subdomain.myserver.de")
+        XCTAssertEqual(project?.project, "myproject")
+        XCTAssertEqual(project?.password, "mypassword")
     }
 
     func testCospendStringDecodingForNonStandardPort() throws {
@@ -83,11 +76,9 @@ class UrlExtensionsTests: XCTestCase {
         let project = url.decodeCospendString()
         XCTAssertNotNil(project)
 
-        if let server = project?.server, let password = project?.password, let project = project?.project {
-            XCTAssertEqual(server.absoluteString, "https://myserver.de:1234")
-            XCTAssertEqual(project, "myproject")
-            XCTAssertEqual(password, "mypassword")
-        }
+        XCTAssertEqual(project?.server.absoluteString, "https://myserver.de:1234")
+        XCTAssertEqual(project?.project, "myproject")
+        XCTAssertEqual(project?.password, "mypassword")
     }
 
     func testCospendError_wrongScheme() throws {
@@ -150,37 +141,20 @@ class UrlExtensionsTests: XCTestCase {
         XCTAssertEqual(project?.password, "mypassword")
     }
 
-    func testDecodeQRCode_httpsSchemeRoutesToMoneyBusterDecoder() throws {
-        // For https:// QR codes, decodeQRCode() must call decodeMoneyBusterString().
-        // A MoneyBuster QR code uses https:// with the fixed MoneyBuster host prefix.
-        let url = URL(string: "https://net.eneiluj.moneybuster.cospend/myserver.de/myproject/mypassword")!
-
-        let project = url.decodeMoneyBusterString()
-        XCTAssertNotNil(project)
-
-        if let server = project?.server, let password = project?.password, let project = project?.project {
-            XCTAssertEqual(server.absoluteString, "https://myserver.de")
-            XCTAssertEqual(password, "mypassword")
-            XCTAssertEqual(project, "myproject")
-        }
-    }
-
     func testMoneyBusterNoPassword() throws {
         let url = URL(string: "https://net.eneiluj.moneybuster.cospend/myserver.de/myproject")!
 
         let project = url.decodeMoneyBusterString()
         XCTAssertNotNil(project)
 
-        if let server = project?.server, let project = project?.project {
-            XCTAssertEqual(server.absoluteString, "https://myserver.de")
-            XCTAssertEqual(project, "myproject")
-        }
+        XCTAssertEqual(project?.server.absoluteString, "https://myserver.de")
+        XCTAssertEqual(project?.project, "myproject")
     }
 
     func testIHateMoneyQRDecoding() throws {
         let url: URL = URL(string: "ihatemoney://my-server.de/demo-project/join/WyJ0ZXN0Il0.Rt04fNMmxp9YslCRq8hB6jE9s1Q")!
 
-        let project = url.decodeIHateMoenyString()
+        let project = url.decodeIHateMoneyString()
         XCTAssertNotNil(project)
 
         XCTAssertEqual(project?.server.absoluteString, "https://my-server.de")

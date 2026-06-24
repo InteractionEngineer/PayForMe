@@ -110,19 +110,6 @@ class AddProjectQRViewModel: ObservableObject {
                                 self.isTestingSubject.send(.failure)
                             }
                         }
-                            //                    NetworkService.shared.testProject(project)
-                            //                        .asUIPublisher
-                            //                        .sink(receiveValue: {
-                            //                            project, code in
-                            //                            if code == 200 {
-                            //                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now().advanced(by: .seconds(1))) {
-                            //                                    ProjectManager.shared.addProject(project)
-                            //                                }
-                            //                                self.isTestingSubject.send(.success)
-                            //                            } else {
-                            //                                self.isTestingSubject.send(.failure)
-                            //                            }
-                            //                        }).store(in: &self.subscriptions)
                     } else {
                         withAnimation {
                             self.url = projectData.server

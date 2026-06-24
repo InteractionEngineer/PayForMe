@@ -185,25 +185,12 @@ struct ProjectDataWithToken: ProjectData {
     var server: URL
     var project: String
     var token: String
-
-    init(server: URL, project: String, token: String) {
-        self.server = server
-        self.project = project
-        self.token = token
-    }
-
 }
 
 struct ProjectDataWithPassword: ProjectData {
     var server: URL
     var project: String
     var password: String?
-
-    init(server: URL, project: String, password: String?) {
-        self.server = server
-        self.project = project
-        self.password = password
-    }
 }
 
 extension URL {
@@ -225,9 +212,7 @@ extension URL {
             password: password
         )
     }
-}
 
-extension URL {
     func decodeCospendString() -> ProjectDataWithPassword? {
         guard let host = host,
               let scheme = scheme,
@@ -239,7 +224,7 @@ extension URL {
         var hostString = host
 
         if let port = port {hostString += ":\(port)"}
-        
+
         if pathComponents.count > 3 {
             hostString += "/" + pathComponents[1..<(pathComponents.count - 2)].joined(separator: "/")
         }
@@ -255,11 +240,9 @@ extension URL {
             project: project,
             password: password)
     }
-}
 
-extension URL {
-    func decodeIHateMoenyString() -> ProjectDataWithToken? {
-        guard var host = host, let scheme = scheme, scheme.localizedCaseInsensitiveContains("ihatemoney") else {
+    func decodeIHateMoneyString() -> ProjectDataWithToken? {
+        guard let host = host, let scheme = scheme, scheme.localizedCaseInsensitiveContains("ihatemoney") else {
             return nil
         }
 
@@ -273,23 +256,21 @@ extension URL {
 
         return ProjectDataWithToken(server: url, project: project, token: token)
     }
-}
 
-extension URL {
     func decodeQRCode() -> ProjectData? {
         guard let scheme = scheme else { return nil }
         if scheme.contains("cospend") {
             return decodeCospendString()
         } else if scheme.contains("ihatemoney") {
-            return decodeIHateMoenyString()
+            return decodeIHateMoneyString()
         } else {
             return decodeMoneyBusterString()
         }
     }
 }
 
-// Why is URL an identifier but not identifiable?
 extension URL: Identifiable {
+    // Why is URL an identifier but not identifiable?
     public var id: URL {
         self
     }

@@ -111,25 +111,6 @@ class NetworkService {
         return Project(name: apiProject.name, password: "", token: invite.token, backend: ProjectBackend.iHateMoney, url: URL(string: invite.url)!, projectId: apiProject.id)
     }
 
-    func fetchInvite(_ invite: InviteData?) async throws {
-        guard let invite = invite, let url = URL(string: invite.url) else {
-            return
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue(
-            "Bearer \(invite.token)",
-            forHTTPHeaderField: "Authorization"
-        )
-
-        let (data, response) = try await URLSession.shared.data(for: request)
-        if let httpResponse = response as? HTTPURLResponse {
-            print("status:", httpResponse.statusCode)
-        }
-        print(String(data: data, encoding: .utf8) ?? "")
-    }
-
     func postBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
         let request = buildURLRequest("bills", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "POST")
         return sendBillPublisher(request: request)
