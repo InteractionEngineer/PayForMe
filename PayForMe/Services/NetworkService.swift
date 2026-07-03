@@ -172,7 +172,7 @@ class NetworkService {
 
         if project.backend == .cospend {
             url = url
-                .appendingPathComponent(project.projectId)
+                .appendingPathComponent(project.token)
                 .appendingPathComponent(project.password)
         }
 
