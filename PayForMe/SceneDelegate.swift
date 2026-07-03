@@ -67,7 +67,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func scene(_: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         guard let context = URLContexts.first,
               let scheme = context.url.scheme,
-              scheme.localizedCaseInsensitiveContains("cospend")
+              scheme.localizedCaseInsensitiveContains("cospend") || scheme.localizedCaseInsensitiveContains("ihatemoney")
         else {
             return
         }
