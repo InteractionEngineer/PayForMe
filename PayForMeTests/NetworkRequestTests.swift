@@ -87,7 +87,7 @@ class NetworkRequestTests: XCTestCase {
         // The full Cospend path must be:
         // /index.php/apps/cospend/api/projects/{token}/{password}/bills
         XCTAssertTrue(
-            url.contains("/index.php/apps/cospend/api/projects/myproject/mypass/bills"),
+            url.contains("/index.php/apps/cospend/api/projects/mytoken/mypass/bills"),
             "Cospend must put token and password in the URL path. Got: \(url)"
         )
     }
@@ -105,7 +105,7 @@ class NetworkRequestTests: XCTestCase {
         let url = MockURLProtocol.lastCapturedRequest?.url?.absoluteString ?? ""
         XCTAssertTrue(url.hasSuffix("/members") || url.contains("/members"),
                       "Members endpoint must end with /members. Got: \(url)")
-        XCTAssertTrue(url.contains("/proj/pass/members"),
+        XCTAssertTrue(url.contains("/tok/pass/members"),
                       "Cospend must embed token and password. Got: \(url)")
     }
 
