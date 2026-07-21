@@ -95,7 +95,7 @@ class NetworkService {
     }
 
     func getProjectName(invite: InviteData) async throws -> Project {
-        var request = URLRequest(url: URL(string: invite.url + "/api/projects/" + invite.project)!)
+        var request = URLRequest(url: URL(string: invite.baseUrl + "/api/projects/" + invite.project)!)
         request.httpMethod = "GET"
         request.setValue(
             "Bearer \(invite.token)",
@@ -108,7 +108,7 @@ class NetworkService {
         }
         let apiProject = try JSONDecoder().decode(APIProject.self, from: data)
 
-        return Project(name: apiProject.name, password: "", token: invite.token, backend: ProjectBackend.iHateMoney, url: URL(string: invite.url)!, projectId: apiProject.id)
+        return Project(name: apiProject.name, password: "", token: invite.token, backend: ProjectBackend.iHateMoney, url: URL(string: invite.baseUrl)!, projectId: apiProject.id)
     }
 
     func postBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {

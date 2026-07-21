@@ -124,7 +124,7 @@ class AddProjectQRViewModel: ObservableObject {
                     self.isTestingSubject.send(.connecting)
                     Task(priority: .userInitiated) {
                         do {
-                            let apiProject = try await NetworkService.shared.getProjectName(invite: InviteData(url: projectData.server.absoluteString, baseUrl: projectData.server.absoluteString, token: projectData.token, project: projectData.project))
+                            let apiProject = try await NetworkService.shared.getProjectName(invite: InviteData(baseUrl: projectData.server.absoluteString, token: projectData.token, project: projectData.project))
                             try ProjectManager.shared.addProject(apiProject)
                             self.isTestingSubject.send(.success)
                         } catch {

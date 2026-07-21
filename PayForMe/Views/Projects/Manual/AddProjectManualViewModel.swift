@@ -11,7 +11,6 @@ import SlickLoadingSpinner
 import UIKit
 
 struct InviteData {
-    let url: String
     let baseUrl: String
     let token: String
     let project: String
@@ -73,7 +72,7 @@ class AddProjectManualViewModel: ObservableObject {
     private func validateInviteToken(_ token: String) {
         guard !token.isEmpty, !serverAddress.isEmpty, !projectName.isEmpty else { return }
         let baseUrl = serverAddress.hasPrefix("https://") ? serverAddress : "https://\(serverAddress)"
-        let inviteData = InviteData(url: baseUrl, baseUrl: baseUrl, token: token, project: projectName)
+        let inviteData = InviteData(baseUrl: baseUrl, token: token, project: projectName)
         validationProgress = .connecting
         Task { @MainActor in
             do {
