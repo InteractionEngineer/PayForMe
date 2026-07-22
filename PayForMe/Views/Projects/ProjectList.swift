@@ -12,7 +12,7 @@ struct ProjectList: View {
     @ObservedObject
     var manager = ProjectManager.shared
 
-    @State private var addProject: AddingProjectMethod?
+    @State private var showAddProject = false
     @State private var shareProject: Project?
 
     var body: some View {
@@ -28,43 +28,22 @@ struct ProjectList: View {
                     ShareProjectQRCode(project: project)
                 }
             }
-            .navigationBarTitle("Projects")
-            .navigationBarItems(trailing:
-                HStack {
-                    Button(action: {
-                        self.addProject = .manual
-                    }) {
-                        Image(systemName: "plus").fancyStyle()
+            .navigationTitle("Projects")
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        showAddProject = true
+                    } label: {
+                        Image(systemName: "plus")
                     }
-                    Button(action: {
-                        self.addProject = .qrCode
-                    }) {
-                        Image(systemName: "qrcode").fancyStyle()
-                    }
+                    .accessibilityLabel(Text("Add project"))
                 }
-                .sheet(item: $addProject, content: { method -> AnyView in
-                    switch method {
-                    case .qrCode:
-                        return destination.eraseToAnyView()
-                    case .manual:
-                        return AddProjectManualView().eraseToAnyView()
-                    }
-                })
-            )
-        }
-        .navigationViewStyle(StackNavigationViewStyle())
-    }
-
-    private enum AddingProjectMethod: Int, CaseIterable, Identifiable {
-        var id: Int {
-            switch self {
-            case .qrCode: return 0
-            case .manual: return 1
+            }
+            .sheet(isPresented: $showAddProject) {
+                AddProjectManualView()
             }
         }
-
-        case qrCode
-        case manual
+        .navigationViewStyle(StackNavigationViewStyle())
     }
 
     func deleteProject(at offsets: IndexSet) {
@@ -73,10 +52,6 @@ struct ProjectList: View {
                 manager.deleteProject(manager.projects[index])
             }
         }
-    }
-
-    var destination: some View {
-        ProjectQRPermissionCheckerView()
     }
 }
 

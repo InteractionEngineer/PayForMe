@@ -14,16 +14,26 @@ struct BillList: View {
     @State
     var deleteAlert: IndexSet?
 
+    @State
+    private var showAddBill = false
+
     var body: some View {
         NavigationView {
             List {
                 iOS15ListContent
             }
-            .addFloatingAddButton()
             .refreshable {
                 await ProjectManager.shared.refresh()
             }
-            .navigationBarTitle("Bills")
+            .navigationTitle("Bills")
+            .glassActionButton(systemImage: "bag.badge.plus",
+                               accessibilityLabel: "Add Bill",
+                               accessibilityIdentifier: "Add Bill") {
+                showAddBill = true
+            }
+            .sheet(isPresented: $showAddBill) {
+                AddBillView(showModal: $showAddBill)
+            }
             .alert(item: $deleteAlert) { index in
                 Alert(title: Text("Delete Bill"),
                       message: Text("Do you really want to erase the bill from the server?"),

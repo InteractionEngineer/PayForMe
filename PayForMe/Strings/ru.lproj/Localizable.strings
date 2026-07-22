@@ -145,3 +145,14 @@
 
 
 "What was paid" = "За что платил";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Отмена";
+"Scan QR code" = "Сканировать QR-код";
+"Backend" = "Бэкенд";
+"server_hint_cospend" = "Ваш собственный сервер Cospend (Nextcloud), например https://cloud.example.com";
+"server_hint_ihatemoney" = "Оставьте пустым для официального ihatemoney.org или укажите свой сервер.";
+"Could not add member" = "Не удалось добавить участника";
+"member_error_forbidden" = "Обычно для этого нужны права сопровождающего проекта. Пароль общего доступа может давать только права участника.";
+"member_error_network" = "Нет соединения с сервером. Проверьте сеть и повторите попытку.";
+"member_error_generic" = "Сервер отклонил запрос (HTTP %d).";

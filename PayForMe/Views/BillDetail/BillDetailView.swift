@@ -11,8 +11,8 @@ import SlickLoadingSpinner
 import SwiftUI
 
 struct BillDetailView: View {
-    @Environment(\.presentationMode)
-    var presentationMode: Binding<PresentationMode>
+    @Environment(\.dismiss)
+    private var dismiss
 
     @Binding
     var showModal: Bool
@@ -61,7 +61,8 @@ struct BillDetailView: View {
                 }
                 .padding()
         }
-        .navigationBarTitle(navBarTitle, displayMode: .inline)
+        .navigationTitle(navBarTitle)
+        .navigationBarTitleDisplayMode(.inline)
     }
 
     func sendBillToServer() {
@@ -75,7 +76,7 @@ struct BillDetailView: View {
             ProjectManager.shared.loadBillsAndMembers()
             self.showModal.toggle()
             DispatchQueue.main.async {
-                self.presentationMode.wrappedValue.dismiss()
+                self.dismiss()
             }
         })
     }

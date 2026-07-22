@@ -28,7 +28,6 @@
 		6524D60225385E0800B2AA7B /* GRDB in Frameworks */ = {isa = PBXBuildFile; productRef = 6524D60125385E0800B2AA7B /* GRDB */; };
 		6533A02B23D888B100FF822B /* BillCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6533A02A23D888B100FF822B /* BillCell.swift */; };
 		654754B82528736F00A82EB6 /* Views+Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754B72528736F00A82EB6 /* Views+Extensions.swift */; };
-		654754BC2528750A00A82EB6 /* FloatingAddButtonViewModifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754BB2528750A00A82EB6 /* FloatingAddButtonViewModifier.swift */; };
 		654754C0252889B200A82EB6 /* ProjectQRPermissionCheckerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754BF252889B200A82EB6 /* ProjectQRPermissionCheckerView.swift */; };
 		654754C8252899FF00A82EB6 /* FancyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754C7252899FF00A82EB6 /* FancyButton.swift */; };
 		654754E42528B29F00A82EB6 /* AddProjectManuallyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 654754E32528B29F00A82EB6 /* AddProjectManuallyTests.swift */; };
@@ -111,7 +110,6 @@
 		6523FC502558153600BCD843 /* AddPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPasswordView.swift; sourceTree = "<group>"; };
 		6533A02A23D888B100FF822B /* BillCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillCell.swift; sourceTree = "<group>"; };
 		654754B72528736F00A82EB6 /* Views+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views+Extensions.swift"; sourceTree = "<group>"; };
-		654754BB2528750A00A82EB6 /* FloatingAddButtonViewModifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingAddButtonViewModifier.swift; sourceTree = "<group>"; };
 		654754BF252889B200A82EB6 /* ProjectQRPermissionCheckerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectQRPermissionCheckerView.swift; sourceTree = "<group>"; };
 		654754C7252899FF00A82EB6 /* FancyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FancyButton.swift; sourceTree = "<group>"; };
 		654754E12528B29F00A82EB6 /* PayForMeTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PayForMeTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -379,7 +377,6 @@
 				489D35F923E081120029F59F /* Util.swift */,
 				65A65E3E2527529D00C86533 /* Combine.swift */,
 				654754B72528736F00A82EB6 /* Views+Extensions.swift */,
-				654754BB2528750A00A82EB6 /* FloatingAddButtonViewModifier.swift */,
 			);
 			path = Util;
 			sourceTree = "<group>";
@@ -575,7 +572,6 @@
 				650059FC23DDE1C300D1D599 /* Person.swift in Sources */,
 				65662A0323D7320000303207 /* AppDelegate.swift in Sources */,
 				654754C0252889B200A82EB6 /* ProjectQRPermissionCheckerView.swift in Sources */,
-				654754BC2528750A00A82EB6 /* FloatingAddButtonViewModifier.swift in Sources */,
 				6533A02B23D888B100FF822B /* BillCell.swift in Sources */,
 				48CF709B240FF82000770B97 /* AddMemberView.swift in Sources */,
 				65D9094025581BE100351F4B /* AddFromURLView.swift in Sources */,
@@ -825,7 +821,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PayForMe/PayForMe.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 109;
+				CURRENT_PROJECT_VERSION = 110;
 				DEVELOPMENT_ASSET_PATHS = "\"PayForMe/Preview Content\"";
 				DEVELOPMENT_TEAM = 22BT3L9N5V;
 				ENABLE_PREVIEWS = YES;
@@ -836,7 +832,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
+				MARKETING_VERSION = 2.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = de.mayflower.PayForMe;
 				PRODUCT_NAME = PayForMe;
 				SWIFT_VERSION = 5.0;
@@ -850,7 +846,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = PayForMe/PayForMe.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 109;
+				CURRENT_PROJECT_VERSION = 110;
 				DEVELOPMENT_ASSET_PATHS = "\"PayForMe/Preview Content\"";
 				DEVELOPMENT_TEAM = 22BT3L9N5V;
 				ENABLE_PREVIEWS = YES;
@@ -861,7 +857,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.5.1;
+				MARKETING_VERSION = 2.6.0;
 				PRODUCT_BUNDLE_IDENTIFIER = de.mayflower.PayForMe;
 				PRODUCT_NAME = PayForMe;
 				SWIFT_VERSION = 5.0;

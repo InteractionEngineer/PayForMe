@@ -240,9 +240,20 @@ extension ProjectManager {
         deleteBillFromServer(bill: bill, completion: completion)
     }
 
-    func addMember(_ name: String, completion: @escaping () -> Void) {
-        let newMember = Person(id: -1, weight: -1, name: name, activated: true, color: nil)
-        sendMemberToServer(newMember, update: false, completion: completion)
+    /// Legt ein Mitglied an und meldet den HTTP-Statuscode zurück (2xx = Erfolg, sonst Fehler;
+    /// -1 bei Transportfehler). So kann die UI einen echten Fehler anzeigen statt still zu scheitern.
+    func addMember(_ name: String, completion: @escaping (Int) -> Void) {
+        cancellable?.cancel()
+        cancellable = NetworkService.shared.createMemberStatusPublisher(name: name)
+            .receive(on: DispatchQueue.main)
+            .sink { statusCode in
+                if (200 ... 299).contains(statusCode) {
+                    print("Member successfully created")
+                } else {
+                    print("Error creating member: HTTP \(statusCode)")
+                }
+                completion(statusCode)
+            }
     }
 
     func updateMember(_ member: Person, completion: @escaping () -> Void) {

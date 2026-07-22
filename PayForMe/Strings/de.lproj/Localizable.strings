@@ -139,3 +139,14 @@
 
 
 "Server returned an invalid HTTP response" = "Server lieferte eine ungültige HTTP-Antwort";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Abbrechen";
+"Scan QR code" = "QR-Code scannen";
+"Backend" = "Backend";
+"server_hint_cospend" = "Dein selbstgehosteter Cospend-Server (Nextcloud), z. B. https://cloud.beispiel.de";
+"server_hint_ihatemoney" = "Leer lassen für das offizielle ihatemoney.org oder eigene Instanz eintragen.";
+"Could not add member" = "Mitglied konnte nicht hinzugefügt werden";
+"member_error_forbidden" = "Dafür sind meist Maintainer-Rechte am Projekt nötig. Das geteilte Projekt-Passwort erlaubt oft nur Teilnehmer-Zugriff.";
+"member_error_network" = "Keine Verbindung zum Server. Bitte Netzwerk prüfen und erneut versuchen.";
+"member_error_generic" = "Der Server hat die Anfrage abgelehnt (HTTP %d).";

@@ -17,22 +17,27 @@ struct BalanceList: View {
     @State
     var memberName = ""
 
+    @State
+    private var memberAddError: MemberAddError?
+
     var body: some View {
         NavigationView {
-            mainView
-                .navigationBarTitle("Members")
-        }.navigationViewStyle(StackNavigationViewStyle())
-    }
-
-    @ViewBuilder
-    var mainView: some View {
-        VStack(alignment: .center) {
-            if addingUser {
-                AddMemberView(memberName: $memberName, addMemberAction: submitUser, cancelButtonAction: cancelAddUser)
-            }
             list
-                .addFloatingAddButton()
-        }
+                .navigationTitle("Members")
+                .glassActionButton(systemImage: "person.badge.plus",
+                                   accessibilityLabel: "Add member",
+                                   accessibilityIdentifier: "Add member") {
+                    showAddUser()
+                }
+                .sheet(isPresented: $addingUser) {
+                    AddMemberView(memberName: $memberName, addMemberAction: submitUser, cancelButtonAction: cancelAddUser)
+                        .alert(item: $memberAddError) { error in
+                            Alert(title: Text("Could not add member"),
+                                  message: Text(memberErrorMessage(for: error.code)),
+                                  dismissButton: .default(Text("OK")))
+                        }
+                }
+        }.navigationViewStyle(StackNavigationViewStyle())
     }
 
     @ViewBuilder
@@ -63,10 +68,26 @@ struct BalanceList: View {
     }
 
     func submitUser() {
-        ProjectManager.shared.addMember(memberName) {
-            self.addingUser = false
-            self.memberName = ""
-            ProjectManager.shared.loadBillsAndMembers()
+        ProjectManager.shared.addMember(memberName) { statusCode in
+            if (200 ... 299).contains(statusCode) {
+                self.addingUser = false
+                self.memberName = ""
+                ProjectManager.shared.loadBillsAndMembers()
+            } else {
+                // Sheet offen lassen, damit der Nutzer die Eingabe behält und es erneut versuchen kann.
+                self.memberAddError = MemberAddError(code: statusCode)
+            }
+        }
+    }
+
+    private func memberErrorMessage(for code: Int) -> String {
+        switch code {
+        case 401, 403:
+            return NSLocalizedString("member_error_forbidden", comment: "Member add failed due to insufficient rights")
+        case -1:
+            return NSLocalizedString("member_error_network", comment: "Member add failed due to a network error")
+        default:
+            return String(format: NSLocalizedString("member_error_generic", comment: "Member add failed with HTTP status code"), code)
         }
     }
 
@@ -82,6 +103,12 @@ struct BalanceList: View {
         let amount = ower.amount.magnitude < balance.amount.magnitude ? ower.amount : balance.amount.magnitude
         return Bill(id: -1, amount: amount, what: topic, date: Date(), payer_id: payer.id, owers: [ower.person], repeat: "n")
     }
+}
+
+/// Fehler beim Anlegen eines Mitglieds, identifizierbar über den HTTP-Statuscode (für `.alert(item:)`).
+struct MemberAddError: Identifiable {
+    let code: Int
+    var id: Int { code }
 }
 
 struct BalanceList_Previews: PreviewProvider {

@@ -142,3 +142,14 @@
 
 
 "What was paid" = "Qu'est-ce qui a été payé?";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Annuler";
+"Scan QR code" = "Scanner le QR code";
+"Backend" = "Backend";
+"server_hint_cospend" = "Votre serveur Cospend auto-hébergé (Nextcloud), par ex. https://cloud.exemple.com";
+"server_hint_ihatemoney" = "Laissez vide pour le ihatemoney.org officiel, ou saisissez votre instance.";
+"Could not add member" = "Impossible d'ajouter le membre";
+"member_error_forbidden" = "Cela nécessite généralement des droits de mainteneur sur le projet. Le mot de passe partagé peut ne donner qu'un accès participant.";
+"member_error_network" = "Pas de connexion au serveur. Vérifiez votre réseau et réessayez.";
+"member_error_generic" = "Le serveur a rejeté la requête (HTTP %d).";

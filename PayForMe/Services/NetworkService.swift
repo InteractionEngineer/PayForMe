@@ -159,6 +159,16 @@ class NetworkService {
         return sendMemberPublisher(request: request)
     }
 
+    /// Wie `createMemberPublisher`, gibt aber den HTTP-Statuscode zurück (bzw. -1 bei
+    /// Transportfehler), damit die UI einen echten Fehler statt eines stillen `false` anzeigen kann.
+    func createMemberStatusPublisher(name: String) -> AnyPublisher<Int, Never> {
+        let request = buildURLRequest("members", params: ["name": name], project: currentProject, httpMethod: "POST")
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .map { output -> Int in (output.response as? HTTPURLResponse)?.statusCode ?? -1 }
+            .replaceError(with: -1)
+            .eraseToAnyPublisher()
+    }
+
     func updateMemberPublisher(member: Person) -> AnyPublisher<Bool, Never> {
         let request = buildURLRequest("members/\(member.id)", params: ["name": member.name], project: currentProject, httpMethod: "PUT")
         return sendMemberPublisher(request: request)

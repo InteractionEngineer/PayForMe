@@ -142,3 +142,14 @@
 
 
 "Server returned an invalid HTTP response" = "Server returned an invalid HTTP response";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Cancel";
+"Scan QR code" = "Scan QR code";
+"Backend" = "Backend";
+"server_hint_cospend" = "Your self-hosted Cospend (Nextcloud) server, e.g. https://cloud.example.com";
+"server_hint_ihatemoney" = "Leave empty for the official ihatemoney.org, or enter your own instance.";
+"Could not add member" = "Could not add member";
+"member_error_forbidden" = "This usually requires maintainer rights for the project. The shared project password may only grant participant access.";
+"member_error_network" = "No connection to the server. Please check your network and try again.";
+"member_error_generic" = "The server rejected the request (HTTP %d).";

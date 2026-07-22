@@ -139,3 +139,14 @@
 
 
 "What was paid" = "Co bylo placeno?";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Zrušit";
+"Scan QR code" = "Naskenovat QR kód";
+"Backend" = "Backend";
+"server_hint_cospend" = "Váš vlastní server Cospend (Nextcloud), např. https://cloud.priklad.cz";
+"server_hint_ihatemoney" = "Ponechte prázdné pro oficiální ihatemoney.org, nebo zadejte vlastní instanci.";
+"Could not add member" = "Člena se nepodařilo přidat";
+"member_error_forbidden" = "To obvykle vyžaduje práva správce projektu. Sdílené heslo projektu může umožňovat jen přístup účastníka.";
+"member_error_network" = "Není spojení se serverem. Zkontrolujte síť a zkuste to znovu.";
+"member_error_generic" = "Server odmítl požadavek (HTTP %d).";

@@ -8,37 +8,46 @@
 import Combine
 import SlickLoadingSpinner
 import SwiftUI
+import UIKit
 
 struct AddProjectManualView: View {
-    @Environment(\.presentationMode)
-    var presentationMode: Binding<PresentationMode>
+    @Environment(\.dismiss)
+    private var dismiss
 
     @StateObject
     private var viewmodel = AddProjectManualViewModel()
 
+    /// True, wenn die Zwischenablage (datenschutzfreundlich, ohne Inhalt zu lesen) eine URL enthält.
+    @State private var clipboardHasURL = false
+
     var body: some View {
-        VStack {
-            Text("Add project").font(.title)
-            Picker(selection: $viewmodel.projectType, label: Text("snens")) {
-                Text("Cospend").tag(ProjectBackend.cospend)
-                Text("iHateMoney").tag(ProjectBackend.iHateMoney)
-            }
-            .pickerStyle(SegmentedPickerStyle())
-            .padding(EdgeInsets(top: 8, leading: 8, bottom: 0, trailing: 8))
-            if #available(iOS 16.0, *) {
-                PasteButton(payloadType: String.self) { strings in
-                    pasteLink(pasteString: strings[0])
-                }
-                .padding(.top, 10)
-            } else {
-                Button("Paste Link") {
-                    pasteLink()
-                }
-                .padding(.top, 10)
-            }
+        NavigationView {
             Form {
+                if clipboardHasURL {
+                    Section {
+                        pasteButton
+                    }
+                }
+
+                Section {
+                    NavigationLink {
+                        ProjectQRPermissionCheckerView()
+                    } label: {
+                        Label("Scan QR code", systemImage: "qrcode.viewfinder")
+                    }
+                }
+
+                Section {
+                    Picker("Backend", selection: $viewmodel.projectType) {
+                        Text("Cospend").tag(ProjectBackend.cospend)
+                        Text("iHateMoney").tag(ProjectBackend.iHateMoney)
+                    }
+                    .pickerStyle(.segmented)
+                }
+
                 Section(
-                    header: Text(viewmodel.projectType == .iHateMoney ? "Server Address (Optional)" : "Server Address")
+                    header: Text(LocalizedStringKey(viewmodel.projectType == .iHateMoney ? "Server Address (Optional)" : "Server Address")),
+                    footer: Text(LocalizedStringKey(viewmodel.projectType == .cospend ? "server_hint_cospend" : "server_hint_ihatemoney"))
                 ) {
                     TextFieldContainer(
                         viewmodel.projectType == .cospend
@@ -48,10 +57,8 @@ struct AddProjectManualView: View {
                 }
 
                 Section(header: Text("Project ID & Password")) {
-                    TextField("Enter project id",
-                              text: self.$viewmodel.projectName)
-                    .autocapitalization(.none)
-
+                    TextField("Enter project id", text: self.$viewmodel.projectName)
+                        .autocapitalization(.none)
                     SecureField("Enter project password", text: self.$viewmodel.projectPassword)
                 }
 
@@ -62,28 +69,68 @@ struct AddProjectManualView: View {
                     }
                 }
 
-
-                SlickLoadingSpinner(connectionState: viewmodel.validationProgress)
-                    .frame(width: 50, height: 50)
-                FancyButton(
-                    add: false,
-                    action: addButton,
-                    text: "Add Project"
-                )
-                .disabled(viewmodel.validationProgress != .success)
-                if !viewmodel.errorText.isEmpty {
-                    Text(viewmodel.errorText)
+                Section {
+                    HStack {
+                        Spacer()
+                        if viewmodel.validationProgress == .connecting {
+                            SlickLoadingSpinner(connectionState: viewmodel.validationProgress)
+                                .frame(width: 50, height: 50)
+                        } else {
+                            FancyButton(add: false, action: addButton, text: "Add Project")
+                                .disabled(viewmodel.validationProgress != .success)
+                        }
+                        Spacer()
+                    }
+                    if !viewmodel.errorText.isEmpty {
+                        Text(viewmodel.errorText)
+                            .foregroundColor(.red)
+                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
                 }
             }
-            .id(viewmodel.projectType == .cospend ? "cospend" : "iHateMoney")}
-        .padding(.horizontal, 20)
-        .padding(.vertical, 50)
-        .background(Color.PFMBackground)
+            .id(viewmodel.projectType == .cospend ? "cospend" : "iHateMoney")
+            .navigationTitle("Add project")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                }
+            }
+        }
+        .navigationViewStyle(StackNavigationViewStyle())
+        .onAppear { detectClipboard() }
+    }
+
+    @ViewBuilder
+    private var pasteButton: some View {
+        if #available(iOS 16.0, *) {
+            PasteButton(payloadType: String.self) { strings in
+                guard let first = strings.first else { return }
+                pasteLink(pasteString: first)
+            }
+        } else {
+            Button {
+                pasteLink()
+            } label: {
+                Label("Paste Link", systemImage: "doc.on.clipboard")
+            }
+        }
+    }
+
+    /// Prüft datenschutzfreundlich (ohne Inhalt zu lesen, kein Paste-Hinweis), ob die
+    /// Zwischenablage eine URL enthält, und blendet nur dann den Einfügen-Button ein.
+    private func detectClipboard() {
+        UIPasteboard.general.detectPatterns(for: [\.probableWebURL]) { result in
+            guard case let .success(patterns) = result else { return }
+            DispatchQueue.main.async {
+                clipboardHasURL = patterns.contains(\.probableWebURL)
+            }
+        }
     }
 
     func addButton() {
         viewmodel.addProject()
-        presentationMode.wrappedValue.dismiss()
+        dismiss()
     }
     
     private func pasteLink(pasteString: String) {
