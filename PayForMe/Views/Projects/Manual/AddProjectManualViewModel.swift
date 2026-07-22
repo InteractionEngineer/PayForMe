@@ -71,8 +71,15 @@ class AddProjectManualViewModel: ObservableObject {
     }
 
     private func validateInviteToken(_ token: String) {
-        guard !token.isEmpty, !serverAddress.isEmpty, !projectName.isEmpty else { return }
-        let baseUrl = serverAddress.hasPrefix("https://") ? serverAddress : "https://\(serverAddress)"
+        guard !token.isEmpty, !projectName.isEmpty else { return }
+
+        let baseUrl: String
+        if serverAddress.isEmpty {
+            baseUrl = NetworkService.iHateMoneyURLString
+        } else {
+            baseUrl = serverAddress.hasPrefix("https://") ? serverAddress : "https://\(serverAddress)"
+        }
+
         let inviteData = InviteData(url: baseUrl, baseUrl: baseUrl, token: token, project: projectName)
         validationProgress = .connecting
         Task { @MainActor in
