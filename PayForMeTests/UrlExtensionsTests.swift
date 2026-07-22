@@ -149,6 +149,7 @@ class UrlExtensionsTests: XCTestCase {
 
         XCTAssertEqual(project?.server.absoluteString, "https://myserver.de")
         XCTAssertEqual(project?.project, "myproject")
+        XCTAssertNil(project?.password)
     }
 
     func testIHateMoneyQRDecoding() throws {
