@@ -79,7 +79,7 @@ struct GlassActionButton: View {
     let action: () -> Void
 
     var body: some View {
-        Button(action: action) {
+        let button = Button(action: action) {
             Image(systemName: systemImage)
                 .font(.title2.weight(.semibold))
                 .overlay(alignment: .bottomLeading) { plusBadge }
@@ -87,7 +87,12 @@ struct GlassActionButton: View {
         }
         .glassCircleStyle()
         .accessibilityLabel(Text(accessibilityLabel))
-        .accessibilityIdentifier(accessibilityIdentifier ?? "")
+
+        if let accessibilityIdentifier {
+            button.accessibilityIdentifier(accessibilityIdentifier)
+        } else {
+            button
+        }
     }
 
     private var plusBadge: some View {
