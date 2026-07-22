@@ -100,11 +100,12 @@ class AddProjectManualViewModel: ObservableObject {
             .combineLatest($inviteUrl)
             .sink { [weak self] combo, invite in
                 guard let self else { return }
-                let (type, server, name, password) = combo
+                let (type, server, name, _) = combo
                 let hasCompleteInput: Bool
                 switch type {
                 case .cospend:
-                    hasCompleteInput = !server.isEmpty && !name.isEmpty && !password.isEmpty
+                    // Mirror validatedInput: Cospend accepts an empty password (sent as "no-pass"),
+                    hasCompleteInput = !server.isEmpty && !name.isEmpty
                 case .iHateMoney:
                     hasCompleteInput = !invite.isEmpty
                 }
