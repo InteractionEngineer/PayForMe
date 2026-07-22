@@ -51,7 +51,7 @@
 "Enter project id" = "Введите id проекта";
 
 
-"Enter project password" = "Введите пароль проекта";
+"Enter project password (Optional)" = "Введите пароль проекта (необязательно)";
 
 /*  */
 "Expense date" = "Дата расхода";
@@ -123,7 +123,7 @@
 "Sure" = "Конечно";
 
 /*  */
-"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually." = "Чтобы начать делиться расходами с друзьями, вы должны добавить проект из Cospend или iHateMoney. \n\n Проекты Cospend можно добавить с помощью QR-кода или заполнив информацию вручную, для iHateMoney необходимо заполнить информацию вручную.";
+"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you." = "Чтобы начать делиться расходами с друзьями, вы должны добавить проект из Cospend или iHateMoney. Для этого отсканируйте QR-код или откройте ссылку на проект, которым с вами поделились.";
 
 /*  */
 "To use iHateMoney, host an own instance or register at" = "Чтобы использовать iHateMoney, создайте собственный экземпляр или зарегистрируйтесь на сайте";
@@ -145,3 +145,14 @@
 
 
 "What was paid" = "За что платил";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Отмена";
+"Scan QR code" = "Сканировать QR-код";
+"Backend" = "Бэкенд";
+"server_hint_cospend" = "Ваш собственный сервер Cospend (Nextcloud).";
+"server_hint_ihatemoney" = "Оставьте пустым для официального сервера или укажите свой.";
+"Could not add member" = "Не удалось добавить участника";
+"member_error_forbidden" = "Обычно для этого нужны права сопровождающего проекта. Пароль общего доступа может давать только права участника.";
+"member_error_network" = "Нет соединения с сервером. Проверьте сеть и повторите попытку.";
+"member_error_generic" = "Сервер отклонил запрос (HTTP %d).";

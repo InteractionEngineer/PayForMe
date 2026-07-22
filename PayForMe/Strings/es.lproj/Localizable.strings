@@ -51,7 +51,7 @@
 "Enter project id" = "Entrar el ID del proyecto";
 
 
-"Enter project password" = "Entrar la contraseña del proyecto";
+"Enter project password (Optional)" = "Entrar la contraseña del proyecto (opcional)";
 
 /*  */
 "Expense date" = "Fecha de gasto";
@@ -120,7 +120,7 @@
 "Sure" = "Claro";
 
 /*  */
-"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually." = "Para empezar a compartir gastos con amigos, debes añadir un proyecto de Cospend o iHateMoney. \Los proyectos de Cospend se pueden añadir mediante un código QR o rellenando manualmente la información, para iHateMoney es necesario rellenar la información manualmente.";
+"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you." = "Para empezar a compartir gastos con amigos, debes añadir un proyecto de Cospend o iHateMoney. Para ello, escanea el código QR o haz clic en el enlace del proyecto que te han compartido.";
 
 /*  */
 "To use iHateMoney, host an own instance or register at" = "Para utilizar iHateMoney, aloje una instancia propia o regístrese en";
@@ -142,3 +142,14 @@
 
 
 "What was paid" = "¿Qué se pagó?";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Cancelar";
+"Scan QR code" = "Escanear código QR";
+"Backend" = "Backend";
+"server_hint_cospend" = "Tu servidor Cospend autoalojado (Nextcloud).";
+"server_hint_ihatemoney" = "Déjalo vacío para la instancia oficial, o introduce tu instancia.";
+"Could not add member" = "No se pudo añadir el miembro";
+"member_error_forbidden" = "Esto suele requerir permisos de mantenedor del proyecto. La contraseña compartida puede dar solo acceso de participante.";
+"member_error_network" = "Sin conexión con el servidor. Comprueba tu red e inténtalo de nuevo.";
+"member_error_generic" = "El servidor rechazó la solicitud (HTTP %d).";

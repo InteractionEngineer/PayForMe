@@ -13,7 +13,11 @@ import SwiftUI
 struct AddProjectQRView: View {
     @StateObject var viewmodel = AddProjectQRViewModel()
 
-    @Environment(\.presentationMode) var presentationMode
+    @Environment(\.dismiss) private var dismiss
+
+    /// Called after a successful scan. When set, the presenting view dismisses the whole flow;
+    /// otherwise only this view is dismissed.
+    var onFinish: (() -> Void)?
 
     @State var scanningCode: [AVMetadataObject.ObjectType] = [.qr]
 
@@ -30,7 +34,11 @@ struct AddProjectQRView: View {
             case .success:
                 DispatchQueue.main.asyncAfter(deadline: DispatchTime.now().advanced(by: .seconds(1))) {
                     withAnimation {
-                        presentationMode.wrappedValue.dismiss()
+                        if let onFinish {
+                            onFinish()
+                        } else {
+                            dismiss()
+                        }
                     }
                 }
             case .failure:

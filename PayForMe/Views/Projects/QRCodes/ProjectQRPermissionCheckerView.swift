@@ -12,10 +12,13 @@ struct ProjectQRPermissionCheckerView: View {
     @State
     var cameraAuthStatus = AVCaptureDevice.authorizationStatus(for: .video)
 
+    /// Called after a successful scan so the presenting view can dismiss.
+    var onFinish: (() -> Void)?
+
     var body: some View {
         switch cameraAuthStatus {
         case .authorized:
-            return AddProjectQRView().eraseToAnyView()
+            return AddProjectQRView(onFinish: onFinish).eraseToAnyView()
         case .denied:
             return permissionDeniedView.eraseToAnyView()
         default:

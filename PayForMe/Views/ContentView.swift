@@ -52,20 +52,21 @@ struct ContentView: View {
         TabView(selection: $tabBarIndex) {
             BillList(viewModel: billListViewModel)
                 .tabItem {
-                    Image(systemName: "rectangle.stack")
+                    Label("Bills", systemImage: "rectangle.stack")
                 }
                 .tag(tabBarItems.BillList)
             BalanceList(viewModel: balanceViewModel)
                 .tabItem {
-                    Image(systemName: "arrow.right.arrow.left")
+                    Label("Members", systemImage: "arrow.right.arrow.left")
                 }
                 .tag(tabBarItems.Balance)
             ProjectList()
                 .tabItem {
-                    Image(systemName: "gear")
+                    Label("Projects", systemImage: "gear")
                 }
                 .tag(tabBarItems.ServerList)
         }
+        .glassTabBarMinimize()
     }
 }
 

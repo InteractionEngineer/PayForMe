@@ -54,7 +54,7 @@
 "Enter project id" = "Enter project id";
 
 
-"Enter project password" = "Enter project password";
+"Enter project password (Optional)" = "Enter project password (Optional)";
 
 
 "Expense date" = "Expense date";
@@ -89,6 +89,10 @@
 
 "Paste Link" = "Paste Link";
 
+"Invite Link" = "Invite Link";
+"Enter invite link" = "Enter invite link";
+"invite_link_hint" = "Paste the full invite link. Server and project are detected automatically.";
+
 /* BillDetail.swift */
 "Payer" = "Payer";
 
@@ -117,7 +121,7 @@
 "Sure" = "Sure";
 
 
-"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually." = "To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually.";
+"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you." = "To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you.";
 
 
 "To use iHateMoney, host an own instance or register at" = "To use iHateMoney, host an own instance or register at";
@@ -142,3 +146,14 @@
 
 
 "Server returned an invalid HTTP response" = "Server returned an invalid HTTP response";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Cancel";
+"Scan QR code" = "Scan QR code";
+"Backend" = "Backend";
+"server_hint_cospend" = "Your self-hosted Cospend (Nextcloud) server.";
+"server_hint_ihatemoney" = "Leave empty for the official instance, or enter your own domain.";
+"Could not add member" = "Could not add member";
+"member_error_forbidden" = "This usually requires maintainer rights for the project. You can grant those at any time by changing the share-link's settings in Cospend (your Nextcloud-App).";
+"member_error_network" = "No connection to the server. Please check your network and try again.";
+"member_error_generic" = "The server rejected the request (HTTP %d).";

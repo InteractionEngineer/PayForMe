@@ -51,7 +51,7 @@
 "Enter project id" = "Entrer le ID du projet";
 
 
-"Enter project password" = "Entrer le mot de passe du projet";
+"Enter project password (Optional)" = "Entrer le mot de passe du projet (facultatif)";
 
 /*  */
 "Expense date" = "Date de la dépense";
@@ -120,7 +120,7 @@
 "Sure" = "Bien sûr, c'est une évidence";
 
 /*  */
-"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually." = "Pour commencer à partager des dépenses avec des amis, vous devez ajouter un projet de Cospend ou de iHateMoney. \Les projets Cospend peuvent être ajoutés par QR Code ou en remplissant manuellement les informations, pour iHateMoney vous devez remplir les informations manuellement.";
+"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you." = "Pour commencer à partager des dépenses avec des amis, vous devez ajouter un projet de Cospend ou de iHateMoney. Pour cela, scannez le QR code ou cliquez sur le lien du projet qui vous a été partagé.";
 
 /*  */
 "To use iHateMoney, host an own instance or register at" = "Pour utiliser iHateMoney, hébergez votre propre instance ou inscrivez-vous à l'adresse suivante";
@@ -142,3 +142,14 @@
 
 
 "What was paid" = "Qu'est-ce qui a été payé?";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Annuler";
+"Scan QR code" = "Scanner le QR code";
+"Backend" = "Backend";
+"server_hint_cospend" = "Votre serveur Cospend auto-hébergé (Nextcloud).";
+"server_hint_ihatemoney" = "Laissez vide pour l'instance officielle, ou saisissez votre instance.";
+"Could not add member" = "Impossible d'ajouter le membre";
+"member_error_forbidden" = "Cela nécessite généralement des droits de mainteneur sur le projet. Le mot de passe partagé peut ne donner qu'un accès participant.";
+"member_error_network" = "Pas de connexion au serveur. Vérifiez votre réseau et réessayez.";
+"member_error_generic" = "Le serveur a rejeté la requête (HTTP %d).";

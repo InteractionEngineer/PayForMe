@@ -39,6 +39,20 @@ class AddProjectManualViewModel: ObservableObject {
 
     private var cancellables = Set<AnyCancellable>()
 
+    /// Saved input state per backend, so fields persist when switching between Cospend and iHateMoney without mixing.
+    private struct TabState {
+        var serverAddress = ""
+        var projectName = ""
+        var projectPassword = ""
+        var inviteUrl = ""
+        var validationProgress = LoadingState.notStarted
+        var errorText = ""
+        var lastProjectTestedSuccessfully: Project?
+    }
+
+    private var tabStates: [ProjectBackend: TabState] = [:]
+    private var currentTab: ProjectBackend = .cospend
+
     init() {
         validatedInput.map { _ in LoadingState.connecting }.assign(to: &$validationProgress)
         validatedServer.map { $0 == 200 ? LoadingState.success : LoadingState.failure }.assign(to: &$validationProgress)
@@ -49,6 +63,57 @@ class AddProjectManualViewModel: ObservableObject {
             .filter { _ in self.projectType == .iHateMoney }
             .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
             .sink { [weak self] token in self?.validateInviteToken(token) }
+            .store(in: &cancellables)
+
+        // On backend switch, save the old tab's state and restore the new one, keeping Cospend and
+        // iHateMoney inputs separate. Runs synchronously when projectType is set; since `pasteAddress`
+        // sets projectType before the fields, a pasted link correctly overwrites the restored values.
+        $projectType
+            .dropFirst()
+            .sink { [weak self] newTab in
+                guard let self, newTab != self.currentTab else { return }
+                self.tabStates[self.currentTab] = TabState(
+                    serverAddress: self.serverAddress,
+                    projectName: self.projectName,
+                    projectPassword: self.projectPassword,
+                    inviteUrl: self.inviteUrl,
+                    validationProgress: self.validationProgress,
+                    errorText: self.errorText,
+                    lastProjectTestedSuccessfully: self.lastProjectTestedSuccessfully
+                )
+                let restored = self.tabStates[newTab] ?? TabState()
+                self.currentTab = newTab
+                self.serverAddress = restored.serverAddress
+                self.projectName = restored.projectName
+                self.projectPassword = restored.projectPassword
+                self.inviteUrl = restored.inviteUrl
+                self.lastProjectTestedSuccessfully = restored.lastProjectTestedSuccessfully
+                // Set status last so the synchronous reset/error publishers above (reacting to field changes) don't overwrite it.
+                self.validationProgress = restored.validationProgress
+                self.errorText = restored.errorText
+            }
+            .store(in: &cancellables)
+
+        // When input becomes incomplete (e.g. pasted link cleared or tab switched), reset the
+        // connection spinner immediately instead of spinning forever.
+        Publishers.CombineLatest4($projectType, $serverAddress, $projectName, $projectPassword)
+            .combineLatest($inviteUrl)
+            .sink { [weak self] combo, invite in
+                guard let self else { return }
+                let (type, server, name, _) = combo
+                let hasCompleteInput: Bool
+                switch type {
+                case .cospend:
+                    // Mirror validatedInput: Cospend accepts an empty password (sent as "no-pass"),
+                    hasCompleteInput = !server.isEmpty && !name.isEmpty
+                case .iHateMoney:
+                    hasCompleteInput = !invite.isEmpty
+                }
+                if !hasCompleteInput {
+                    self.validationProgress = .notStarted
+                    self.errorText = ""
+                }
+            }
             .store(in: &cancellables)
     }
 
@@ -65,14 +130,16 @@ class AddProjectManualViewModel: ObservableObject {
         do {
             try ProjectManager.shared.addProject(project)
         } catch {
-            errorText = "Project already exists!"
+            errorText = "Could not save project"
         }
     }
 
-    private func validateInviteToken(_ token: String) {
-        guard !token.isEmpty, !serverAddress.isEmpty, !projectName.isEmpty else { return }
-        let baseUrl = serverAddress.hasPrefix("https://") ? serverAddress : "https://\(serverAddress)"
-        let inviteData = InviteData(baseUrl: baseUrl, token: token, project: projectName)
+    private func validateInviteToken(_ input: String) {
+        guard let inviteData = inviteData(from: input) else {
+            // Incomplete/empty input: don't get stuck in the connection spinner.
+            validationProgress = .notStarted
+            return
+        }
         validationProgress = .connecting
         Task { @MainActor in
             do {
@@ -86,12 +153,62 @@ class AddProjectManualViewModel: ObservableObject {
         }
     }
 
+    /// Builds `InviteData` from the field contents. Accepts a full invite URL of the form
+    /// `https://host/<project>/join/<token>` (server and project are derived and filled into the
+    /// fields) or, as a fallback, a raw token with separately filled server and project.
+    private func inviteData(from input: String) -> InviteData? {
+        let trimmed = input.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmed.isEmpty else { return nil }
+
+        if let url = URL(string: trimmed),
+           let scheme = url.scheme, let host = url.host,
+           let joinIndex = url.pathComponents.firstIndex(of: "join"),
+           joinIndex >= 2, joinIndex + 1 < url.pathComponents.count {
+            // Locate project/token relative to the "join" segment so a reverse-proxied
+            // subpath doesn't shift the indices. Keep the port and any prefix path so the
+            // derived base URL stays reachable.
+            let project = url.pathComponents[joinIndex - 1]
+            let token = url.pathComponents[joinIndex + 1]
+            var baseUrl = "\(scheme)://\(host)"
+            if let port = url.port {
+                baseUrl += ":\(port)"
+            }
+            let prefix = url.pathComponents[1 ..< (joinIndex - 1)]
+            if !prefix.isEmpty {
+                baseUrl += "/" + prefix.joined(separator: "/")
+            }
+            serverAddress = baseUrl
+            projectName = project
+            return InviteData(baseUrl: baseUrl, token: token, project: project)
+        }
+
+        guard !serverAddress.isEmpty, !projectName.isEmpty else { return nil }
+        let baseUrl = serverAddress.hasPrefix("https://") ? serverAddress : "https://\(serverAddress)"
+        return InviteData(baseUrl: baseUrl, token: trimmed, project: projectName)
+    }
+
+    /// Checks whether clipboard text is a project link that fits the form; same detection as
+    /// `pasteAddress` but without mutating the fields.
+    func canPaste(_ string: String) -> Bool {
+        let trimmed = string.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard let url = URL(string: trimmed) else { return false }
+        switch url.decodeQRCode() {
+        case is ProjectDataWithPassword, is ProjectDataWithToken:
+            return true
+        default:
+            return url.pathComponents.contains("join")
+                && url.scheme != nil && url.host != nil
+                && url.pathComponents.count >= 4
+        }
+    }
+
     func pasteAddress(address: String) {
         let trimmedAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
         guard let url = URL(string: trimmedAddress) else { return }
 
         switch url.decodeQRCode() {
         case let project as ProjectDataWithPassword:
+            projectType = .cospend
             serverAddress = project.server.absoluteString
             projectName = project.project
             projectPassword = project.password ?? ""
@@ -101,13 +218,23 @@ class AddProjectManualViewModel: ObservableObject {
             projectName = project.project
             inviteUrl = project.token
         default:
-            guard url.pathComponents.contains("join"),
-                  let scheme = url.scheme, let host = url.host,
-                  url.pathComponents.count >= 4 else { return }
+            guard let scheme = url.scheme, let host = url.host,
+                  let joinIndex = url.pathComponents.firstIndex(of: "join"),
+                  joinIndex >= 2, joinIndex + 1 < url.pathComponents.count else { return }
+            // Same relative parsing as inviteData(from:): tolerate a reverse-proxied subpath
+            // and preserve the port so the base URL stays reachable.
             projectType = .iHateMoney
-            serverAddress = "\(scheme)://\(host)"
-            projectName = url.pathComponents[1]
-            inviteUrl = url.pathComponents[3]
+            var baseUrl = "\(scheme)://\(host)"
+            if let port = url.port {
+                baseUrl += ":\(port)"
+            }
+            let prefix = url.pathComponents[1 ..< (joinIndex - 1)]
+            if !prefix.isEmpty {
+                baseUrl += "/" + prefix.joined(separator: "/")
+            }
+            serverAddress = baseUrl
+            projectName = url.pathComponents[joinIndex - 1]
+            inviteUrl = url.pathComponents[joinIndex + 1]
         }
     }
 
@@ -162,12 +289,17 @@ class AddProjectManualViewModel: ObservableObject {
         Publishers.CombineLatest3(validatedAddress, $projectName, $projectPassword)
             .debounce(for: 1, scheduler: DispatchQueue.main)
             .compactMap { server, token, password -> Project? in
-                if let address = server.address, address.isValidURL, !token.isEmpty, !password.isEmpty {
-                    guard let url = URL(string: address) else { return nil }
-                    return Project(name: token, password: password, token: token, backend: server.0, url: url, projectId: self.projectName)
+                guard let address = server.address, address.isValidURL, !token.isEmpty,
+                      let url = URL(string: address) else { return nil }
+                // Cospend allows an empty password: "no-pass" is sent then. The user can enter a real password to override.
+                let effectivePassword: String
+                if server.0 == .cospend {
+                    effectivePassword = password.isEmpty ? "no-pass" : password
                 } else {
-                    return nil
+                    guard !password.isEmpty else { return nil }
+                    effectivePassword = password
                 }
+                return Project(name: token, password: effectivePassword, token: token, backend: server.0, url: url, projectId: self.projectName)
             }
             .removeDuplicates()
             .share()

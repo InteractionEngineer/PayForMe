@@ -28,7 +28,7 @@ struct FancyLoadingButton: View {
                     Text(LocalizedStringKey(text))
                 }
             }
-            .fancyStyle(active: self.isEnabled)
+            .prominentActionStyle(active: self.isEnabled)
             .disabled(!isEnabled)
             .eraseToAnyView()
         default:

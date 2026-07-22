@@ -54,7 +54,7 @@
 "Enter project id" = "Zadejte identifikátor projektu";
 
 
-"Enter project password" = "Zadejte heslo k projektu";
+"Enter project password (Optional)" = "Zadejte heslo k projektu (volitelné)";
 
 /*  */
 "Expense date" = "Datum výdaje";
@@ -117,7 +117,7 @@
 "Sure" = "Jistě";
 
 
-"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually." = "Pokud chcete začít sdílet náklady s přáteli, je třeba přidat projekt z Cospend nebo iHateMoney. \n\n Cospend projekty je možné přidávat prostřednictvím QR kódu nebo ručně vyplněním potřebných údajů, pro iHateMoney je třeba vyplnit potřebné údaje vždy ručně.";
+"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you." = "Chcete-li začít sdílet výdaje s přáteli, musíte přidat projekt z Cospend nebo iHateMoney. Naskenujte k tomu QR kód nebo klikněte na odkaz projektu, který vám byl sdílen.";
 
 
 "To use iHateMoney, host an own instance or register at" = "Pokud chcete použít iHateMoney, hostujte si svou vlastní instanci nebo se zaregistrujte na";
@@ -139,3 +139,14 @@
 
 
 "What was paid" = "Co bylo placeno?";
+
+/* Feedback round 2.6.0 */
+"Cancel" = "Zrušit";
+"Scan QR code" = "Naskenovat QR kód";
+"Backend" = "Backend";
+"server_hint_cospend" = "Váš vlastní server Cospend (Nextcloud).";
+"server_hint_ihatemoney" = "Ponechte prázdné pro oficiální instanci, nebo zadejte vlastní instanci.";
+"Could not add member" = "Člena se nepodařilo přidat";
+"member_error_forbidden" = "To obvykle vyžaduje práva správce projektu. Sdílené heslo projektu může umožňovat jen přístup účastníka.";
+"member_error_network" = "Není spojení se serverem. Zkontrolujte síť a zkuste to znovu.";
+"member_error_generic" = "Server odmítl požadavek (HTTP %d).";
