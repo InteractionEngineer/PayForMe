@@ -32,7 +32,22 @@ class AddProjectManuallyTests: XCTestCase {
     var viewmodel = AddProjectManualViewModel()
     var subscriptions = Set<AnyCancellable>()
 
+    override func setUp() {
+        super.setUp()
+        // The view model validates the server over the network once a full
+        // triple is entered. Intercept it so tests stay offline and deterministic.
+        URLProtocol.registerClass(MockURLProtocol.self)
+        MockURLProtocol.requestHandler = { request in
+            let response = HTTPURLResponse(url: request.url!, statusCode: 200,
+                                           httpVersion: nil, headerFields: nil)!
+            let body = #"{"name": "nameXY", "id": "nameXY"}"#.data(using: .utf8)!
+            return (response, body)
+        }
+    }
+
     override func tearDownWithError() throws {
+        URLProtocol.unregisterClass(MockURLProtocol.self)
+        MockURLProtocol.reset()
         subscriptions.removeAll()
     }
 
