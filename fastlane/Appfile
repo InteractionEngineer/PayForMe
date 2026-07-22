@@ -1,8 +1,6 @@
 app_identifier("de.mayflower.PayForMe") # The bundle identifier of your app
-apple_id("maxt1409@gmail.com") # Your Apple email address
 
-itc_team_id("340374") # App Store Connect Team ID
-team_id("L79BTFY6FV") # Developer Portal Team ID
+# Account + team are resolved from the App Store Connect API key (see fastlane/.env),
 
 # For more information about the Appfile, see:
 #     https://docs.fastlane.tools/advanced/#appfile

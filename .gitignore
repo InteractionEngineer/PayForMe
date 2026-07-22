@@ -61,6 +61,10 @@ fastlane/Preview.html
 fastlane/screenshots/**/*.png
 fastlane/test_output
 
+# App Store Connect API key + secrets (never commit)
+fastlane/*.p8
+fastlane/.env
+
 ## Gcc Patch
 /*.gcno
 
