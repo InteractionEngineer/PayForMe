@@ -145,17 +145,20 @@ struct AddProjectManualView: View {
         .disabled(!clipboardHasURL)
     }
 
-    /// Reads the clipboard contents only after a pattern check confirms a URL, to avoid a paste prompt.
     private func detectClipboard() {
-        UIPasteboard.general.detectPatterns(for: [\.probableWebURL]) { result in
-            guard case let .success(patterns) = result, patterns.contains(\.probableWebURL) else {
-                DispatchQueue.main.async { clipboardHasURL = false }
-                return
+        // iOS 16+ gates the read behind a pattern check, so contents are only inspected (and the
+        // paste notification only shown) when a URL is present. That API is unavailable on iOS 15.
+        if #available(iOS 16.0, *) {
+            UIPasteboard.general.detectPatterns(for: [\.probableWebURL]) { result in
+                guard (try? result.get())?.contains(\.probableWebURL) == true else {
+                    DispatchQueue.main.async { clipboardHasURL = false }
+                    return
+                }
+                let content = UIPasteboard.general.string ?? ""
+                DispatchQueue.main.async { clipboardHasURL = viewmodel.canPaste(content) }
             }
-            let content = UIPasteboard.general.string ?? ""
-            DispatchQueue.main.async {
-                clipboardHasURL = viewmodel.canPaste(content)
-            }
+        } else {
+            clipboardHasURL = viewmodel.canPaste(UIPasteboard.general.string ?? "")
         }
     }
 
