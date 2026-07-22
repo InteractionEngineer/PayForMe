@@ -51,7 +51,7 @@
 "Enter project id" = "Entrer le ID du projet";
 
 
-"Enter project password" = "Entrer le mot de passe du projet";
+"Enter project password (Optional)" = "Entrer le mot de passe du projet (facultatif)";
 
 /*  */
 "Expense date" = "Date de la dépense";
@@ -147,8 +147,8 @@
 "Cancel" = "Annuler";
 "Scan QR code" = "Scanner le QR code";
 "Backend" = "Backend";
-"server_hint_cospend" = "Votre serveur Cospend auto-hébergé (Nextcloud), par ex. https://cloud.exemple.com";
-"server_hint_ihatemoney" = "Laissez vide pour le ihatemoney.org officiel, ou saisissez votre instance.";
+"server_hint_cospend" = "Votre serveur Cospend auto-hébergé (Nextcloud).";
+"server_hint_ihatemoney" = "Laissez vide pour l'instance officielle, ou saisissez votre instance.";
 "Could not add member" = "Impossible d'ajouter le membre";
 "member_error_forbidden" = "Cela nécessite généralement des droits de mainteneur sur le projet. Le mot de passe partagé peut ne donner qu'un accès participant.";
 "member_error_network" = "Pas de connexion au serveur. Vérifiez votre réseau et réessayez.";

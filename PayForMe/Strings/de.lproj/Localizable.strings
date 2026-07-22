@@ -51,7 +51,7 @@
 "Enter project id" = "Projekt ID eingeben";
 
 
-"Enter project password" = "Projekt Passwort eingeben";
+"Enter project password (Optional)" = "Projekt Passwort eingeben (optional)";
 
 /*  */
 "Expense date" = "Datum der Aufwendung";
@@ -86,6 +86,10 @@
 
 "Paste Link" = "Link einsetzen";
 
+"Invite Link" = "Invite-Link";
+"Enter invite link" = "Invite-Link einsetzen";
+"invite_link_hint" = "Kompletten Invite-Link einsetzen. Server und Projekt werden automatisch erkannt.";
+
 
 "Payer" = "Zahler";
 
@@ -114,10 +118,10 @@
 "Sure" = "Sicher";
 
 
-"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually." = "Um deine Ausgaben mit Freunden teilen zu können, musst du ein Projekt von Cospend oder iHateMoney hinzufügen \n\n Cospend Projekte können manuell oder mit QR-Code hinzugefügt werden, für iHateMoney musst du das Projekt manuell hinzufügen.";
+"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you." = "Um deine Ausgaben mit Freunden teilen zu können, musst du ein Projekt von Cospend oder iHateMoney hinzufügen. Scanne dazu den QR-Code oder Link des Projekts, der dir geteilt wurde.";
 
 
-"To use iHateMoney, host an own instance or register at" = "Um iHateMoney zu benutzen, hoste eine eigene Instanz oder registrier dich bei";
+"To use iHateMoney, host an own instance or register at" = "Um iHateMoney zu benutzen, hoste eine eigene Instanz oder registriere dich bei";
 
 
 "Type password here" = "Hier Passwort eingeben";
@@ -144,8 +148,8 @@
 "Cancel" = "Abbrechen";
 "Scan QR code" = "QR-Code scannen";
 "Backend" = "Backend";
-"server_hint_cospend" = "Dein selbstgehosteter Cospend-Server (Nextcloud), z. B. https://cloud.beispiel.de";
-"server_hint_ihatemoney" = "Leer lassen für das offizielle ihatemoney.org oder eigene Domain eintragen.";
+"server_hint_cospend" = "Dein selbstgehosteter Cospend-Server (Nextcloud).";
+"server_hint_ihatemoney" = "Leer lassen für die offizielle Instanz oder eigene Domain eintragen.";
 "Could not add member" = "Mitglied hinzugefügt gescheitert";
 "member_error_forbidden" = "Für den Erfolg sind meist Maintainer-Rechte am Projekt nötig. Du kannst diese Berechtigungen jederzeit erteilen, indem du die Einstellungen des Freigabelinks in Cospend (deiner Nextcloud-App) änderst.";
 "member_error_network" = "Keine Verbindung zum Server. Bitte Netzwerk prüfen und erneut versuchen.";

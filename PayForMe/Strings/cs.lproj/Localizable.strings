@@ -54,7 +54,7 @@
 "Enter project id" = "Zadejte identifikátor projektu";
 
 
-"Enter project password" = "Zadejte heslo k projektu";
+"Enter project password (Optional)" = "Zadejte heslo k projektu (volitelné)";
 
 /*  */
 "Expense date" = "Datum výdaje";
@@ -144,8 +144,8 @@
 "Cancel" = "Zrušit";
 "Scan QR code" = "Naskenovat QR kód";
 "Backend" = "Backend";
-"server_hint_cospend" = "Váš vlastní server Cospend (Nextcloud), např. https://cloud.priklad.cz";
-"server_hint_ihatemoney" = "Ponechte prázdné pro oficiální ihatemoney.org, nebo zadejte vlastní instanci.";
+"server_hint_cospend" = "Váš vlastní server Cospend (Nextcloud).";
+"server_hint_ihatemoney" = "Ponechte prázdné pro oficiální instanci, nebo zadejte vlastní instanci.";
 "Could not add member" = "Člena se nepodařilo přidat";
 "member_error_forbidden" = "To obvykle vyžaduje práva správce projektu. Sdílené heslo projektu může umožňovat jen přístup účastníka.";
 "member_error_network" = "Není spojení se serverem. Zkontrolujte síť a zkuste to znovu.";

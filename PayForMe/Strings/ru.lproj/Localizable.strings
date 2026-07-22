@@ -51,7 +51,7 @@
 "Enter project id" = "Введите id проекта";
 
 
-"Enter project password" = "Введите пароль проекта";
+"Enter project password (Optional)" = "Введите пароль проекта (необязательно)";
 
 /*  */
 "Expense date" = "Дата расхода";
@@ -150,8 +150,8 @@
 "Cancel" = "Отмена";
 "Scan QR code" = "Сканировать QR-код";
 "Backend" = "Бэкенд";
-"server_hint_cospend" = "Ваш собственный сервер Cospend (Nextcloud), например https://cloud.example.com";
-"server_hint_ihatemoney" = "Оставьте пустым для официального ihatemoney.org или укажите свой сервер.";
+"server_hint_cospend" = "Ваш собственный сервер Cospend (Nextcloud).";
+"server_hint_ihatemoney" = "Оставьте пустым для официального сервера или укажите свой.";
 "Could not add member" = "Не удалось добавить участника";
 "member_error_forbidden" = "Обычно для этого нужны права сопровождающего проекта. Пароль общего доступа может давать только права участника.";
 "member_error_network" = "Нет соединения с сервером. Проверьте сеть и повторите попытку.";

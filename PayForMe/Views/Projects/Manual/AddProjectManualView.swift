@@ -17,34 +17,13 @@ struct AddProjectManualView: View {
     @StateObject
     private var viewmodel = AddProjectManualViewModel()
 
-    /// True, wenn die Zwischenablage (datenschutzfreundlich, ohne Inhalt zu lesen) eine URL enthält.
     @State private var clipboardHasURL = false
+
+    @State private var showQRScanner = false
 
     var body: some View {
         NavigationView {
             Form {
-                if clipboardHasURL {
-                    Section {
-                        pasteButton
-                    }
-                }
-
-                Section {
-                    NavigationLink {
-                        ProjectQRPermissionCheckerView()
-                    } label: {
-                        Label("Scan QR code", systemImage: "qrcode.viewfinder")
-                    }
-                }
-
-                Section {
-                    Picker("Backend", selection: $viewmodel.projectType) {
-                        Text("Cospend").tag(ProjectBackend.cospend)
-                        Text("iHateMoney").tag(ProjectBackend.iHateMoney)
-                    }
-                    .pickerStyle(.segmented)
-                }
-
                 Section(
                     header: Text(LocalizedStringKey(viewmodel.projectType == .iHateMoney ? "Server Address (Optional)" : "Server Address")),
                     footer: Text(LocalizedStringKey(viewmodel.projectType == .cospend ? "server_hint_cospend" : "server_hint_ihatemoney"))
@@ -59,27 +38,37 @@ struct AddProjectManualView: View {
                 Section(header: Text("Project ID & Password")) {
                     TextField("Enter project id", text: self.$viewmodel.projectName)
                         .autocapitalization(.none)
-                    SecureField("Enter project password", text: self.$viewmodel.projectPassword)
+                    SecureField("Enter project password (Optional)", text: self.$viewmodel.projectPassword)
                 }
 
                 if viewmodel.projectType == .iHateMoney {
-                    Section(header: Text("Invite Token")) {
-                        TextField("Enter invite url", text: self.$viewmodel.inviteUrl)
+                    Section(
+                        header: Text("Invite Link"),
+                        footer: Text("invite_link_hint")
+                    ) {
+                        TextField("Enter invite link", text: self.$viewmodel.inviteUrl)
                             .autocapitalization(.none)
+                            .autocorrectionDisabled()
                     }
                 }
 
                 Section {
-                    HStack {
-                        Spacer()
-                        if viewmodel.validationProgress == .connecting {
+                    if viewmodel.validationProgress == .connecting {
+                        HStack {
+                            Spacer()
                             SlickLoadingSpinner(connectionState: viewmodel.validationProgress)
                                 .frame(width: 50, height: 50)
-                        } else {
-                            FancyButton(add: false, action: addButton, text: "Add Project")
-                                .disabled(viewmodel.validationProgress != .success)
+                            Spacer()
                         }
-                        Spacer()
+                    } else {
+                        Button(action: addButton) {
+                            Text("Add Project")
+                                .fontWeight(.semibold)
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 4)
+                        }
+                        .prominentActionStyle(active: viewmodel.validationProgress == .success)
+                        .disabled(viewmodel.validationProgress != .success)
                     }
                     if !viewmodel.errorText.isEmpty {
                         Text(viewmodel.errorText)
@@ -87,8 +76,27 @@ struct AddProjectManualView: View {
                             .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
+                .listRowBackground(Color.clear)
             }
             .id(viewmodel.projectType == .cospend ? "cospend" : "iHateMoney")
+            .safeAreaInset(edge: .top, spacing: 0) {
+                VStack(spacing: 20) {
+                    Picker("Backend", selection: $viewmodel.projectType) {
+                        Text("Cospend").tag(ProjectBackend.cospend)
+                        Text("iHateMoney").tag(ProjectBackend.iHateMoney)
+                    }
+                    .pickerStyle(.segmented)
+                    .controlSize(.large)
+
+                    HStack(spacing: 12) {
+                        qrButton
+                        pasteButton
+                    }
+                }
+                .padding(.horizontal)
+                .padding(.top, 8)
+                .padding(.bottom, 24)
+            }
             .navigationTitle("Add project")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -99,31 +107,54 @@ struct AddProjectManualView: View {
         }
         .navigationViewStyle(StackNavigationViewStyle())
         .onAppear { detectClipboard() }
-    }
-
-    @ViewBuilder
-    private var pasteButton: some View {
-        if #available(iOS 16.0, *) {
-            PasteButton(payloadType: String.self) { strings in
-                guard let first = strings.first else { return }
-                pasteLink(pasteString: first)
+        .sheet(isPresented: $showQRScanner) {
+            NavigationView {
+                ProjectQRPermissionCheckerView(onFinish: { dismiss() })
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Cancel") { showQRScanner = false }
+                        }
+                    }
             }
-        } else {
-            Button {
-                pasteLink()
-            } label: {
-                Label("Paste Link", systemImage: "doc.on.clipboard")
-            }
+            .navigationViewStyle(StackNavigationViewStyle())
         }
     }
 
-    /// Prüft datenschutzfreundlich (ohne Inhalt zu lesen, kein Paste-Hinweis), ob die
-    /// Zwischenablage eine URL enthält, und blendet nur dann den Einfügen-Button ein.
+    private var qrButton: some View {
+        Button {
+            showQRScanner = true
+        } label: {
+            Text("Scan QR code")
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+        }
+        .prominentActionStyle()
+    }
+
+    private var pasteButton: some View {
+        Button {
+            handlePaste()
+        } label: {
+            Text("Paste Link")
+                .fontWeight(.semibold)
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, 4)
+        }
+        .prominentActionStyle(active: clipboardHasURL)
+        .disabled(!clipboardHasURL)
+    }
+
+    /// Reads the clipboard contents only after a pattern check confirms a URL, to avoid a paste prompt.
     private func detectClipboard() {
         UIPasteboard.general.detectPatterns(for: [\.probableWebURL]) { result in
-            guard case let .success(patterns) = result else { return }
+            guard case let .success(patterns) = result, patterns.contains(\.probableWebURL) else {
+                DispatchQueue.main.async { clipboardHasURL = false }
+                return
+            }
+            let content = UIPasteboard.general.string ?? ""
             DispatchQueue.main.async {
-                clipboardHasURL = patterns.contains(\.probableWebURL)
+                clipboardHasURL = viewmodel.canPaste(content)
             }
         }
     }
@@ -132,16 +163,10 @@ struct AddProjectManualView: View {
         viewmodel.addProject()
         dismiss()
     }
-    
-    private func pasteLink(pasteString: String) {
-        viewmodel.pasteAddress(address: pasteString)
-    }
 
-    private func pasteLink() {
-        if let pasteString = UIPasteboard.general.string {
-            print(pasteString)
-            viewmodel.pasteAddress(address: pasteString)
-        }
+    private func handlePaste() {
+        guard let pasteString = UIPasteboard.general.string else { return }
+        viewmodel.pasteAddress(address: pasteString)
     }
 }
 

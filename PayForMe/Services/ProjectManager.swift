@@ -185,15 +185,19 @@ enum StoringError: Error {
 
 extension ProjectManager {
     func addProject(_ project: Project) throws {
-        guard storageService.saveProject(project: project) else {
+        let didSave = storageService.saveProject(project: project)
+        let reloaded = storageService.loadProjects()
+
+        // An already-existing project is not an error: it just gets activated (same for manual add
+        // and QR scan). Only a real save failure throws.
+        guard didSave || reloaded.contains(project) else {
             throw StoringError.couldNotSave
         }
         DispatchQueue.main.async { [self] in
-            projects = storageService.loadProjects()
+            projects = reloaded
 
-            if projects.count == 1 {
-                setCurrentProject(project)
-            }
+            // Always activate the added (or already-known) project, whether it's the first or not.
+            setCurrentProject(project)
             openedByURL = nil
             print("project added")
         }
@@ -240,8 +244,7 @@ extension ProjectManager {
         deleteBillFromServer(bill: bill, completion: completion)
     }
 
-    /// Legt ein Mitglied an und meldet den HTTP-Statuscode zurück (2xx = Erfolg, sonst Fehler;
-    /// -1 bei Transportfehler). So kann die UI einen echten Fehler anzeigen statt still zu scheitern.
+    /// Creates a member and reports the HTTP status code (2xx = success, -1 = transport error) so the UI can surface a real error.
     func addMember(_ name: String, completion: @escaping (Int) -> Void) {
         cancellable?.cancel()
         cancellable = NetworkService.shared.createMemberStatusPublisher(name: name)

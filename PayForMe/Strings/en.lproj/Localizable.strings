@@ -54,7 +54,7 @@
 "Enter project id" = "Enter project id";
 
 
-"Enter project password" = "Enter project password";
+"Enter project password (Optional)" = "Enter project password (Optional)";
 
 
 "Expense date" = "Expense date";
@@ -88,6 +88,10 @@
 
 
 "Paste Link" = "Paste Link";
+
+"Invite Link" = "Invite Link";
+"Enter invite link" = "Enter invite link";
+"invite_link_hint" = "Paste the full invite link. Server and project are detected automatically.";
 
 /* BillDetail.swift */
 "Payer" = "Payer";
@@ -147,8 +151,8 @@
 "Cancel" = "Cancel";
 "Scan QR code" = "Scan QR code";
 "Backend" = "Backend";
-"server_hint_cospend" = "Your self-hosted Cospend (Nextcloud) server, e.g. https://cloud.example.com";
-"server_hint_ihatemoney" = "Leave empty for the official ihatemoney.org, or enter your own domain.";
+"server_hint_cospend" = "Your self-hosted Cospend (Nextcloud) server.";
+"server_hint_ihatemoney" = "Leave empty for the official instance, or enter your own domain.";
 "Could not add member" = "Could not add member";
 "member_error_forbidden" = "This usually requires maintainer rights for the project. You can grant those at any time by changing the share-link's settings in Cospend (your Nextcloud-App).";
 "member_error_network" = "No connection to the server. Please check your network and try again.";
