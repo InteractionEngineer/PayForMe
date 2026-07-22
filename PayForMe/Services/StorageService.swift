@@ -19,37 +19,47 @@ class StorageService {
 
     private let dbQueue: DatabaseQueue
 
+    static func makeMigrator() -> DatabaseMigrator {
+        var migrator = DatabaseMigrator()
+
+        migrator.registerMigration("v1", migrate: { db in
+            try db.create(table: "storedProject", ifNotExists: true) { table in
+                table.autoIncrementedPrimaryKey("id")
+                table.column("name")
+                table.column("password")
+                table.column("url")
+                table.column("backend")
+            }
+        })
+        migrator.registerMigration("v2", migrate: { db in
+            try db.alter(table: "storedProject", body: { table in
+                table.add(column: "token")
+            })
+            try db.execute(sql: "UPDATE storedProject SET token = name;")
+
+        })
+        migrator.registerMigration("v3") { db in
+            try db.alter(table: "storedProject", body: { table in
+                table.add(column: "me")
+            })
+        }
+        migrator.registerMigration("v4") { db in
+            try db.alter(table: "storedProject", body: { table in
+                table.add(column: "projectId")
+            })
+            try db.execute(sql: "UPDATE storedProject SET projectId = token;")
+        }
+        // #if DEBUG
+        //// Speed up development by nuking the database when migrations change
+        // migrator.eraseDatabaseOnSchemaChange = true
+        // #endif
+        return migrator
+    }
+
     init() {
         do {
-            var migrator = DatabaseMigrator()
-
-            migrator.registerMigration("v1", migrate: { db in
-                try db.create(table: "storedProject", ifNotExists: true) { table in
-                    table.autoIncrementedPrimaryKey("id")
-                    table.column("name")
-                    table.column("password")
-                    table.column("url")
-                    table.column("backend")
-                }
-            })
-            migrator.registerMigration("v2", migrate: { db in
-                try db.alter(table: "storedProject", body: { table in
-                    table.add(column: "token")
-                })
-                try db.execute(sql: "UPDATE storedProject SET token = name;")
-
-            })
-            migrator.registerMigration("v3") { db in
-                try db.alter(table: "storedProject", body: { table in
-                    table.add(column: "me")
-                })
-            }
-            // #if DEBUG
-            //// Speed up development by nuking the database when migrations change
-            // migrator.eraseDatabaseOnSchemaChange = true
-            // #endif
             dbQueue = try DatabaseQueue(path: databasePath.appendingPathComponent("payforme.sqlite").path)
-            try migrator.migrate(dbQueue)
+            try Self.makeMigrator().migrate(dbQueue)
         } catch {
             print("Storage couldn't be initialized \(error.localizedDescription)")
             fatalError()
@@ -153,6 +163,6 @@ private class OldProject: Codable, Identifiable {
     var bills: [Bill]
 
     func toProject() -> StoredProject {
-        return StoredProject(name: name, password: password, token: name, url: url, backend: backend)
+        return StoredProject(name: name, password: password, token: name, url: url, backend: backend, projectId: name)
     }
 }

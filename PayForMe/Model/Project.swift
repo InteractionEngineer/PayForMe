@@ -19,11 +19,13 @@ class Project: Codable, Identifiable {
     var bills: [Bill]
     var me: Int?
 
-    convenience init(name: String, password: String, token: String, backend: ProjectBackend, url: URL) {
-        self.init(name: name, password: password, token: token, backend: backend, url: url, id: nil)
+    let projectId: String
+
+    convenience init(name: String, password: String, token: String, backend: ProjectBackend, url: URL, projectId: String) {
+        self.init(name: name, password: password, token: token, backend: backend, url: url, id: nil, projectId: projectId)
     }
 
-    fileprivate init(name: String, password: String, token: String, backend: ProjectBackend, url: URL, id: Int?, me: Int? = nil) {
+    fileprivate init(name: String, password: String, token: String, backend: ProjectBackend, url: URL, id: Int?, me: Int? = nil, projectId: String) {
         self.name = name
         self.password = password
         self.token = token
@@ -33,6 +35,7 @@ class Project: Codable, Identifiable {
         members = [:]
         bills = []
         self.me = me
+        self.projectId = projectId
     }
 }
 
@@ -49,8 +52,9 @@ struct StoredProject: Codable {
     let backend: ProjectBackend
     var id: Int?
     let me: Int?
+    let projectId: String
 
-    init(name: String, password: String, token: String, url: URL, backend: ProjectBackend) {
+    init(name: String, password: String, token: String, url: URL, backend: ProjectBackend, projectId: String) {
         self.name = name
         self.password = password
         self.token = token
@@ -58,6 +62,7 @@ struct StoredProject: Codable {
         self.backend = backend
         id = nil
         me = nil
+        self.projectId = projectId
     }
 
     init(project: Project) {
@@ -68,10 +73,11 @@ struct StoredProject: Codable {
         backend = project.backend
         id = project.id
         me = project.me
+        projectId = project.projectId
     }
 
     func toProject() -> Project {
-        Project(name: name, password: password, token: token, backend: backend, url: url, id: id!, me: me)
+        Project(name: name, password: password, token: token, backend: backend, url: url, id: id!, me: me, projectId: projectId)
     }
 }
 
@@ -101,10 +107,10 @@ enum ProjectBackend: Int, Codable {
     }
 }
 
-let previewProject = Project(name: "TestProject", password: "TestPassword", token: "asdasdas", backend: .cospend, url: URL(string: "https://testserver.de")!, id: 0)
+let previewProject = Project(name: "TestProject", password: "TestPassword", token: "asdasdas", backend: .cospend, url: URL(string: "https://testserver.de")!, id: 0, projectId: "TestProject")
 let previewProjects = [
     previewProject,
-    Project(name: "test1", password: "test23", token: "dasdasa", backend: .cospend, url: URL(string: "https://testserver.de")!, id: 1),
-    Project(name: "test2", password: "test45", token: "123123122", backend: .cospend, url: URL(string: "https://testserver.de")!, id: 2),
+    Project(name: "test1", password: "test23", token: "dasdasa", backend: .cospend, url: URL(string: "https://testserver.de")!, id: 1, projectId: "test1"),
+    Project(name: "test2", password: "test45", token: "123123122", backend: .cospend, url: URL(string: "https://testserver.de")!, id: 2, projectId: "test2"),
 ]
-let demoProject = Project(name: "study-group", password: "no-pass", token: "9da50e410157dc1ca63e594af022f3a2", backend: .cospend, url: URL(string: "https://intranet.mayflower.de")!, id: 1)
+let demoProject = Project(name: "study-group", password: "no-pass", token: "9da50e410157dc1ca63e594af022f3a2", backend: .cospend, url: URL(string: "https://intranet.mayflower.de")!, id: 1, projectId: "study-group")

@@ -10,6 +10,12 @@ import Foundation
 import SlickLoadingSpinner
 import UIKit
 
+struct InviteData {
+    let baseUrl: String
+    let token: String
+    let project: String
+}
+
 class AddProjectManualViewModel: ObservableObject {
     @Published
     var projectType = ProjectBackend.cospend
@@ -23,18 +29,30 @@ class AddProjectManualViewModel: ObservableObject {
     @Published
     var projectPassword = ""
 
+    @Published var inviteUrl = ""
+
     @Published var validationProgress = LoadingState.notStarted
 
     @Published var errorText = ""
 
     private var lastProjectTestedSuccessfully: Project?
 
+    private var cancellables = Set<AnyCancellable>()
+
     init() {
         validatedInput.map { _ in LoadingState.connecting }.assign(to: &$validationProgress)
         validatedServer.map { $0 == 200 ? LoadingState.success : LoadingState.failure }.assign(to: &$validationProgress)
         errorTextPublisher.assign(to: &$errorText)
         serverCheckUnsupportedProtocoll.assign(to: &$errorText)
+
+        $inviteUrl
+            .filter { _ in self.projectType == .iHateMoney }
+            .debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+            .sink { [weak self] token in self?.validateInviteToken(token) }
+            .store(in: &cancellables)
     }
+
+
 
     func reset() {
         serverAddress = ""
@@ -51,34 +69,46 @@ class AddProjectManualViewModel: ObservableObject {
         }
     }
 
+    private func validateInviteToken(_ token: String) {
+        guard !token.isEmpty, !serverAddress.isEmpty, !projectName.isEmpty else { return }
+        let baseUrl = serverAddress.hasPrefix("https://") ? serverAddress : "https://\(serverAddress)"
+        let inviteData = InviteData(baseUrl: baseUrl, token: token, project: projectName)
+        validationProgress = .connecting
+        Task { @MainActor in
+            do {
+                let testedProject = try await NetworkService.shared.getProjectName(invite: inviteData)
+                self.lastProjectTestedSuccessfully = testedProject
+                self.validationProgress = .success
+            } catch {
+                print("Invite URL failed: \(error)")
+                self.validationProgress = .failure
+            }
+        }
+    }
+
     func pasteAddress(address: String) {
         let trimmedAddress = address.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard let url = URL(string: trimmedAddress) else {
-            return
-        }
+        guard let url = URL(string: trimmedAddress) else { return }
 
-        // If it is a moneybuster URL
-        let (mUrl, mName, mPassword) = url.decodeQRCode()
-        if let url = mUrl, let name = mName {
-            serverAddress = url.absoluteString
-            projectName = name
-            if let password = mPassword {
-                projectPassword = password
-            }
-            return
+        switch url.decodeQRCode() {
+        case let project as ProjectDataWithPassword:
+            serverAddress = project.server.absoluteString
+            projectName = project.project
+            projectPassword = project.password ?? ""
+        case let project as ProjectDataWithToken:
+            projectType = .iHateMoney
+            serverAddress = project.server.absoluteString
+            projectName = project.project
+            inviteUrl = project.token
+        default:
+            guard url.pathComponents.contains("join"),
+                  let scheme = url.scheme, let host = url.host,
+                  url.pathComponents.count >= 4 else { return }
+            projectType = .iHateMoney
+            serverAddress = "\(scheme)://\(host)"
+            projectName = url.pathComponents[1]
+            inviteUrl = url.pathComponents[3]
         }
-        // If it is another url
-
-        let pathComponents = url.pathComponents
-        let pureUrl = url.deletingPathExtension().absoluteString
-        let trimmIndices = url.absoluteString.indices(of: "/")
-        if let cutIndex = trimmIndices[safe: 2] {
-            let trimmedUrl = pureUrl[...cutIndex]
-            serverAddress = String(trimmedUrl)
-        } else {
-            serverAddress = pureUrl
-        }
-        fillFieldsFromComponents(components: pathComponents)
     }
 
     var serverAddressFormatted: AnyPublisher<String, Never> {
@@ -134,7 +164,7 @@ class AddProjectManualViewModel: ObservableObject {
             .compactMap { server, token, password -> Project? in
                 if let address = server.address, address.isValidURL, !token.isEmpty, !password.isEmpty {
                     guard let url = URL(string: address) else { return nil }
-                    return Project(name: token, password: password, token: token, backend: server.0, url: url)
+                    return Project(name: token, password: password, token: token, backend: server.0, url: url, projectId: self.projectName)
                 } else {
                     return nil
                 }

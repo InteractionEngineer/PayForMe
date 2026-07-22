@@ -68,6 +68,7 @@
 		BF4D7AF265FC4A90B1AC5AEB /* JSONDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F4D55C3EF5EFCD925428041 /* JSONDecodingTests.swift */; };
 		D279295CFA25D9CC69C6F27C /* BillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EED3194A2342518B0E74079 /* BillTests.swift */; };
 		DBBD86EF399BCF232C021935 /* NetworkRequestTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 316FBA7C0CE4ABB51EC2A121 /* NetworkRequestTests.swift */; };
+		65AF00022F1A000100000002 /* StorageMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65AF00012F1A000100000001 /* StorageMigrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -106,6 +107,7 @@
 		6514934B26CFC71000F00851 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
 		6514934C26CFC71000F00851 /* cs */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = cs; path = cs.lproj/Localizable.strings; sourceTree = "<group>"; };
 		6523FC4B25580EEF00BCD843 /* UrlExtensionsTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UrlExtensionsTests.swift; sourceTree = "<group>"; };
+		65AF00012F1A000100000001 /* StorageMigrationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageMigrationTests.swift; sourceTree = "<group>"; };
 		6523FC502558153600BCD843 /* AddPasswordView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPasswordView.swift; sourceTree = "<group>"; };
 		6533A02A23D888B100FF822B /* BillCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BillCell.swift; sourceTree = "<group>"; };
 		654754B72528736F00A82EB6 /* Views+Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Views+Extensions.swift"; sourceTree = "<group>"; };
@@ -236,6 +238,7 @@
 				143F41EE78329905894C8A29 /* BalanceCalculationTests.swift */,
 				92ABB02BEA28BEA7C8C64841 /* BillSortingTests.swift */,
 				316FBA7C0CE4ABB51EC2A121 /* NetworkRequestTests.swift */,
+				65AF00012F1A000100000001 /* StorageMigrationTests.swift */,
 			);
 			path = PayForMeTests;
 			sourceTree = "<group>";
@@ -551,6 +554,7 @@
 				56E7DB46FDCDC5B46C475020 /* BalanceCalculationTests.swift in Sources */,
 				62C73597878BA5AD4572FE90 /* BillSortingTests.swift in Sources */,
 				DBBD86EF399BCF232C021935 /* NetworkRequestTests.swift in Sources */,
+				65AF00022F1A000100000002 /* StorageMigrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

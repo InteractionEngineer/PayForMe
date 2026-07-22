@@ -54,7 +54,8 @@ class AddProjectQRViewModel: ObservableObject {
         )
         .map { url, token, password in
             self.isTestingSubject.send(.connecting)
-            return Project(name: "", password: password, token: token, backend: .cospend, url: url)
+
+            return Project(name: "", password: password, token: token, backend: .cospend, url: url, projectId: token)
         }
         .flatMap { project in
             NetworkService.shared.testProject(project)
@@ -97,42 +98,46 @@ class AddProjectQRViewModel: ObservableObject {
             .receive(on: DispatchQueue.main)
             .sink { codedUrl in
                 let projectData = codedUrl.decodeQRCode()
-                guard let url = projectData.server, let token = projectData.project else { return }
-                if let password = projectData.passwd {
+
+                if let projectData = projectData as? ProjectDataWithPassword {
+                    if let password = projectData.password {
+                        self.isTestingSubject.send(.connecting)
+                        let project = Project(name: projectData.project, password: password, token: projectData.project, backend: .cospend, url: projectData.server, projectId: projectData.project)
+                        Task(priority: .userInitiated) {
+                            do {
+                                let apiProject = try await NetworkService.shared.getProjectName(project)
+                                try ProjectManager.shared.addProject(apiProject)
+                                self.isTestingSubject.send(.success)
+                            } catch {
+                                print(codedUrl)
+                                print()
+                                print(error)
+                                self.isTestingSubject.send(.failure)
+                            }
+                        }
+                    } else {
+                        withAnimation {
+                            self.url = projectData.server
+                            self.name = projectData.project
+                            self.askForPassword.toggle()
+                        }
+                    }
+                    return
+                }
+
+                if let  projectData = projectData as? ProjectDataWithToken {
                     self.isTestingSubject.send(.connecting)
-                    let project = Project(name: token, password: password, token: token, backend: .cospend, url: url)
                     Task(priority: .userInitiated) {
                         do {
-                            let apiProject = try await NetworkService.shared.getProjectName(project)
+                            let apiProject = try await NetworkService.shared.getProjectName(invite: InviteData(baseUrl: projectData.server.absoluteString, token: projectData.token, project: projectData.project))
                             try ProjectManager.shared.addProject(apiProject)
                             self.isTestingSubject.send(.success)
                         } catch {
-                            print(codedUrl)
-                            print()
-                            print(error)
                             self.isTestingSubject.send(.failure)
                         }
                     }
-//                    NetworkService.shared.testProject(project)
-//                        .asUIPublisher
-//                        .sink(receiveValue: {
-//                            project, code in
-//                            if code == 200 {
-//                                DispatchQueue.main.asyncAfter(deadline: DispatchTime.now().advanced(by: .seconds(1))) {
-//                                    ProjectManager.shared.addProject(project)
-//                                }
-//                                self.isTestingSubject.send(.success)
-//                            } else {
-//                                self.isTestingSubject.send(.failure)
-//                            }
-//                        }).store(in: &self.subscriptions)
-                } else {
-                    withAnimation {
-                        self.url = url
-                        self.name = token
-                        self.askForPassword.toggle()
-                    }
                 }
             }
+
     }
 }

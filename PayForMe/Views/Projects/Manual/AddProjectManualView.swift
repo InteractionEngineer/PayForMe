@@ -25,18 +25,16 @@ struct AddProjectManualView: View {
             }
             .pickerStyle(SegmentedPickerStyle())
             .padding(EdgeInsets(top: 8, leading: 8, bottom: 0, trailing: 8))
-            if viewmodel.projectType == .cospend {
-                if #available(iOS 16.0, *) {
-                    PasteButton(payloadType: String.self) { strings in
-                        pasteLink(pasteString: strings[0])
-                    }
-                    .padding(.top, 10)
-                } else {
-                    Button("Paste Link") {
-                        pasteLink()
-                    }
-                    .padding(.top, 10)
+            if #available(iOS 16.0, *) {
+                PasteButton(payloadType: String.self) { strings in
+                    pasteLink(pasteString: strings[0])
                 }
+                .padding(.top, 10)
+            } else {
+                Button("Paste Link") {
+                    pasteLink()
+                }
+                .padding(.top, 10)
             }
             Form {
                 Section(
@@ -44,7 +42,7 @@ struct AddProjectManualView: View {
                 ) {
                     TextFieldContainer(
                         viewmodel.projectType == .cospend
-                            ? "https://mynextcloud.org" : "https://ihatemoney.org",
+                        ? "https://mynextcloud.org" : "https://ihatemoney.org",
                         text: self.$viewmodel.serverAddress
                     )
                 }
@@ -52,26 +50,32 @@ struct AddProjectManualView: View {
                 Section(header: Text("Project ID & Password")) {
                     TextField("Enter project id",
                               text: self.$viewmodel.projectName)
-                        .autocapitalization(.none)
+                    .autocapitalization(.none)
 
                     SecureField("Enter project password", text: self.$viewmodel.projectPassword)
                 }
+
+                if viewmodel.projectType == .iHateMoney {
+                    Section(header: Text("Invite Token")) {
+                        TextField("Enter invite url", text: self.$viewmodel.inviteUrl)
+                            .autocapitalization(.none)
+                    }
+                }
+
+
+                SlickLoadingSpinner(connectionState: viewmodel.validationProgress)
+                    .frame(width: 50, height: 50)
+                FancyButton(
+                    add: false,
+                    action: addButton,
+                    text: "Add Project"
+                )
+                .disabled(viewmodel.validationProgress != .success)
+                if !viewmodel.errorText.isEmpty {
+                    Text(viewmodel.errorText)
+                }
             }
-            .id(viewmodel.projectType == .cospend ? "cospend" : "iHateMoney")
-            .frame(width: UIScreen.main.bounds.width, height: 220, alignment: .center)
-            SlickLoadingSpinner(connectionState: viewmodel.validationProgress)
-                .frame(width: 50, height: 50)
-            FancyButton(
-                add: false,
-                action: addButton,
-                text: "Add Project"
-            )
-            .disabled(viewmodel.validationProgress != .success)
-            if !viewmodel.errorText.isEmpty {
-                Text(viewmodel.errorText)
-            }
-            Spacer()
-        }
+            .id(viewmodel.projectType == .cospend ? "cospend" : "iHateMoney")}
         .padding(.horizontal, 20)
         .padding(.vertical, 50)
         .background(Color.PFMBackground)

@@ -72,7 +72,7 @@ class NetworkRequestTests: XCTestCase {
 
     func testCospend_loadBills_urlEmbedsTokenAndPassword() {
         let project = Project.makeCospend(token: "mytoken", password: "mypass",
-                                          url: "https://cloud.example.com")
+                                          url: "https://cloud.example.com", projectId: "myproject")
         MockURLProtocol.requestHandler = jsonHandler()
 
         let exp = expectation(description: "request intercepted")
@@ -93,7 +93,7 @@ class NetworkRequestTests: XCTestCase {
     }
 
     func testCospend_loadMembers_urlContainsMembersEndpoint() {
-        let project = Project.makeCospend(token: "tok", password: "pass")
+        let project = Project.makeCospend(token: "tok", password: "pass", projectId: "proj")
         MockURLProtocol.requestHandler = jsonHandler()
 
         let exp = expectation(description: "request intercepted")
@@ -151,7 +151,7 @@ class NetworkRequestTests: XCTestCase {
     func testIHateMoney_loadBills_urlDoesNotContainPassword() {
         // iHateMoney uses HTTP Basic Auth — the password must NEVER appear in the URL.
         let project = Project.makeIHateMoney(token: "mytoken", password: "secret",
-                                             url: "https://ihatemoney.org")
+                                             url: "https://ihatemoney.org", projectId: "myproject")
         MockURLProtocol.requestHandler = jsonHandler()
 
         let exp = expectation(description: "request intercepted")
@@ -163,7 +163,7 @@ class NetworkRequestTests: XCTestCase {
         let url = MockURLProtocol.lastCapturedRequest?.url?.absoluteString ?? ""
         XCTAssertFalse(url.contains("secret"),
                        "iHateMoney password must NOT appear in the URL. Got: \(url)")
-        XCTAssertTrue(url.contains("/api/projects/mytoken/bills"),
+        XCTAssertTrue(url.contains("/api/projects/myproject/bills"),
                       "iHateMoney URL must use /api/projects/{token}/bills. Got: \(url)")
     }
 

@@ -99,7 +99,32 @@ class NetworkService {
         }
         let apiProject = try JSONDecoder().decode(APIProject.self, from: data)
 
-        return Project(name: apiProject.name, password: project.password, token: project.token, backend: project.backend, url: project.url)
+        return Project(name: apiProject.name, password: project.password, token: project.token, backend: project.backend, url: project.url, projectId: apiProject.id)
+    }
+
+    func getProjectName(invite: InviteData) async throws -> Project {
+        guard var components = URLComponents(string: invite.baseUrl),
+              let baseURL = components.url else {
+            throw URLError(.badURL)
+        }
+        components.path += iHateMoneyStaticPath + "/" + invite.project
+        guard let url = components.url else {
+            throw URLError(.badURL)
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue(
+            "Bearer \(invite.token)",
+            forHTTPHeaderField: "Authorization"
+        )
+
+        let (data, response) = try await URLSession.shared.data(for: request)
+        guard let httpResponse = response as? HTTPURLResponse, httpResponse.statusCode / 100 == 2 else {
+            throw HTTPError.statuscode
+        }
+        let apiProject = try JSONDecoder().decode(APIProject.self, from: data)
+
+        return Project(name: apiProject.name, password: "", token: invite.token, backend: ProjectBackend.iHateMoney, url: baseURL, projectId: apiProject.id)
     }
 
     func postBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
@@ -155,13 +180,21 @@ class NetworkService {
             .replaceError(with: false)
             .eraseToAnyPublisher()
     }
+    
 
     private func baseURLFor(_ project: Project, suffix: String) -> URL {
         var url = project.url
             .appendingPathComponent(project.backend.staticPath)
-            .appendingPathComponent(project.token)
+
         if project.backend == .cospend {
-            url = url.appendingPathComponent(project.password)
+            url = url
+                .appendingPathComponent(project.token)
+                .appendingPathComponent(project.password)
+        }
+
+        if project.backend == .iHateMoney {
+            url = url
+                .appendingPathComponent(project.projectId)
         }
         if suffix.isEmpty {
             return url
@@ -189,8 +222,14 @@ class NetworkService {
         request = URLRequest(url: requestURL)
 
         if project.backend == .iHateMoney {
-            guard let authString = "\(project.token):\(project.password)".data(using: .utf8)?.base64EncodedString() else { fatalError("error generating authString. THIS SHOULD NOT HAPPEN") }
-            request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
+            if project.password.isEmpty {
+                request.setValue("Bearer \(project.token)", forHTTPHeaderField: "Authorization")
+            } else {
+                guard let authString = "\(project.token):\(project.password)".data(using: .utf8)?.base64EncodedString() else {
+                    fatalError("error generating authString. THIS SHOULD NOT HAPPEN")
+                }
+                request.setValue("Basic \(authString)", forHTTPHeaderField: "Authorization")
+            }
 
             if !params.isEmpty {
                 request.httpBody = try? JSONSerialization.data(withJSONObject: params)
