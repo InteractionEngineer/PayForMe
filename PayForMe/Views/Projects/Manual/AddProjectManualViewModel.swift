@@ -161,12 +161,22 @@ class AddProjectManualViewModel: ObservableObject {
         guard !trimmed.isEmpty else { return nil }
 
         if let url = URL(string: trimmed),
-           url.pathComponents.contains("join"),
-           url.pathComponents.count >= 4,
-           let scheme = url.scheme, let host = url.host {
-            let baseUrl = "\(scheme)://\(host)"
-            let project = url.pathComponents[1]
-            let token = url.pathComponents[3]
+           let scheme = url.scheme, let host = url.host,
+           let joinIndex = url.pathComponents.firstIndex(of: "join"),
+           joinIndex >= 2, joinIndex + 1 < url.pathComponents.count {
+            // Locate project/token relative to the "join" segment so a reverse-proxied
+            // subpath doesn't shift the indices. Keep the port and any prefix path so the
+            // derived base URL stays reachable.
+            let project = url.pathComponents[joinIndex - 1]
+            let token = url.pathComponents[joinIndex + 1]
+            var baseUrl = "\(scheme)://\(host)"
+            if let port = url.port {
+                baseUrl += ":\(port)"
+            }
+            let prefix = url.pathComponents[1 ..< (joinIndex - 1)]
+            if !prefix.isEmpty {
+                baseUrl += "/" + prefix.joined(separator: "/")
+            }
             serverAddress = baseUrl
             projectName = project
             return InviteData(baseUrl: baseUrl, token: token, project: project)
@@ -208,13 +218,23 @@ class AddProjectManualViewModel: ObservableObject {
             projectName = project.project
             inviteUrl = project.token
         default:
-            guard url.pathComponents.contains("join"),
-                  let scheme = url.scheme, let host = url.host,
-                  url.pathComponents.count >= 4 else { return }
+            guard let scheme = url.scheme, let host = url.host,
+                  let joinIndex = url.pathComponents.firstIndex(of: "join"),
+                  joinIndex >= 2, joinIndex + 1 < url.pathComponents.count else { return }
+            // Same relative parsing as inviteData(from:): tolerate a reverse-proxied subpath
+            // and preserve the port so the base URL stays reachable.
             projectType = .iHateMoney
-            serverAddress = "\(scheme)://\(host)"
-            projectName = url.pathComponents[1]
-            inviteUrl = url.pathComponents[3]
+            var baseUrl = "\(scheme)://\(host)"
+            if let port = url.port {
+                baseUrl += ":\(port)"
+            }
+            let prefix = url.pathComponents[1 ..< (joinIndex - 1)]
+            if !prefix.isEmpty {
+                baseUrl += "/" + prefix.joined(separator: "/")
+            }
+            serverAddress = baseUrl
+            projectName = url.pathComponents[joinIndex - 1]
+            inviteUrl = url.pathComponents[joinIndex + 1]
         }
     }
 
