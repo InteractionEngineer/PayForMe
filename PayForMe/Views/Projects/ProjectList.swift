@@ -29,15 +29,10 @@ struct ProjectList: View {
                 }
             }
             .navigationTitle("Projects")
-            .toolbar {
-                ToolbarItem(placement: .primaryAction) {
-                    Button {
-                        showAddProject = true
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                    .accessibilityLabel(Text("Add project"))
-                }
+            .glassActionButton(systemImage: "folder",
+                               accessibilityLabel: "Add project",
+                               accessibilityIdentifier: "Add project") {
+                showAddProject = true
             }
             .sheet(isPresented: $showAddProject) {
                 AddProjectManualView()

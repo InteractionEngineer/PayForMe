@@ -24,7 +24,7 @@ struct BalanceList: View {
         NavigationView {
             list
                 .navigationTitle("Members")
-                .glassActionButton(systemImage: "person.badge.plus",
+                .glassActionButton(systemImage: "person.fill",
                                    accessibilityLabel: "Add member",
                                    accessibilityIdentifier: "Add member") {
                     showAddUser()
@@ -74,7 +74,7 @@ struct BalanceList: View {
                 self.memberName = ""
                 ProjectManager.shared.loadBillsAndMembers()
             } else {
-                // Sheet offen lassen, damit der Nutzer die Eingabe behält und es erneut versuchen kann.
+                // Keep the sheet open so the user keeps their input and can retry.
                 self.memberAddError = MemberAddError(code: statusCode)
             }
         }
@@ -105,7 +105,6 @@ struct BalanceList: View {
     }
 }
 
-/// Fehler beim Anlegen eines Mitglieds, identifizierbar über den HTTP-Statuscode (für `.alert(item:)`).
 struct MemberAddError: Identifiable {
     let code: Int
     var id: Int { code }

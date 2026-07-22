@@ -26,7 +26,7 @@ struct BillList: View {
                 await ProjectManager.shared.refresh()
             }
             .navigationTitle("Bills")
-            .glassActionButton(systemImage: "bag.badge.plus",
+            .glassActionButton(systemImage: "bag",
                                accessibilityLabel: "Add Bill",
                                accessibilityIdentifier: "Add Bill") {
                 showAddBill = true

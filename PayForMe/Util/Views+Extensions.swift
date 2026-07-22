@@ -9,7 +9,6 @@ import Foundation
 import SwiftUI
 
 extension View {
-    /// Fallback-Look für prominente Aktions-Buttons vor iOS 26 (kein Liquid Glass verfügbar).
     func fancyStyle(active: Bool = true) -> some View {
         padding(10)
             .background(active ? Color.accentColor : Color.secondary)
@@ -19,7 +18,6 @@ extension View {
             .shadow(color: (active ? Color.accentColor : Color.secondary).opacity(0.5), radius: 4, x: 2, y: 2)
     }
 
-    /// Prominenter Aktions-Button: System-Liquid-Glass ab iOS 26, sonst der bisherige `fancyStyle`.
     @ViewBuilder
     func prominentActionStyle(active: Bool = true) -> some View {
         if #available(iOS 26, *) {
@@ -29,7 +27,6 @@ extension View {
         }
     }
 
-    /// Lässt die Tab-Bar beim Scrollen einklappen (Liquid-Glass-Verhalten). No-op vor iOS 26.
     @ViewBuilder
     func glassTabBarMinimize() -> some View {
         if #available(iOS 26, *) {
@@ -43,8 +40,6 @@ extension View {
         AnyView(self)
     }
 
-    /// Kreisförmiger Glass-Hintergrund für einen Button. Ab iOS 26 echtes Liquid Glass,
-    /// sonst ein Accent-Kreis mit Schatten (analog altem Floating-Button).
     @ViewBuilder
     func glassCircleStyle() -> some View {
         if #available(iOS 26, *) {
@@ -60,8 +55,6 @@ extension View {
         }
     }
 
-    /// Legt einen schwebenden, kreisförmigen Aktions-Button unten rechts über den Inhalt
-    /// (über der Tab-Bar, à la Apple Music). Daumen-erreichbar.
     func glassActionButton(systemImage: String,
                            accessibilityLabel: LocalizedStringKey,
                            accessibilityIdentifier: String? = nil,
@@ -77,7 +70,8 @@ extension View {
     }
 }
 
-/// Schwebender, kreisförmiger Haupt-Aktions-Button (Liquid Glass ab iOS 26).
+/// The plus is composited as a separate badge rather than using the `.badge.plus` symbol variant,
+/// which sits in a different spot per symbol.
 struct GlassActionButton: View {
     let systemImage: String
     let accessibilityLabel: LocalizedStringKey
@@ -88,10 +82,20 @@ struct GlassActionButton: View {
         Button(action: action) {
             Image(systemName: systemImage)
                 .font(.title2.weight(.semibold))
+                .overlay(alignment: .bottomLeading) { plusBadge }
                 .frame(width: 56, height: 56)
         }
         .glassCircleStyle()
         .accessibilityLabel(Text(accessibilityLabel))
         .accessibilityIdentifier(accessibilityIdentifier ?? "")
+    }
+
+    private var plusBadge: some View {
+        Image(systemName: "plus")
+            .font(.system(size: 8, weight: .black))
+            .foregroundStyle(Color.accentColor)
+            .padding(3)
+            .background(.white, in: Circle())
+            .offset(x: -4, y: 4)
     }
 }
