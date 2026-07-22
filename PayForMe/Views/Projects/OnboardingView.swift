@@ -14,22 +14,14 @@ struct OnboardingView: View {
         NavigationView {
             VStack(spacing: 32) {
                 Text("Welcome to PayForMe!").font(.largeTitle)
-                Text("To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually.")
-                HStack(spacing: 50) {
-                    NavigationLink(destination: ProjectQRPermissionCheckerView()) {
-                        Image(systemName: "qrcode")
-                            .resizable()
-                            .aspectRatio(contentMode: .fit)
-                    }
-                    NavigationLink(
-                        destination: AddProjectManualView(),
-                        label: {
-                            Image(systemName: "square.and.pencil")
-                                .resizable()
-                                .aspectRatio(contentMode: .fit)
-                        }
-                    )
-                }.padding(.horizontal, 30)
+                Text("To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you.")
+                NavigationLink(destination: AddProjectManualView()) {
+                    Label("Add project", systemImage: "plus")
+                        .font(.headline)
+                        .padding(.vertical, 4)
+                        .padding(.horizontal, 20)
+                }
+                .prominentActionStyle()
                 if moreInfo {
                     Button(action: {
                         withAnimation {

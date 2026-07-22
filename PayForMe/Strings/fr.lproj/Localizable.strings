@@ -120,7 +120,7 @@
 "Sure" = "Bien sûr, c'est une évidence";
 
 /*  */
-"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. \n\n Cospend projects can be added by QR Code or by manually filling out the information, for iHateMoney you need to fill out the information manually." = "Pour commencer à partager des dépenses avec des amis, vous devez ajouter un projet de Cospend ou de iHateMoney. \Les projets Cospend peuvent être ajoutés par QR Code ou en remplissant manuellement les informations, pour iHateMoney vous devez remplir les informations manuellement.";
+"To get started sharing expenses with friends, you must add a project from Cospend or iHateMoney. To do this, scan the QR code or click the link for the project that was shared with you." = "Pour commencer à partager des dépenses avec des amis, vous devez ajouter un projet de Cospend ou de iHateMoney. Pour cela, scannez le QR code ou cliquez sur le lien du projet qui vous a été partagé.";
 
 /*  */
 "To use iHateMoney, host an own instance or register at" = "Pour utiliser iHateMoney, hébergez votre propre instance ou inscrivez-vous à l'adresse suivante";
