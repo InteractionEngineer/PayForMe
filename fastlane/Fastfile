@@ -17,6 +17,11 @@ default_platform(:ios)
 
 platform :ios do
   before_all do
+    # fastlane reads xcodebuild output over a PTY and decodes it as the shell
+    # locale; a non-UTF-8 LANG/LC_ALL crashes with FastlanePtyError on the first
+    # non-ASCII byte. Force UTF-8 so runs don't depend on the caller's shell.
+    ENV["LANG"] = "en_US.UTF-8"
+    ENV["LC_ALL"] = "en_US.UTF-8"
     app_store_connect_api_key(
       key_id: ENV["ASC_KEY_ID"],
       issuer_id: ENV["ASC_ISSUER_ID"],
@@ -26,8 +31,18 @@ platform :ios do
 
   desc "Push a new beta build to TestFlight"
   lane :beta do
-    increment_build_number(xcodeproj: "PayForMe.xcodeproj") 
-    build_app(scheme: "PayForMe")
+    increment_build_number(xcodeproj: "PayForMe.xcodeproj")
+    get_provisioning_profile(app_identifier: "de.mayflower.PayForMe")
+    build_app(
+      scheme: "PayForMe",
+      export_options: {
+        signingStyle: "manual",
+        teamID: "22BT3L9N5V",
+        provisioningProfiles: {
+          "de.mayflower.PayForMe" => lane_context[SharedValues::SIGH_NAME]
+        }
+      }
+    )
     upload_to_testflight
   end
 
@@ -39,33 +54,73 @@ platform :ios do
   end
 
   lane :screenshots do
-    capture_screenshots
-    upload_to_app_store
+    capture_screenshots(clean: true)
+    upload_to_app_store(
+      screenshots_path: "./fastlane/screenshots",
+      skip_binary_upload: true,
+      skip_metadata: true,
+      overwrite_screenshots: true,
+      precheck_include_in_app_purchases: false
+    )
   end
 
   lane :githubshots do
+    # Use the Snapfile default device (iPhone 16 Pro Max); frameit ships a
+    # matching Pro Max frame, so the framed repo images match the App Store shots.
+    # Reuse one derived data path and skip clean: these are local repo images, so
+    # a warm incremental build keeps the two runs (dark + light) to minutes, not
+    # a full cold rebuild each time.
+    snapshot_dd = File.expand_path("~/Library/Caches/tools.fastlane/payforme_snapshot_dd")
     capture_screenshots(
+      derived_data_path: snapshot_dd,
       dark_mode: true,
       output_directory: "screenshots/darkmode"
     )
-    frameit
+    frameit(path: "./screenshots/darkmode")
     capture_screenshots(
+      derived_data_path: snapshot_dd,
       dark_mode: false,
       output_directory: "screenshots/lightmode"
     )
-    frameit
+    frameit(path: "./screenshots/lightmode")
   end
 
   lane :deliverToAppstore do
-    increment_build_number(xcodeproj: "PayForMe.xcodeproj") 
-    build_app(scheme: "PayForMe")
+    increment_build_number(xcodeproj: "PayForMe.xcodeproj")
+    get_provisioning_profile(app_identifier: "de.mayflower.PayForMe")
+    build_app(
+      scheme: "PayForMe",
+      export_options: {
+        signingStyle: "manual",
+        teamID: "22BT3L9N5V",
+        provisioningProfiles: {
+          "de.mayflower.PayForMe" => lane_context[SharedValues::SIGH_NAME]
+        }
+      }
+    )
     capture_screenshots(
+      clean: true,
       clear_previous_screenshots: true
     )
-    upload_to_app_store(ignore_language_directory_validation: true)
+    upload_to_app_store(
+      ignore_language_directory_validation: true,
+      precheck_include_in_app_purchases: false
+    )
   end
 
+  # Upload metadata + screenshots for an already-uploaded build, without touching
+  # the binary and without submitting for review — the manual, low-risk path.
   lane :upload do
-    upload_to_app_store(ignore_language_directory_validation: true)
+    upload_to_app_store(
+      skip_binary_upload: true,
+      # ASC merges screenshots by default, so a previous run's shots for other
+      # devices/locales linger and produce a mixed set. overwrite_screenshots
+      # replaces the whole set with exactly what we upload now.
+      overwrite_screenshots: true,
+      submit_for_review: false,
+      force: true,
+      ignore_language_directory_validation: true,
+      precheck_include_in_app_purchases: false
+    )
   end
 end
