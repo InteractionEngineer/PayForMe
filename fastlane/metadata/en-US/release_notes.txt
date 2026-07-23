@@ -1,0 +1,15 @@
+A fresh look for iOS 26: PayForMe now fully adopts Liquid Glass. The tab bar and buttons float translucently above your content and adapt to light and dark automatically. A floating, thumb-reachable plus button is available everywhere for adding things.
+
+Adding projects is easier now:
+- iHateMoney projects can be added via invite link – server and project are detected automatically
+- The Cospend password is now optional
+- Reworked input screen with separate fields per backend
+
+Plus lots of stability and bug fixes:
+- Far fewer server requests when adding projects (no more "Too many requests")
+- Fixed double slashes in server URLs (Nextcloud in subfolders)
+- More reliable refresh via pull-to-refresh and on app launch
+- Bill list now re-sorts correctly when switching projects
+- More robust QR code scanning (including re-scans)
+- Clearer error message for invalid server responses
+- Members can now be added directly from the Members tab

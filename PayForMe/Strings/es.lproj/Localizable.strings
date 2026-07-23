@@ -153,3 +153,7 @@
 "member_error_forbidden" = "Esto suele requerir permisos de mantenedor del proyecto. La contraseña compartida puede dar solo acceso de participante.";
 "member_error_network" = "Sin conexión con el servidor. Comprueba tu red e inténtalo de nuevo.";
 "member_error_generic" = "El servidor rechazó la solicitud (HTTP %d).";
+"Invite Link" = "Enlace de invitación";
+"Enter invite link" = "Introducir el enlace de invitación";
+"invite_link_hint" = "Pega el enlace de invitación completo. El servidor y el proyecto se detectan automáticamente.";
+"Server returned an invalid HTTP response" = "El servidor devolvió una respuesta HTTP no válida";
