@@ -8,6 +8,49 @@
 import Combine
 import Foundation
 
+/// Why loading a project's data failed.
+///
+/// The load publishers used to declare `Never` as their failure type, which
+/// left everything upstream unable to tell "this project is empty" from "the
+/// server rejected us". Changing a project's password on the server therefore
+/// showed empty lists and no explanation at all (#37).
+enum LoadError: Error, Equatable, Identifiable {
+    /// Credentials rejected. Usually the project password was changed on the
+    /// server after it was added here.
+    case unauthorized
+    case notFound
+    case http(Int)
+    /// No usable connection, or a response that was not HTTP at all.
+    case connection
+    /// The server answered, but not with something we could decode.
+    case invalidResponse
+
+    var id: String { String(describing: self) }
+
+    init(statusCode: Int) {
+        switch statusCode {
+        case 401, 403:
+            self = .unauthorized
+        case 404:
+            self = .notFound
+        default:
+            self = .http(statusCode)
+        }
+    }
+
+    init(_ error: Error) {
+        switch error {
+        case let serverError as LoadError:
+            self = serverError
+        case is URLError:
+            self = .connection
+        default:
+            // Decoding failed: the server answered, we just could not read it.
+            self = .invalidResponse
+        }
+    }
+}
+
 class NetworkService {
     static let shared = NetworkService()
 
@@ -34,16 +77,25 @@ class NetworkService {
 
     let networkActivityPublisher = PassthroughSubject<Bool, Never>()
 
-    func loadBillsPublisher(_ project: Project) -> AnyPublisher<[Bill], Never> {
+    /// Turns a response into its body or into a typed failure. Both cases used
+    /// to collapse into "no value emitted", which is precisely what made a
+    /// rejected password indistinguishable from an empty project.
+    private static func validate(_ data: Data, _ response: URLResponse) throws -> Data {
+        guard let httpResponse = response as? HTTPURLResponse else {
+            throw LoadError.connection
+        }
+        guard httpResponse.statusCode == 200 else {
+            throw LoadError(statusCode: httpResponse.statusCode)
+        }
+        return data
+    }
+
+    func loadBillsPublisher(_ project: Project) -> AnyPublisher<[Bill], LoadError> {
         let request = buildURLRequest("bills", params: [:], project: project)
         return URLSession.shared.dataTaskPublisher(for: request)
-            .compactMap { data, response -> Data? in
-                guard let httpResponse = response as? HTTPURLResponse else { print("Network Error"); return nil }
-                guard httpResponse.statusCode == 200 else { print("Network Error: Status code: \(httpResponse.statusCode) \(httpResponse.description)"); return nil }
-                return data
-            }
+            .tryMap { data, response in try NetworkService.validate(data, response) }
             .decode(type: [Bill].self, decoder: decoder)
-            .replaceError(with: [])
+            .mapError { LoadError($0) }
             .map {
                 $0.sorted {
                     if let l1 = $0.lastchanged,
@@ -57,16 +109,12 @@ class NetworkService {
             .eraseToAnyPublisher()
     }
 
-    func loadMembersPublisher(_ project: Project) -> AnyPublisher<[Int: Person], Never> {
+    func loadMembersPublisher(_ project: Project) -> AnyPublisher<[Int: Person], LoadError> {
         let request = buildURLRequest("members", params: [:], project: project)
         return URLSession.shared.dataTaskPublisher(for: request)
-            .compactMap { data, response -> Data? in
-                guard let httpResponse = response as? HTTPURLResponse else { print("Network Error"); return nil }
-                guard httpResponse.statusCode == 200 else { print("Network Error: Status code: \(httpResponse.statusCode) \(httpResponse.description)"); return nil }
-                return data
-            }
+            .tryMap { data, response in try NetworkService.validate(data, response) }
             .decode(type: [Person].self, decoder: decoder)
-            .replaceError(with: [])
+            .mapError { LoadError($0) }
             .map {
                 members in
                 let filtered = members.filter {

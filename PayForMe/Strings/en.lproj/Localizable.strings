@@ -157,3 +157,10 @@
 "member_error_forbidden" = "This usually requires maintainer rights for the project. You can grant those at any time by changing the share-link's settings in Cospend (your Nextcloud-App).";
 "member_error_network" = "No connection to the server. Please check your network and try again.";
 "member_error_generic" = "The server rejected the request (HTTP %d).";
+
+"Could not load project" = "Could not load project";
+"load_error_unauthorized" = "The server rejected the stored password. If the project password was changed, add the project again with the new one.";
+"load_error_not_found" = "The server does not know this project. It may have been deleted, or the project id may be wrong.";
+"load_error_connection" = "No connection to the server. Please check your network and try again.";
+"load_error_invalid_response" = "The server's answer could not be read. It may not be a Cospend or iHateMoney server.";
+"load_error_generic" = "The server refused to send the project (HTTP %d).";

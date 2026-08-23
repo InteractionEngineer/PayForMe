@@ -26,6 +26,11 @@ class ProjectManager: ObservableObject {
 
     @Published var openedByURL: URL?
 
+    /// The last failure while loading bills and members, or nil after a load
+    /// that worked. Set so the UI can say something instead of showing lists
+    /// that are empty for no visible reason (#37).
+    @Published var loadingError: LoadError?
+
     private init() {
         print("init")
         projects = storageService.loadProjects()
@@ -80,8 +85,15 @@ class ProjectManager: ObservableObject {
             .receive(on: DispatchQueue.main)
             .handleEvents(receiveCancel: invokeCompletionOnce)
             .sink(
-                receiveCompletion: { _ in invokeCompletionOnce() },
+                receiveCompletion: { [weak self] result in
+                    if case let .failure(error) = result {
+                        self?.loadingError = error
+                    }
+                    invokeCompletionOnce()
+                },
                 receiveValue: { [weak self] project in
+                    // A load that worked clears whatever went wrong last time.
+                    self?.loadingError = nil
                     self?.currentProject = project
                     invokeCompletionOnce()
                 }

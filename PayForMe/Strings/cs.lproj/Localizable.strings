@@ -150,3 +150,10 @@
 "member_error_forbidden" = "To obvykle vyžaduje práva správce projektu. Sdílené heslo projektu může umožňovat jen přístup účastníka.";
 "member_error_network" = "Není spojení se serverem. Zkontrolujte síť a zkuste to znovu.";
 "member_error_generic" = "Server odmítl požadavek (HTTP %d).";
+
+"Could not load project" = "Projekt se nepodařilo načíst";
+"load_error_unauthorized" = "Server odmítl uložené heslo. Pokud se heslo projektu změnilo, přidej projekt znovu s novým heslem.";
+"load_error_not_found" = "Server tento projekt nezná. Možná byl smazán nebo je špatné ID projektu.";
+"load_error_connection" = "Žádné spojení se serverem. Zkontroluj síť a zkus to znovu.";
+"load_error_invalid_response" = "Odpověď serveru nelze přečíst. Možná nejde o server Cospend ani iHateMoney.";
+"load_error_generic" = "Server projekt neodeslal (HTTP %d).";

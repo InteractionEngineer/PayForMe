@@ -77,7 +77,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadBillsPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -98,7 +98,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadMembersPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -116,7 +116,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadBillsPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -136,7 +136,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadBillsPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -156,7 +156,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadBillsPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -176,7 +176,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadBillsPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -194,7 +194,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadBillsPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -264,40 +264,49 @@ class NetworkRequestTests: XCTestCase {
 
     // MARK: - loadBills() — graceful empty result on error
 
-    func testLoadBills_on404_publisherCompletesWithoutEmittingBills() {
+    func testLoadBills_on404_failsWithNotFound() {
         let project = Project.makeCospend()
         MockURLProtocol.requestHandler = { req in
             (.notFound(for: req.url!), Data())
         }
 
-        var didReceiveBills = false
-        let exp = expectation(description: "publisher completes without emitting (status quo, not ideal)")
+        var received: LoadError?
+        let exp = expectation(description: "publisher fails")
 
         NetworkService.shared.loadBillsPublisher(project)
-            .handleEvents(receiveCompletion: { _ in exp.fulfill() })
-            .sink { _ in didReceiveBills = true }
+            .sink(receiveCompletion: { completion in
+                if case let .failure(error) = completion { received = error }
+                exp.fulfill()
+            }, receiveValue: { _ in
+                XCTFail("no bills should arrive on 404")
+            })
             .store(in: &subscriptions)
 
         waitForExpectations(timeout: 2)
-        XCTAssertFalse(didReceiveBills,
-                       "loadBillsPublisher must NOT emit on 404 — but should when proper feedback is implemented")
+        XCTAssertEqual(received, .notFound,
+                       "a missing project has to reach the UI, not vanish into an empty list")
     }
 
-    func testLoadMembers_returnsEmptyDictOnNetworkFailure() {
+    /// This used to emit `[:]`, which the UI could not tell apart from a project
+    /// that genuinely has no members.
+    func testLoadMembers_onNetworkFailure_failsWithConnection() {
         let project = Project.makeCospend()
         MockURLProtocol.requestHandler = { _ in
             throw URLError(.timedOut)
         }
 
-        let exp = expectation(description: "empty members received")
+        var received: LoadError?
+        let exp = expectation(description: "publisher fails")
         NetworkService.shared.loadMembersPublisher(project)
-            .sink { members in
-                XCTAssertTrue(members.isEmpty,
-                              "loadMembers must return [:] on network failure, not crash")
+            .sink(receiveCompletion: { completion in
+                if case let .failure(error) = completion { received = error }
                 exp.fulfill()
-            }
+            }, receiveValue: { _ in
+                XCTFail("no members should arrive when the connection failed")
+            })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
+        XCTAssertEqual(received, .connection)
     }
 
     // MARK: - HTTP methods
@@ -308,7 +317,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadBillsPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -321,7 +330,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.loadMembersPublisher(project)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -337,7 +346,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.postBillPublisher(bill: .make())
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -353,7 +362,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.postBillPublisher(bill: .make())
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -369,7 +378,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.postBillPublisher(bill: .make())
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -387,7 +396,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.postBillPublisher(bill: .make())
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -430,7 +439,7 @@ class NetworkRequestTests: XCTestCase {
         let bill = Bill.make(id: 42)
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.updateBillPublisher(bill: bill)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -449,7 +458,7 @@ class NetworkRequestTests: XCTestCase {
         let bill = Bill.make(id: 7)
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.deleteBillPublisher(bill: bill)
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 
@@ -469,7 +478,7 @@ class NetworkRequestTests: XCTestCase {
 
         let exp = expectation(description: "request intercepted")
         NetworkService.shared.createMemberPublisher(name: "Alice")
-            .sink { _ in exp.fulfill() }
+            .sink(receiveCompletion: { _ in exp.fulfill() }, receiveValue: { _ in })
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
 

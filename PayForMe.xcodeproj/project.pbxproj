@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C34C21CC3AD72833B6C06C9D /* LoadErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CD167A293B2F0746C0A09C2E /* LoadErrorTests.swift */; };
 		481FB4FB23E964C8003BD108 /* ProjectManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481FB4FA23E964C8003BD108 /* ProjectManager.swift */; };
 		481FB4FD23EAD78F003BD108 /* AddProjectManualViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 481FB4FC23EAD78F003BD108 /* AddProjectManualViewModel.swift */; };
 		489995DA23F6EC6F008B7E38 /* OnboardingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 489995D923F6EC6F008B7E38 /* OnboardingView.swift */; };
@@ -88,6 +89,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CD167A293B2F0746C0A09C2E /* LoadErrorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoadErrorTests.swift; sourceTree = "<group>"; };
 		0865D2DAF541B24078D1DC41 /* TestHelpers.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TestHelpers.swift; sourceTree = "<group>"; };
 		143F41EE78329905894C8A29 /* BalanceCalculationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BalanceCalculationTests.swift; sourceTree = "<group>"; };
 		316FBA7C0CE4ABB51EC2A121 /* NetworkRequestTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NetworkRequestTests.swift; sourceTree = "<group>"; };
@@ -228,6 +230,7 @@
 			isa = PBXGroup;
 			children = (
 				654754E32528B29F00A82EB6 /* AddProjectManuallyTests.swift */,
+				CD167A293B2F0746C0A09C2E /* LoadErrorTests.swift */,
 				654754E52528B29F00A82EB6 /* Info.plist */,
 				6523FC4B25580EEF00BCD843 /* UrlExtensionsTests.swift */,
 				0865D2DAF541B24078D1DC41 /* TestHelpers.swift */,
@@ -544,6 +547,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				654754E42528B29F00A82EB6 /* AddProjectManuallyTests.swift in Sources */,
+				C34C21CC3AD72833B6C06C9D /* LoadErrorTests.swift in Sources */,
 				6523FC4C25580EEF00BCD843 /* UrlExtensionsTests.swift in Sources */,
 				57BC8D25B91CE40F4669650C /* TestHelpers.swift in Sources */,
 				D279295CFA25D9CC69C6F27C /* BillTests.swift in Sources */,

@@ -154,3 +154,10 @@
 "member_error_forbidden" = "Für den Erfolg sind meist Maintainer-Rechte am Projekt nötig. Du kannst diese Berechtigungen jederzeit erteilen, indem du die Einstellungen des Freigabelinks in Cospend (deiner Nextcloud-App) änderst.";
 "member_error_network" = "Keine Verbindung zum Server. Bitte Netzwerk prüfen und erneut versuchen.";
 "member_error_generic" = "Der Server hat die Anfrage abgelehnt (HTTP %d).";
+
+"Could not load project" = "Projekt konnte nicht geladen werden";
+"load_error_unauthorized" = "Der Server hat das gespeicherte Passwort abgelehnt. Wurde das Projektpasswort geändert, füge das Projekt mit dem neuen Passwort erneut hinzu.";
+"load_error_not_found" = "Der Server kennt dieses Projekt nicht. Möglicherweise wurde es gelöscht oder die Projekt-ID stimmt nicht.";
+"load_error_connection" = "Keine Verbindung zum Server. Bitte prüfe dein Netzwerk und versuche es erneut.";
+"load_error_invalid_response" = "Die Antwort des Servers war nicht lesbar. Möglicherweise ist es kein Cospend- oder iHateMoney-Server.";
+"load_error_generic" = "Der Server hat das Projekt nicht herausgegeben (HTTP %d).";

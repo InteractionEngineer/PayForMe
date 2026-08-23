@@ -157,3 +157,10 @@
 "Enter invite link" = "Introducir el enlace de invitación";
 "invite_link_hint" = "Pega el enlace de invitación completo. El servidor y el proyecto se detectan automáticamente.";
 "Server returned an invalid HTTP response" = "El servidor devolvió una respuesta HTTP no válida";
+
+"Could not load project" = "No se pudo cargar el proyecto";
+"load_error_unauthorized" = "El servidor rechazó la contraseña guardada. Si se cambió la contraseña del proyecto, añádelo de nuevo con la nueva.";
+"load_error_not_found" = "El servidor no conoce este proyecto. Puede que se haya eliminado o que el identificador sea incorrecto.";
+"load_error_connection" = "Sin conexión con el servidor. Comprueba tu red e inténtalo de nuevo.";
+"load_error_invalid_response" = "No se pudo leer la respuesta del servidor. Puede que no sea un servidor Cospend o iHateMoney.";
+"load_error_generic" = "El servidor se negó a enviar el proyecto (HTTP %d).";

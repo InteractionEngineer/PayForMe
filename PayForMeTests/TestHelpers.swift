@@ -147,4 +147,8 @@ extension HTTPURLResponse {
     static func notFound(for url: URL) -> HTTPURLResponse {
         HTTPURLResponse(url: url, statusCode: 404, httpVersion: nil, headerFields: nil)!
     }
+
+    static func status(_ code: Int, for url: URL) -> HTTPURLResponse {
+        HTTPURLResponse(url: url, statusCode: code, httpVersion: nil, headerFields: nil)!
+    }
 }
