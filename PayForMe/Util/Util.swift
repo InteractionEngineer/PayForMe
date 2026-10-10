@@ -57,6 +57,50 @@ extension String {
         return false
     }
 
+    /// The project id iHateMoney derives from a project's name: NFKD-normalised,
+    /// stripped of everything that is not a word character, whitespace or a
+    /// hyphen, lowercased, with runs of hyphens and whitespace collapsed into a
+    /// single hyphen.
+    ///
+    /// Users only ever see the name — the id is not shown anywhere in the web UI
+    /// — but the API is addressed by the id. A name typed into the add-project
+    /// form therefore has to be converted the same way the server converts it.
+    /// Mirrors `slugify()` in `ihatemoney/utils.py`.
+    var iHateMoneyProjectId: String {
+        let withoutPunctuation = decomposedStringWithCompatibilityMapping.unicodeScalars.filter { scalar in
+            switch scalar.properties.generalCategory {
+            case .nonspacingMark, .spacingMark, .enclosingMark:
+                // The diacritics NFKD just split off. Dropping them is what
+                // turns "Café" into "cafe" rather than "cafe\u{301}".
+                return false
+            default:
+                return CharacterSet.alphanumerics.contains(scalar)
+                    || scalar == "_"
+                    || scalar == "-"
+                    || CharacterSet.whitespacesAndNewlines.contains(scalar)
+            }
+        }
+
+        let normalised = String(String.UnicodeScalarView(withoutPunctuation))
+            .trimmingCharacters(in: .whitespacesAndNewlines)
+            .lowercased()
+
+        var result = ""
+        var lastWasSeparator = false
+        for character in normalised {
+            if character == "-" || character.isWhitespace {
+                if !lastWasSeparator {
+                    result.append("-")
+                }
+                lastWasSeparator = true
+            } else {
+                result.append(character)
+                lastWasSeparator = false
+            }
+        }
+        return result
+    }
+
     var isValidEmail: Bool {
         // here, `try!` will always succeed because the pattern is valid
         let regex = try! NSRegularExpression(pattern: "^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$", options: .caseInsensitive)

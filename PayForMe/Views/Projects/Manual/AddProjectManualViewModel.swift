@@ -299,7 +299,11 @@ class AddProjectManualViewModel: ObservableObject {
                     guard !password.isEmpty else { return nil }
                     effectivePassword = password
                 }
-                return Project(name: token, password: effectivePassword, token: token, backend: server.0, url: url, projectId: self.projectName)
+                // iHateMoney is addressed by the project id, which it derives
+                // from the name. The name is all users ever see, so accept it
+                // and convert it the same way the server does.
+                let identifier = server.0.projectIdentifier(fromUserInput: token)
+                return Project(name: token, password: effectivePassword, token: identifier, backend: server.0, url: url, projectId: identifier)
             }
             .removeDuplicates()
             .share()

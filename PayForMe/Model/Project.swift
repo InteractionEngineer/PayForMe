@@ -124,6 +124,22 @@ enum ProjectBackend: Int, Codable {
     case cospend = 0
     case iHateMoney = 1
 
+    /// What the user typed into the add-project form, turned into the value the
+    /// API expects.
+    ///
+    /// iHateMoney addresses projects by an id derived from the name, and the id
+    /// is never shown in its web UI — so people type the name and the request
+    /// 404s. Cospend uses the share token exactly as entered and must not be
+    /// touched.
+    func projectIdentifier(fromUserInput input: String) -> String {
+        switch self {
+        case .iHateMoney:
+            return input.iHateMoneyProjectId
+        case .cospend:
+            return input
+        }
+    }
+
     var staticPath: String {
         switch self {
         case .cospend:
