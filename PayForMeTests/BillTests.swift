@@ -59,9 +59,28 @@ class BillTests: XCTestCase {
     }
 
     func testCospend_paymentMode_isN() {
-        // The Cospend API requires paymentmode; "n" means "no specific payment mode".
+        // The legacy char stays fixed at "n": with `paymentmodeid` set the server derives the real
+        // char from the payment mode's `old_id` itself and discards whatever the client sent.
+        // Verified against a live instance.
         let params = makeBill().paramsFor(.cospend)
         XCTAssertEqual(params["paymentmode"] as? String, "n")
+    }
+
+    func testCospend_paymentModeId_isSent() {
+        // The id is what actually selects the payment mode.
+        let params = Bill.make(paymentmodeid: 37).paramsFor(.cospend)
+        XCTAssertEqual(params["paymentmodeid"] as? String, "37")
+    }
+
+    func testCospend_paymentModeId_defaultsToZero() {
+        // 0 is the API's encoding for "no payment mode".
+        XCTAssertEqual(makeBill().paramsFor(.cospend)["paymentmodeid"] as? String, "0")
+    }
+
+    func testCospend_categoryId_isSent() {
+        // Used to be hardcoded to "0", which wiped the category on every single save.
+        let params = Bill.make(categoryid: 122).paramsFor(.cospend)
+        XCTAssertEqual(params["categoryid"] as? String, "122")
     }
 
     func testCospend_categoryId_isZero() {
@@ -136,6 +155,13 @@ class BillTests: XCTestCase {
         let params = makeBill().paramsFor(.iHateMoney)
         XCTAssertNil(params["paymentmode"],
                      "iHateMoney must NOT receive paymentmode")
+    }
+
+    func testIHateMoney_ignoresPaymentModeChar() {
+        // The char is a Cospend concept. Passing one must not leak it into an iHateMoney request.
+        let params = makeBill().paramsFor(.iHateMoney)
+        XCTAssertNil(params["paymentmode"],
+                     "iHateMoney must NOT receive paymentmode, even when a char is passed")
     }
 
     func testIHateMoney_noCategoryId() {

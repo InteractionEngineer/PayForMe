@@ -24,6 +24,9 @@
 "Bills" = "Účty";
 
 /*  */
+"Category" = "Kategorie";
+
+
 "Changed date" = "Změněné datum";
 
 
@@ -81,6 +84,12 @@
 "Members" = "Členové";
 
 
+"No category" = "Bez kategorie";
+
+
+"No payment mode" = "Bez způsobu platby";
+
+
 "None" = "Žádní";
 
 
@@ -91,6 +100,9 @@
 
 /* BillDetail.swift */
 "Payer" = "Plátce";
+
+
+"Payment mode" = "Způsob platby";
 
 /* ProjectQRPermissionCheckerView.swift */
 "Please allow us to use the camera in order to scan the Cospend QR code" = "Pokud chcete naskenovat QR kód z Cospend, povolte použití kamery zařízení";

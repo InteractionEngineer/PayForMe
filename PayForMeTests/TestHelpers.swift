@@ -77,9 +77,13 @@ extension Project {
         token: String = "mytoken",
         password: String = "mypass",
         url: String = "https://nextcloud.example.com",
-        projectId: String = "my-project"
+        projectId: String = "my-project",
+        categories: [CospendTag] = [],
+        paymentModes: [CospendTag] = []
     ) -> Project {
-        Project(
+        // `categories` / `paymentModes` are `var`s on the class, not init parameters, so they get
+        // assigned after construction.
+        let project = Project(
             name: "test-project",
             password: password,
             token: token,
@@ -87,6 +91,9 @@ extension Project {
             url: URL(string: url)!,
             projectId: projectId,
         )
+        project.categories = categories
+        project.paymentModes = paymentModes
+        return project
     }
 
     static func makeIHateMoney(
@@ -112,6 +119,19 @@ let testAlice = Person(id: 1, weight: 1, name: "Alice", activated: true)
 let testBob   = Person(id: 2, weight: 1, name: "Bob",   activated: true)
 let testCarla = Person(id: 3, weight: 1, name: "Carla", activated: true)
 
+// MARK: - Tag fixtures
+
+let testCategoryGrocery = CospendTag(id: 122, name: "Grocery", color: "#ffaa00", icon: "🛒", order: 0)
+let testPaymentModeCash = CospendTag(id: 37, name: "Cash", color: "#556B2F", icon: "💵", order: 0)
+let testPaymentModeCustom = CospendTag(id: 55, name: "Voucher", color: "#123456", icon: "🎟", order: 0)
+
+/// Stands in for Cospend's built-in categories, which are not bound to a project and therefore
+/// never appear in `ExtraProjectInfo.categories`. The concrete value is deliberately arbitrary —
+/// what is established is only that such ids exist and are negative, not a mapping to a name.
+let testUnlistedNegativeTagId = -11
+/// A positive id the project does not (or no longer) know: the tag deleted on the server.
+let testUnlistedPositiveTagId = 999
+
 // MARK: - Bill fixtures
 
 extension Bill {
@@ -123,6 +143,8 @@ extension Bill {
         payerId: Int = 1,
         owers: [Person] = [testAlice, testBob, testCarla],
         repeat: String? = "n",
+        categoryid: Int? = nil,
+        paymentmodeid: Int? = nil,
         lastchanged: Int? = nil
     ) -> Bill {
         Bill(
@@ -133,6 +155,8 @@ extension Bill {
             payer_id: payerId,
             owers: owers,
             repeat: `repeat`,
+            categoryid: categoryid,
+            paymentmodeid: paymentmodeid,
             lastchanged: lastchanged
         )
     }

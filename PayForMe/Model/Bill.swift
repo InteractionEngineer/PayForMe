@@ -15,6 +15,8 @@ struct Bill: Codable, Identifiable, Hashable {
     var payer_id: Int
     var owers: [Person]
     var `repeat`: String?
+    var categoryid: Int?
+    var paymentmodeid: Int?
     var lastchanged: Int?
 
     func paramsFor(_ backend: ProjectBackend) -> [String: Any] {
@@ -26,8 +28,9 @@ struct Bill: Codable, Identifiable, Hashable {
         ]
         if backend == .cospend {
             dict["payed_for"] = owers.map { $0.id.description }.joined(separator: ",")
+            dict["categoryid"] = (categoryid ?? 0).description
+            dict["paymentmodeid"] = (paymentmodeid ?? 0).description
             dict["paymentmode"] = "n"
-            dict["categoryid"] = "0"
 
             if let rep = self.repeat {
                 dict["repeat"] = rep

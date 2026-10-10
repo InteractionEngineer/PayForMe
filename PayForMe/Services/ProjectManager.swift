@@ -13,6 +13,7 @@ class ProjectManager: ObservableObject {
 
     private var cancellable: Cancellable?
     private var loadCancellable: AnyCancellable?
+    private var tagsCancellable: AnyCancellable?
 
     @Published
     private(set) var projects = [Project]()
@@ -61,6 +62,8 @@ class ProjectManager: ObservableObject {
     func loadBillsAndMembers(completion: (() -> Void)? = nil) {
         let project = currentProject
 
+        loadTags(for: project)
+
         let billsPublisher = NetworkService.shared.loadBillsPublisher(project)
         let membersPublisher = NetworkService.shared.loadMembersPublisher(project)
 
@@ -86,6 +89,21 @@ class ProjectManager: ObservableObject {
                     invokeCompletionOnce()
                 }
             )
+    }
+
+
+    private func loadTags(for project: Project) {
+        tagsCancellable = NetworkService.shared.loadTagsPublisher(project)
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] tags in
+                project.categories = tags.categories
+                project.paymentModes = tags.paymentModes
+                // `Project` is a class, so the assignments above are already visible everywhere —
+                // but only re-publishing makes SwiftUI redraw. Compared by identity, because
+                // `Project: Equatable` ignores the id and would accept a different project.
+                guard let self = self, self.currentProject === project else { return }
+                self.currentProject = project
+            }
     }
 
     private func sendBillToServer(bill: Bill, update: Bool, completion: @escaping () -> Void) {
@@ -274,6 +292,7 @@ extension ProjectManager {
             return
         }
         loadCancellable?.cancel()
+        tagsCancellable?.cancel()
         currentProject = project
         loadBillsAndMembers()
         defaults.set(project.id, forKey: "projectID")

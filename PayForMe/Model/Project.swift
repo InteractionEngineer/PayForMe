@@ -17,6 +17,8 @@ class Project: Codable, Identifiable {
 
     var members: [Int: Person]
     var bills: [Bill]
+    var categories: [CospendTag]
+    var paymentModes: [CospendTag]
     var me: Int?
 
     let projectId: String
@@ -25,15 +27,17 @@ class Project: Codable, Identifiable {
         self.init(name: name, password: password, token: token, backend: backend, url: url, id: nil, projectId: projectId)
     }
 
-    fileprivate init(name: String, password: String, token: String, backend: ProjectBackend, url: URL, id: Int?, me: Int? = nil, projectId: String) {
+    fileprivate init(name: String, password: String, token: String, backend: ProjectBackend, url: URL, id: Int?, me: Int? = nil, projectId: String, categories: [CospendTag] = [], paymentModes: [CospendTag] = []) {
         self.name = name
         self.password = password
         self.token = token
         self.backend = backend
         self.url = url
         self.id = id
-        members = [:]
-        bills = []
+        self.members = [:]
+        self.bills = []
+        self.categories = categories
+        self.paymentModes = paymentModes
         self.me = me
         self.projectId = projectId
     }
@@ -81,6 +85,29 @@ struct StoredProject: Codable {
     }
 }
 
+extension Project {
+    func category(for bill: Bill) -> CospendTag? {
+        tag(id: bill.categoryid, in: categories)
+    }
+
+    func paymentMode(for bill: Bill) -> CospendTag? {
+        tag(id: bill.paymentmodeid, in: paymentModes)
+    }
+
+    private func tag(id: Int?, in tags: [CospendTag]) -> CospendTag? {
+        guard let id = id, id != 0 else { return nil }
+        return tags.first { $0.id == id }
+    }
+
+    func listedCategoryId(_ id: Int) -> Int { listedId(id, in: categories) }
+
+    func listedPaymentModeId(_ id: Int) -> Int { listedId(id, in: paymentModes) }
+
+    private func listedId(_ id: Int, in tags: [CospendTag]) -> Int {
+        tags.contains { $0.id == id } ? id : 0
+    }
+}
+
 extension Project: Equatable {
     static func == (lhs: Project, rhs: Project) -> Bool {
         return lhs.url == rhs.url && lhs.name == rhs.name && lhs.backend == rhs.backend && lhs.password == rhs.password
@@ -107,7 +134,17 @@ enum ProjectBackend: Int, Codable {
     }
 }
 
-let previewProject = Project(name: "TestProject", password: "TestPassword", token: "asdasdas", backend: .cospend, url: URL(string: "https://testserver.de")!, id: 0, projectId: "TestProject")
+let previewProject = Project(
+    name: "TestProject",
+    password: "TestPassword",
+    token: "asdasdas",
+    backend: .cospend,
+    url: URL(string: "https://testserver.de")!,
+    id: 0,
+    projectId: "TestProject",
+    categories: [CospendTag(id: 0, name: "Food", color: "FFFEEE", icon: "", order: 0)],
+    paymentModes: [CospendTag(id: 0, name: "Cash", color: "010010", icon: "", order: 0)]
+)
 let previewProjects = [
     previewProject,
     Project(name: "test1", password: "test23", token: "dasdasa", backend: .cospend, url: URL(string: "https://testserver.de")!, id: 1, projectId: "test1"),

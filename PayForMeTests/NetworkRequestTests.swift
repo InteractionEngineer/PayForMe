@@ -55,6 +55,17 @@ class NetworkRequestTests: XCTestCase {
         super.tearDown()
     }
 
+    // Cospend receives bill params as URL query items, so assertions on what was sent read them
+    // back off the captured request.
+    private func queryItems(of request: URLRequest?) -> [String: String] {
+        guard let url = request?.url,
+              let components = URLComponents(url: url, resolvingAgainstBaseURL: false),
+              let items = components.queryItems
+        else { return [:] }
+        return Dictionary(items.compactMap { item in item.value.map { (item.name, $0) } },
+                          uniquingKeysWith: { first, _ in first })
+    }
+
     // Returns a handler that yields an empty JSON array with a given status code.
     private func jsonHandler(status: Int = 200, body: String = "[]") -> (URLRequest) throws -> (HTTPURLResponse, Data) {
         return { request in
@@ -265,13 +276,17 @@ class NetworkRequestTests: XCTestCase {
     // MARK: - loadBills() — graceful empty result on error
 
     func testLoadBills_on404_publisherCompletesWithoutEmittingBills() {
+        // Not emitting is the point: a failed request must not overwrite the bills already on
+        // screen with an empty list. The subscriber in ProjectManager simply does not run, so the
+        // last good state survives the failed refresh. What is still missing is telling the user
+        // that the refresh failed at all — the silence is by design, the lack of feedback is not.
         let project = Project.makeCospend()
         MockURLProtocol.requestHandler = { req in
             (.notFound(for: req.url!), Data())
         }
 
         var didReceiveBills = false
-        let exp = expectation(description: "publisher completes without emitting (status quo, not ideal)")
+        let exp = expectation(description: "publisher completes without emitting")
 
         NetworkService.shared.loadBillsPublisher(project)
             .handleEvents(receiveCompletion: { _ in exp.fulfill() })
@@ -280,7 +295,7 @@ class NetworkRequestTests: XCTestCase {
 
         waitForExpectations(timeout: 2)
         XCTAssertFalse(didReceiveBills,
-                       "loadBillsPublisher must NOT emit on 404 — but should when proper feedback is implemented")
+                       "loadBillsPublisher must NOT emit on 404 — that would clear the bill list")
     }
 
     func testLoadMembers_returnsEmptyDictOnNetworkFailure() {
@@ -298,6 +313,105 @@ class NetworkRequestTests: XCTestCase {
             }
             .store(in: &subscriptions)
         waitForExpectations(timeout: 2)
+    }
+
+    // MARK: - loadTags() — a failure has to emit, not hang
+
+    func testLoadTags_on500_emitsEmptyLists() {
+        // The subscriber must get exactly one value either way. Empty means the pickers and the
+        // tag line drop out until a refresh succeeds; the ids on the bills are untouched.
+        let project = Project.makeCospend()
+        MockURLProtocol.requestHandler = jsonHandler(status: 500)
+
+        var received: [CospendProjectTags] = []
+        let exp = expectation(description: "value received")
+
+        NetworkService.shared.loadTagsPublisher(project)
+            .sink { tags in
+                received.append(tags)
+                exp.fulfill()
+            }
+            .store(in: &subscriptions)
+
+        waitForExpectations(timeout: 2)
+        XCTAssertEqual(received.count, 1, "must emit exactly once")
+        XCTAssertTrue(received.first?.categories.isEmpty ?? false)
+        XCTAssertTrue(received.first?.paymentModes.isEmpty ?? false)
+    }
+
+    func testLoadTags_onMalformedPayload_emitsEmptyLists() {
+        // The other failure shape: a 200 whose body does not decode fails the stream rather than
+        // ending it empty. Both need covering, or the subscriber never runs.
+        let project = Project.makeCospend()
+        MockURLProtocol.requestHandler = jsonHandler(status: 200, body: "not json at all")
+
+        var received: [CospendProjectTags] = []
+        let exp = expectation(description: "value received")
+
+        NetworkService.shared.loadTagsPublisher(project)
+            .sink { tags in
+                received.append(tags)
+                exp.fulfill()
+            }
+            .store(in: &subscriptions)
+
+        waitForExpectations(timeout: 2)
+        XCTAssertEqual(received.count, 1)
+        XCTAssertTrue(received.first?.categories.isEmpty ?? false)
+    }
+
+    func testCospend_loadTags_decodesProjectRootResponse() {
+        // Categories and payment modes have no endpoint of their own — Cospend ships them inside
+        // the project info, keyed by id (see ExtraProjectInfo in swagger.json).
+        let project = Project.makeCospend(token: "tok", password: "pass", projectId: "proj")
+        MockURLProtocol.requestHandler = jsonHandler(status: 200, body: """
+        {
+          "id": "proj",
+          "name": "Test",
+          "categories": {
+            "122": {"id": 122, "projectid": "proj", "name": "Grocery", "color": "#ffaa00", "icon": "🛒", "order": 0}
+          },
+          "paymentmodes": {
+            "37": {"id": 37, "projectid": "proj", "name": "Cash", "color": "#556B2F", "icon": "💵", "order": 0}
+          }
+        }
+        """)
+
+        var received: CospendProjectTags?
+        let exp = expectation(description: "tags received")
+
+        NetworkService.shared.loadTagsPublisher(project)
+            .sink { tags in
+                received = tags
+                exp.fulfill()
+            }
+            .store(in: &subscriptions)
+        waitForExpectations(timeout: 2)
+
+        let url = MockURLProtocol.lastCapturedRequest?.url?.absoluteString ?? ""
+        XCTAssertTrue(url.hasSuffix("/index.php/apps/cospend/api/projects/tok/pass"),
+                      "Tags come from the project root, without an endpoint suffix. Got: \(url)")
+        XCTAssertEqual(received?.categories.map(\.id), [122])
+        XCTAssertEqual(received?.categories.first?.label, "🛒 Grocery")
+        XCTAssertEqual(received?.paymentModes.map(\.id), [37])
+        XCTAssertEqual(received?.paymentModes.first?.label, "💵 Cash")
+    }
+
+    func testIHateMoney_loadTags_emitsEmptyWithoutSendingARequest() {
+        // iHateMoney has no equivalent concept, so asking its server would be a wasted round trip.
+        let project = Project.makeIHateMoney()
+        MockURLProtocol.requestHandler = jsonHandler()
+
+        var received: [CospendProjectTags] = []
+        NetworkService.shared.loadTagsPublisher(project)
+            .sink { received.append($0) }
+            .store(in: &subscriptions)
+
+        XCTAssertEqual(received.count, 1)
+        XCTAssertTrue(received.first?.categories.isEmpty ?? false)
+        XCTAssertTrue(received.first?.paymentModes.isEmpty ?? false)
+        XCTAssertNil(MockURLProtocol.lastCapturedRequest,
+                     "iHateMoney must not hit the network for Cospend tags")
     }
 
     // MARK: - HTTP methods
@@ -359,6 +473,47 @@ class NetworkRequestTests: XCTestCase {
 
         let url = MockURLProtocol.lastCapturedRequest?.url?.absoluteString ?? ""
         XCTAssertTrue(url.contains("/bills"), "POST bill URL must contain /bills. Got: \(url)")
+    }
+
+    func testCospend_postBill_sendsTheTagIds() {
+        // The two ids are what actually select category and payment mode. `paymentmode` stays the
+        // fixed legacy "n": with `paymentmodeid` set the server derives the real char from the
+        // payment mode's `old_id` itself and discards ours — verified against a live instance.
+        ProjectManager.shared.currentProject = .makeCospend(paymentModes: [testPaymentModeCash])
+        MockURLProtocol.requestHandler = jsonHandler(status: 200, body: "{}")
+
+        let exp = expectation(description: "request intercepted")
+        NetworkService.shared.postBillPublisher(
+            bill: .make(categoryid: testCategoryGrocery.id, paymentmodeid: testPaymentModeCash.id)
+        )
+        .sink { _ in exp.fulfill() }
+        .store(in: &subscriptions)
+        waitForExpectations(timeout: 2)
+
+        let query = queryItems(of: MockURLProtocol.lastCapturedRequest)
+        XCTAssertEqual(query["categoryid"], "122")
+        XCTAssertEqual(query["paymentmodeid"], "37")
+        XCTAssertEqual(query["paymentmode"], "n")
+    }
+
+    func testCospend_postBill_sendsIdsTheProjectDoesNotList() {
+        // A tag deleted on the server, or one of Cospend's built-in categories such as the
+        // reimbursement one on a settlement bill. Neither is in the project's lists, and both have
+        // to reach the server unchanged.
+        ProjectManager.shared.currentProject = .makeCospend()
+        MockURLProtocol.requestHandler = jsonHandler(status: 200, body: "{}")
+
+        let exp = expectation(description: "request intercepted")
+        NetworkService.shared.postBillPublisher(
+            bill: .make(categoryid: testUnlistedNegativeTagId, paymentmodeid: testUnlistedPositiveTagId)
+        )
+        .sink { _ in exp.fulfill() }
+        .store(in: &subscriptions)
+        waitForExpectations(timeout: 2)
+
+        let query = queryItems(of: MockURLProtocol.lastCapturedRequest)
+        XCTAssertEqual(query["categoryid"], "-11")
+        XCTAssertEqual(query["paymentmodeid"], "999")
     }
 
     func testCospend_postBill_paramsInQueryStringNotBody() {
@@ -512,4 +667,87 @@ class NetworkRequestTests: XCTestCase {
             // Any thrown error is acceptable
         }
     }
+
+    // MARK: - The whole rule, end to end through ProjectManager
+
+    /// Tags fail while bills and members succeed — the split that became possible when tags got
+    /// their own subscription. Before that they shared a `Zip` with bills and members, and a
+    /// stumbling project root took the entire bill list down with it, because `Zip` waits for one
+    /// element from every publisher.
+    func testLoadBillsAndMembers_tagRequestFails_clearsTheTagsButKeepsTheBills() {
+        let saved = ProjectManager.shared.currentProject
+        defer { ProjectManager.shared.currentProject = saved }
+
+        let project = Project.makeCospend(categories: [testCategoryGrocery],
+                                          paymentModes: [testPaymentModeCash])
+        ProjectManager.shared.currentProject = project
+
+        MockURLProtocol.requestHandler = { request in
+            let path = request.url!.path
+            let ok = { (body: String) -> (HTTPURLResponse, Data) in
+                (HTTPURLResponse(url: request.url!, statusCode: 200,
+                                 httpVersion: nil, headerFields: nil)!,
+                 body.data(using: .utf8)!)
+            }
+            if path.hasSuffix("/bills") { return ok("[]") }
+            if path.hasSuffix("/members") { return ok("[]") }
+            // The project root: this is the tag request, and it stumbles.
+            return (HTTPURLResponse(url: request.url!, statusCode: 500,
+                                    httpVersion: nil, headerFields: nil)!, Data())
+        }
+
+        let loaded = expectation(description: "bills and members finished")
+        ProjectManager.shared.loadBillsAndMembers { loaded.fulfill() }
+        waitForExpectations(timeout: 2)
+
+        // The tags sink hops through the main queue, so let anything already queued run first.
+        let drained = expectation(description: "main queue drained")
+        DispatchQueue.main.async { drained.fulfill() }
+        wait(for: [drained], timeout: 2)
+
+        XCTAssertTrue(project.categories.isEmpty,
+                      "a failed tag request empties the lists, so the pickers drop out")
+        XCTAssertTrue(project.paymentModes.isEmpty)
+        XCTAssertNotNil(ProjectManager.shared.currentProject,
+                        "but bills and members still arrive — that is the whole point of the split")
+    }
+
+    func testLoadBillsAndMembers_tagRequestSucceeds_replacesTheLists() {
+        let saved = ProjectManager.shared.currentProject
+        defer { ProjectManager.shared.currentProject = saved }
+
+        let project = Project.makeCospend()
+        ProjectManager.shared.currentProject = project
+
+        MockURLProtocol.requestHandler = { request in
+            let path = request.url!.path
+            let body: String
+            if path.hasSuffix("/bills") || path.hasSuffix("/members") {
+                body = "[]"
+            } else {
+                body = """
+                {"id":"my-project","name":"Test",
+                 "categories":{"122":{"id":122,"projectid":"my-project","name":"Grocery",
+                                      "color":"#ffaa00","icon":"\u{1F6D2}","order":0}},
+                 "paymentmodes":{}}
+                """
+            }
+            return (HTTPURLResponse(url: request.url!, statusCode: 200,
+                                    httpVersion: nil, headerFields: nil)!,
+                    body.data(using: .utf8)!)
+        }
+
+        let loaded = expectation(description: "bills and members finished")
+        ProjectManager.shared.loadBillsAndMembers { loaded.fulfill() }
+        waitForExpectations(timeout: 2)
+
+        let drained = expectation(description: "main queue drained")
+        DispatchQueue.main.async { drained.fulfill() }
+        wait(for: [drained], timeout: 2)
+
+        XCTAssertEqual(project.categories.map(\.id), [122],
+                       "only a successful response replaces the lists — that is how a tag deleted "
+                       + "server-side disappears")
+    }
+
 }

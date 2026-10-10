@@ -21,6 +21,9 @@
 "Bills" = "Счета";
 
 /*  */
+"Category" = "Категория";
+
+
 "Changed date" = "Измененная дата";
 
 /*  */
@@ -78,6 +81,12 @@
 "Members" = "Участники";
 
 
+"No category" = "Без категории";
+
+
+"No payment mode" = "Без способа оплаты";
+
+
 "None" = "Никто";
 
 
@@ -88,6 +97,9 @@
 
 
 "Payer" = "Кто платил";
+
+
+"Payment mode" = "Способ оплаты";
 
 /*  */
 "Please allow us to use the camera in order to scan the Cospend QR code" = "Пожалуйста, разрешите нам использовать камеру для сканирования QR-кода Cospend";

@@ -50,6 +50,27 @@ struct BillDetailView: View {
                         Label("Bill date", systemImage: "calendar").labelStyle(.iconOnly)
                     }
                 }
+
+                if !viewModel.currentProject.categories.isEmpty || !viewModel.currentProject.paymentModes.isEmpty {
+                    Section {
+                        if !viewModel.currentProject.categories.isEmpty {
+                            Picker("Category", selection: viewModel.categoryPickerSelection) {
+                                Text("No category").tag(0)
+                                ForEach(viewModel.currentProject.categories) { category in
+                                    Text(category.label).tag(category.id)
+                                }
+                            }
+                        }
+                        if !viewModel.currentProject.paymentModes.isEmpty {
+                            Picker("Payment mode", selection: viewModel.paymentModePickerSelection) {
+                                Text("No payment mode").tag(0)
+                                ForEach(viewModel.currentProject.paymentModes) { paymentMode in
+                                    Text(paymentMode.label).tag(paymentMode.id)
+                                }
+                            }
+                        }
+                    }
+                }
                 Section(header: Text("Owers")) {
                     PotentialOwersView(vm: viewModel.povm)
                 }

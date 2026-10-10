@@ -24,6 +24,9 @@
 "Bills" = "Bills";
 
 
+"Category" = "Category";
+
+
 "Changed date" = "Changed date";
 
 
@@ -81,6 +84,12 @@
 "Members" = "Members";
 
 
+"No category" = "No category";
+
+
+"No payment mode" = "No payment mode";
+
+
 "None" = "None";
 
 
@@ -95,6 +104,9 @@
 
 /* BillDetail.swift */
 "Payer" = "Payer";
+
+
+"Payment mode" = "Payment mode";
 
 /* ProjectQRPermissionCheckerView.swift */
 "Please allow us to use the camera in order to scan the Cospend QR code" = "Please allow us to use the camera in order to scan the Cospend QR code";

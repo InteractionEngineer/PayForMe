@@ -266,4 +266,139 @@ class JSONDecodingTests: XCTestCase {
         }
         XCTAssertEqual(sorted.map { $0.id }, [2, 3, 1])
     }
+
+    // MARK: - CospendTag legacy payment mode char
+
+    func testCospendProjectTags_decodesDictForm() throws {
+        let json = """
+        {
+          "categories": {
+            "122": {"id": 122, "name": "Grocery", "color": "#ffaa00", "icon": "🛒", "order": 0}
+          },
+          "paymentmodes": {
+            "37": {"id": 37, "name": "Cash", "color": "#556B2F", "icon": "💵", "order": 0}
+          }
+        }
+        """.data(using: .utf8)!
+
+        let tags = try decoder.decode(CospendProjectTags.self, from: json)
+        XCTAssertEqual(tags.categories.map(\.id), [122])
+        XCTAssertEqual(tags.paymentModes.map(\.id), [37])
+    }
+
+    func testCospendProjectTags_decodesArrayForm() throws {
+        // The fallback branch: PHP emits [] for an empty collection, and a populated array is the
+        // same code path.
+        let json = """
+        {
+          "categories": [
+            {"id": 122, "name": "Grocery", "color": "#ffaa00", "icon": "🛒", "order": 0}
+          ],
+          "paymentmodes": []
+        }
+        """.data(using: .utf8)!
+
+        let tags = try decoder.decode(CospendProjectTags.self, from: json)
+        XCTAssertEqual(tags.categories.map(\.id), [122])
+        XCTAssertTrue(tags.paymentModes.isEmpty)
+    }
+
+    func testCospendProjectTags_missingKeysYieldEmptyLists() throws {
+        // A project response without either key must decode, not throw — the app then simply has
+        // no tags and hides the pickers.
+        let json = """
+        {"id": "proj", "name": "Test"}
+        """.data(using: .utf8)!
+
+        let tags = try decoder.decode(CospendProjectTags.self, from: json)
+        XCTAssertTrue(tags.categories.isEmpty)
+        XCTAssertTrue(tags.paymentModes.isEmpty)
+    }
+
+    func testCospendProjectTags_nullNameFallsBackToDash() throws {
+        // `name` is nullable per the spec. displayName must not produce an empty picker row.
+        let json = """
+        {
+          "categories": {
+            "5": {"id": 5, "name": null, "color": null, "icon": null, "order": 0}
+          },
+          "paymentmodes": {}
+        }
+        """.data(using: .utf8)!
+
+        let tags = try decoder.decode(CospendProjectTags.self, from: json)
+        let category = try XCTUnwrap(tags.categories.first)
+        XCTAssertNil(category.name)
+        XCTAssertEqual(category.displayName, "—")
+        XCTAssertEqual(category.label, "—", "without an icon the label is just the display name")
+    }
+
+    func testCospendProjectTags_malformedPayloadYieldsEmptyList() throws {
+        // Neither a dict nor an array, i.e. Cospend changed the response format for the field.
+        // Decoding must not throw — the project response as a whole still has to arrive — the tags
+        // are simply gone. `decodeList` swallows the error via `try?`, so this is the documented
+        // failure mode: no tags, no complaint.
+        let json = """
+        {"categories": "nonsense", "paymentmodes": {}}
+        """.data(using: .utf8)!
+
+        let tags = try decoder.decode(CospendProjectTags.self, from: json)
+        XCTAssertTrue(tags.categories.isEmpty)
+        XCTAssertTrue(tags.paymentModes.isEmpty)
+    }
+
+    func testCospendProjectTags_sortsByOrderThenName() throws {
+        // Dict decoding loses any order the server had, so the sort is what the picker relies on.
+        // Cospend leaves `order` at 0 unless tags were reordered by hand, which is why the name
+        // decides far more often than the explicit order does.
+        let json = """
+        {
+          "categories": {
+            "3": {"id": 3, "name": "Zebra", "color": null, "icon": null, "order": 0},
+            "1": {"id": 1, "name": "Apple", "color": null, "icon": null, "order": 0},
+            "2": {"id": 2, "name": "Middle", "color": null, "icon": null, "order": -1}
+          },
+          "paymentmodes": {}
+        }
+        """.data(using: .utf8)!
+
+        let tags = try decoder.decode(CospendProjectTags.self, from: json)
+        XCTAssertEqual(tags.categories.map(\.id), [2, 1, 3],
+                       "order first (-1 before 0), then displayName (Apple before Zebra)")
+    }
+
+    func testCospendProjectTags_sortsNamesLocalized() throws {
+        // Cospend's categories are named in whatever language the project is kept in. Comparing
+        // with plain `<` goes by UTF-16 code units, which files every umlaut and every lowercase
+        // name behind "Z".
+        let json = """
+        {
+          "categories": {
+            "1": {"id": 1, "name": "Zoo", "color": null, "icon": null, "order": 0},
+            "2": {"id": 2, "name": "Ärzte", "color": null, "icon": null, "order": 0},
+            "3": {"id": 3, "name": "apfel", "color": null, "icon": null, "order": 0}
+          },
+          "paymentmodes": {}
+        }
+        """.data(using: .utf8)!
+
+        let tags = try decoder.decode(CospendProjectTags.self, from: json)
+        XCTAssertEqual(tags.categories.map(\.name), ["apfel", "Ärzte", "Zoo"])
+    }
+
+    func testCospendProjectTags_missingOrderSortsLast() throws {
+        // A nil order maps to Int.max, so such a tag lands behind every explicitly ordered one.
+        let json = """
+        {
+          "categories": {
+            "1": {"id": 1, "name": "Apple", "color": null, "icon": null},
+            "2": {"id": 2, "name": "Zebra", "color": null, "icon": null, "order": 5}
+          },
+          "paymentmodes": {}
+        }
+        """.data(using: .utf8)!
+
+        let tags = try decoder.decode(CospendProjectTags.self, from: json)
+        XCTAssertEqual(tags.categories.map(\.id), [2, 1])
+    }
 }

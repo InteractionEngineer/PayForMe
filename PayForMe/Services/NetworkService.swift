@@ -77,6 +77,30 @@ class NetworkService {
             .eraseToAnyPublisher()
     }
 
+
+    func loadTagsPublisher(_ project: Project) -> AnyPublisher<CospendProjectTags, Never> {
+        guard project.backend == .cospend else {
+            return Just(CospendProjectTags.empty).eraseToAnyPublisher()
+        }
+        let request = buildURLRequest("", params: [:], project: project)
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .compactMap { data, response -> Data? in
+                guard let httpResponse = response as? HTTPURLResponse else {
+                    print("Network Error")
+                    return nil
+                }
+                guard httpResponse.statusCode == 200 else {
+                    print("Network Error: Status code: \(httpResponse.statusCode) \(httpResponse.description)")
+                    return nil
+                }
+                return data
+            }
+            .decode(type: CospendProjectTags.self, decoder: decoder)
+            .replaceError(with: .empty)
+            .replaceEmpty(with: .empty)
+            .eraseToAnyPublisher()
+    }
+
     func testProject(_ project: Project) -> AnyPublisher<(Project, Int), Never> {
         let request = buildURLRequest("dummy", params: [:], project: project)
         let requestPub = URLSession.shared.dataTaskPublisher(for: request)

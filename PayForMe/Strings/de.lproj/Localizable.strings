@@ -21,6 +21,9 @@
 "Bills" = "Ausgaben";
 
 /*  */
+"Category" = "Kategorie";
+
+
 "Changed date" = "Geändertes Datum";
 
 
@@ -78,6 +81,12 @@
 "Members" = "Mitglieder";
 
 
+"No category" = "Keine Kategorie";
+
+
+"No payment mode" = "Keine Zahlungsart";
+
+
 "None" = "Niemand";
 
 
@@ -92,6 +101,9 @@
 
 
 "Payer" = "Zahler";
+
+
+"Payment mode" = "Zahlungsart";
 
 /* ProjectQRPermissionCheckerView.swift */
 "Please allow us to use the camera in order to scan the Cospend QR code" = "Bitte erlaube der App die Kamera zu benutzen, um den Cospend QR-Code scannen zu können";

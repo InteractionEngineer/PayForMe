@@ -7,6 +7,7 @@
 
 import Combine
 import Foundation
+import SwiftUI
 
 class BillDetailViewModel: ObservableObject {
     var manager = ProjectManager.shared
@@ -29,6 +30,12 @@ class BillDetailViewModel: ObservableObject {
     
     @Published
     var billDate: Date = Date()
+
+    @Published
+    var selectedCategoryId = 0
+
+    @Published
+    var selectedPaymentModeId = 0
 
     var povm: PotentialOwersViewModel
 
@@ -57,18 +64,37 @@ class BillDetailViewModel: ObservableObject {
         .eraseToAnyPublisher()
     }
 
+    var categoryPickerSelection: Binding<Int> {
+        Binding(
+            get: { self.currentProject.listedCategoryId(self.selectedCategoryId) },
+            set: { self.selectedCategoryId = $0 }
+        )
+    }
+
+    var paymentModePickerSelection: Binding<Int> {
+        Binding(
+            get: { self.currentProject.listedPaymentModeId(self.selectedPaymentModeId) },
+            set: { self.selectedPaymentModeId = $0 }
+        )
+    }
+
     func createBill() -> Bill? {
         let safeAmount = amount.replacingOccurrences(of: ",", with: ".")
         guard let doubleAmount = Double(safeAmount) else {
             return nil
         }
 
-        let billID = currentBill.id
-        let date = billDate
-
-        let actualOwers = povm.actualOwers()
-
-        return Bill(id: billID, amount: doubleAmount, what: topic, date: date, payer_id: selectedPayer, owers: actualOwers, repeat: currentProject.backend == .cospend ? "n" : nil, lastchanged: 0)
+        var bill = currentBill
+        bill.amount = doubleAmount
+        bill.what = topic
+        bill.date = billDate
+        bill.payer_id = selectedPayer
+        bill.owers = povm.actualOwers()
+        bill.repeat = currentProject.backend == .cospend ? currentBill.repeat : nil
+        bill.categoryid = selectedCategoryId
+        bill.paymentmodeid = selectedPaymentModeId
+        bill.lastchanged = 0
+        return bill
     }
 
     func prefillData() {
@@ -84,5 +110,7 @@ class BillDetailViewModel: ObservableObject {
             }
         }
         billDate = currentBill.date
+        selectedCategoryId = currentBill.categoryid ?? 0
+        selectedPaymentModeId = currentBill.paymentmodeid ?? 0
     }
 }
