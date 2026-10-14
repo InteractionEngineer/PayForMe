@@ -397,21 +397,54 @@ class NetworkRequestTests: XCTestCase {
         XCTAssertEqual(received?.paymentModes.first?.label, "💵 Cash")
     }
 
-    func testIHateMoney_loadTags_emitsEmptyWithoutSendingARequest() {
-        // iHateMoney has no equivalent concept, so asking its server would be a wasted round trip.
-        let project = Project.makeIHateMoney()
-        MockURLProtocol.requestHandler = jsonHandler()
+    func testIHateMoney_loadTags_stockServerYieldsEmptyLists() {
+        // Stock iHateMoney answers the project root without any category keys.
+        let project = Project.makeIHateMoney(token: "tok", password: "pass", projectId: "proj")
+        MockURLProtocol.requestHandler = jsonHandler(status: 200, body: """
+        {"id": "proj", "name": "Test", "contact_email": "a@b.c", "members": []}
+        """)
 
-        var received: [CospendProjectTags] = []
+        var received: CospendProjectTags?
+        let exp = expectation(description: "tags received")
         NetworkService.shared.loadTagsPublisher(project)
-            .sink { received.append($0) }
+            .sink { tags in
+                received = tags
+                exp.fulfill()
+            }
             .store(in: &subscriptions)
+        waitForExpectations(timeout: 2)
 
-        XCTAssertEqual(received.count, 1)
-        XCTAssertTrue(received.first?.categories.isEmpty ?? false)
-        XCTAssertTrue(received.first?.paymentModes.isEmpty ?? false)
-        XCTAssertNil(MockURLProtocol.lastCapturedRequest,
-                     "iHateMoney must not hit the network for Cospend tags")
+        let url = MockURLProtocol.lastCapturedRequest?.url?.absoluteString ?? ""
+        XCTAssertTrue(url.hasSuffix("/api/projects/proj"), "Got: \(url)")
+        XCTAssertEqual(received?.categories.count, 0)
+        XCTAssertEqual(received?.paymentModes.count, 0)
+        XCTAssertEqual(received?.features.count, 0)
+    }
+
+    func testIHateMoney_loadTags_forkServerYieldsCategoriesAndFeatures() {
+        let project = Project.makeIHateMoney(projectId: "proj")
+        MockURLProtocol.requestHandler = jsonHandler(status: 200, body: """
+        {
+          "id": "proj", "name": "Test", "members": [],
+          "categories": [{"id": 3, "name": "Pets", "icon": "🐕", "color": "#112233", "order": 0}],
+          "paymentmodes": [{"id": 8, "name": "Cash", "icon": "💵", "color": "", "order": 0}],
+          "features": ["categoryid", "categories", "paymentmodes", "settle", "repeat"]
+        }
+        """)
+
+        var received: CospendProjectTags?
+        let exp = expectation(description: "tags received")
+        NetworkService.shared.loadTagsPublisher(project)
+            .sink { tags in
+                received = tags
+                exp.fulfill()
+            }
+            .store(in: &subscriptions)
+        waitForExpectations(timeout: 2)
+
+        XCTAssertEqual(received?.categories.map(\.id), [3])
+        XCTAssertEqual(received?.paymentModes.map(\.id), [8])
+        XCTAssertTrue(received?.features.contains("categoryid") ?? false)
     }
 
     // MARK: - HTTP methods

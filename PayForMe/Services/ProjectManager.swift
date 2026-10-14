@@ -98,6 +98,7 @@ class ProjectManager: ObservableObject {
             .sink { [weak self] tags in
                 project.categories = tags.categories
                 project.paymentModes = tags.paymentModes
+                project.features = tags.features
                 // `Project` is a class, so the assignments above are already visible everywhere —
                 // but only re-publishing makes SwiftUI redraw. Compared by identity, because
                 // `Project: Equatable` ignores the id and would accept a different project.

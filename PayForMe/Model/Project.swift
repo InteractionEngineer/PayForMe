@@ -19,6 +19,9 @@ class Project: Codable, Identifiable {
     var bills: [Bill]
     var categories: [CospendTag]
     var paymentModes: [CospendTag]
+    /// Capabilities announced by an iHateMoney category fork; empty otherwise. Not persisted,
+    /// refreshed with every tag load.
+    var features: Set<String> = []
     var me: Int?
 
     let projectId: String
@@ -86,8 +89,25 @@ struct StoredProject: Codable {
 }
 
 extension Project {
+    /// Whether bills of this project carry a category. Cospend always does; iHateMoney only when
+    /// the server is a category fork (stock iHateMoney has no such field).
+    var supportsCategories: Bool {
+        backend == .cospend || features.contains("categoryid")
+    }
+
+    var supportsPaymentModes: Bool {
+        backend == .cospend || features.contains("paymentmodes")
+    }
+
+    /// Categories offered in the bill form. An iHateMoney fork accepts Cospend's global ids on
+    /// top of the project's own; Cospend lists only the project's own.
+    var pickableCategories: [CospendTag] {
+        guard backend == .iHateMoney, supportsCategories else { return categories }
+        return CospendTag.globalCategories + categories
+    }
+
     func category(for bill: Bill) -> CospendTag? {
-        tag(id: bill.categoryid, in: categories)
+        tag(id: bill.categoryid, in: pickableCategories)
     }
 
     func paymentMode(for bill: Bill) -> CospendTag? {
@@ -99,7 +119,7 @@ extension Project {
         return tags.first { $0.id == id }
     }
 
-    func listedCategoryId(_ id: Int) -> Int { listedId(id, in: categories) }
+    func listedCategoryId(_ id: Int) -> Int { listedId(id, in: pickableCategories) }
 
     func listedPaymentModeId(_ id: Int) -> Int { listedId(id, in: paymentModes) }
 

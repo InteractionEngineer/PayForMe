@@ -169,3 +169,8 @@
 "Enter invite link" = "Introducir el enlace de invitación";
 "invite_link_hint" = "Pega el enlace de invitación completo. El servidor y el proyecto se detectan automáticamente.";
 "Server returned an invalid HTTP response" = "El servidor devolvió una respuesta HTTP no válida";
+
+/* ProjectList.swift: auto category */
+"Categories" = "Categorías";
+"Suggest category from title" = "Sugerir categoría según el título";
+"Suggest a category from the bill title. Needs a project whose server supports categories." = "Sugiere una categoría a partir del título del gasto. Requiere un proyecto cuyo servidor admita categorías.";

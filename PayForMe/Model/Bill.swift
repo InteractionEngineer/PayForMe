@@ -19,7 +19,9 @@ struct Bill: Codable, Identifiable, Hashable {
     var paymentmodeid: Int?
     var lastchanged: Int?
 
-    func paramsFor(_ backend: ProjectBackend) -> [String: Any] {
+    /// `features` are the capabilities an iHateMoney server announces; category fields are only
+    /// sent to servers that know them (stock iHateMoney has none).
+    func paramsFor(_ backend: ProjectBackend, features: Set<String> = []) -> [String: Any] {
         var dict: [String: Any] = [
             "date": DateFormatter.cospend.string(from: date),
             "what": what,
@@ -40,6 +42,13 @@ struct Bill: Codable, Identifiable, Hashable {
         }
         if backend == .iHateMoney {
             dict["payed_for"] = owers.map { $0.id.description }
+            // The fork's form treats "" as "none" and rejects "0".
+            if features.contains("categoryid") {
+                dict["categoryid"] = (categoryid ?? 0) == 0 ? "" : categoryid!.description
+            }
+            if features.contains("paymentmodes") {
+                dict["paymentmodeid"] = (paymentmodeid ?? 0) == 0 ? "" : paymentmodeid!.description
+            }
         }
 
         return dict
