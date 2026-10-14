@@ -15,14 +15,23 @@ struct ProjectList: View {
     @State private var showAddProject = false
     @State private var shareProject: Project?
 
+    @AppStorage(AppSettings.autoCategoryKey)
+    private var autoCategoryEnabled = false
+
     var body: some View {
         NavigationView {
             VStack {
                 List {
-                    ForEach(manager.projects) { project in
-                        ProjectListEntry(project: project, currentProject: manager.currentProject, shareProject: self.$shareProject)
+                    Section {
+                        ForEach(manager.projects) { project in
+                            ProjectListEntry(project: project, currentProject: manager.currentProject, shareProject: self.$shareProject)
+                        }
+                        .onDelete(perform: deleteProject)
                     }
-                    .onDelete(perform: deleteProject)
+                    Section(header: Text("Categories"), footer: Text("Suggest a category from the bill title. Servers without categories keep them on this device only.")) {
+                        Toggle("Suggest category from title", isOn: $autoCategoryEnabled)
+                            .disabled(!manager.currentProject.supportsCategories)
+                    }
                 }
                 .sheet(item: $shareProject) { project in
                     ShareProjectQRCode(project: project)

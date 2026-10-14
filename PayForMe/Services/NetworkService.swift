@@ -79,9 +79,8 @@ class NetworkService {
 
 
     func loadTagsPublisher(_ project: Project) -> AnyPublisher<CospendProjectTags, Never> {
-        guard project.backend == .cospend else {
-            return Just(CospendProjectTags.empty).eraseToAnyPublisher()
-        }
+        // Cospend and iHateMoney both answer the bare project URL; stock iHateMoney simply has no
+        // categories in it, which decodes to `.empty`.
         let request = buildURLRequest("", params: [:], project: project)
         return URLSession.shared.dataTaskPublisher(for: request)
             .compactMap { data, response -> Data? in
@@ -152,12 +151,28 @@ class NetworkService {
     }
 
     func postBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
-        let request = buildURLRequest("bills", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "POST")
+        let request = buildURLRequest("bills", params: bill.paramsFor(currentProject.backend, features: currentProject.features), project: currentProject, httpMethod: "POST")
         return sendBillPublisher(request: request)
     }
 
+    /// Creates a bill and returns the id the server assigned (iHateMoney answers with the bare id).
+    /// nil on failure or when the response carries none.
+    func postBillWithIdPublisher(bill: Bill) -> AnyPublisher<(success: Bool, id: Int?), Never> {
+        let request = buildURLRequest("bills", params: bill.paramsFor(currentProject.backend, features: currentProject.features), project: currentProject, httpMethod: "POST")
+        return URLSession.shared.dataTaskPublisher(for: request)
+            .map { output -> (success: Bool, id: Int?) in
+                guard let response = output.response as? HTTPURLResponse, response.statusCode / 100 == 2 else {
+                    return (false, nil)
+                }
+                let text = String(data: output.data, encoding: .utf8)?.trimmingCharacters(in: .whitespacesAndNewlines)
+                return (true, text.flatMap { Int($0) })
+            }
+            .replaceError(with: (false, nil))
+            .eraseToAnyPublisher()
+    }
+
     func updateBillPublisher(bill: Bill) -> AnyPublisher<Bool, Never> {
-        let request = buildURLRequest("bills/\(bill.id)", params: bill.paramsFor(currentProject.backend), project: currentProject, httpMethod: "PUT")
+        let request = buildURLRequest("bills/\(bill.id)", params: bill.paramsFor(currentProject.backend, features: currentProject.features), project: currentProject, httpMethod: "PUT")
         return sendBillPublisher(request: request)
     }
 

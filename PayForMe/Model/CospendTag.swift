@@ -19,30 +19,76 @@ struct CospendTag: Codable, Identifiable, Hashable {
 
     var label: String {
         guard let icon = icon, !icon.isEmpty else { return displayName }
-        return "\(icon) \(displayName)"
+        return "\(Self.emojiPresentation(icon)) \(displayName)"
     }
+
+    /// Server colors come as "#rrggbb" or "rrggbb"; empty or malformed values yield nil.
+    var rgb: (red: Double, green: Double, blue: Double)? {
+        guard var hex = color?.trimmingCharacters(in: .whitespaces) else { return nil }
+        if hex.hasPrefix("#") { hex.removeFirst() }
+        guard hex.count == 6, let value = UInt32(hex, radix: 16) else { return nil }
+        return (Double((value >> 16) & 0xFF) / 255, Double((value >> 8) & 0xFF) / 255, Double(value & 0xFF) / 255)
+    }
+
+    /// Emoji such as 🌩 or 🛍 default to a small monochrome text glyph unless followed by the
+    /// emoji variation selector (U+FE0F), which servers usually leave out. Add it where missing.
+    static func emojiPresentation(_ icon: String) -> String {
+        var result = ""
+        for character in icon {
+            result.append(character)
+            guard let first = character.unicodeScalars.first,
+                  character.unicodeScalars.count == 1,
+                  first.properties.isEmoji, !first.properties.isEmojiPresentation, first.value > 0xFF
+            else { continue }
+            result.unicodeScalars.append("\u{FE0F}")
+        }
+        return result
+    }
+
+    /// Cospend's built-in categories (negative ids). Servers do not list them in the project
+    /// info, but accept them as `categoryid`: Nextcloud Cospend and iHateMoney category forks.
+    /// -11 (Reimbursement) is not a category.
+    static let globalCategories: [CospendTag] = [
+        CospendTag(id: -1, name: "Grocery", color: "#ffaa00", icon: "🛒", order: nil),
+        CospendTag(id: -2, name: "Bar/Party", color: "#aa55ff", icon: "🎉", order: nil),
+        CospendTag(id: -3, name: "Rent", color: "#da8733", icon: "🏠", order: nil),
+        CospendTag(id: -4, name: "Bill", color: "#4aa6b0", icon: "🌩", order: nil),
+        CospendTag(id: -5, name: "Excursion/Culture", color: "#0055ff", icon: "🚸", order: nil),
+        CospendTag(id: -6, name: "Health", color: "#bf090c", icon: "💚", order: nil),
+        CospendTag(id: -10, name: "Shopping", color: "#e167d1", icon: "🛍", order: nil),
+        CospendTag(id: -12, name: "Restaurant", color: "#d0d5e1", icon: "🍴", order: nil),
+        CospendTag(id: -13, name: "Accommodation", color: "#5de1a3", icon: "🛌", order: nil),
+        CospendTag(id: -14, name: "Transport", color: "#6f2ee1", icon: "🚌", order: nil),
+        CospendTag(id: -15, name: "Sport", color: "#69e177", icon: "🎾", order: nil),
+    ]
 }
 
 struct CospendProjectTags: Decodable {
     let categories: [CospendTag]
     let paymentModes: [CospendTag]
+    /// Optional capability list of iHateMoney category forks (`categoryid`, `categories`,
+    /// `paymentmodes`, ...). Empty for Cospend and for stock iHateMoney.
+    let features: Set<String>
 
     static let empty = CospendProjectTags(categories: [], paymentModes: [])
 
-    init(categories: [CospendTag], paymentModes: [CospendTag]) {
+    init(categories: [CospendTag], paymentModes: [CospendTag], features: Set<String> = []) {
         self.categories = categories
         self.paymentModes = paymentModes
+        self.features = features
     }
 
     private enum CodingKeys: String, CodingKey {
         case categories
         case paymentmodes
+        case features
     }
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         categories = Self.decodeList(from: container, forKey: .categories)
         paymentModes = Self.decodeList(from: container, forKey: .paymentmodes)
+        features = Set((try? container.decode([String].self, forKey: .features)) ?? [])
     }
 
     private static func decodeList(from container: KeyedDecodingContainer<CodingKeys>, forKey key: CodingKeys) -> [CospendTag] {

@@ -162,3 +162,8 @@
 "member_error_forbidden" = "To obvykle vyžaduje práva správce projektu. Sdílené heslo projektu může umožňovat jen přístup účastníka.";
 "member_error_network" = "Není spojení se serverem. Zkontrolujte síť a zkuste to znovu.";
 "member_error_generic" = "Server odmítl požadavek (HTTP %d).";
+
+/* ProjectList.swift: auto category */
+"Categories" = "Kategorie";
+"Suggest category from title" = "Navrhnout kategorii podle názvu";
+"Suggest a category from the bill title. Servers without categories keep them on this device only." = "Navrhne kategorii podle názvu účtu. Na serverech bez kategorií zůstanou jen v tomto zařízení.";

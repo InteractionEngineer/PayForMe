@@ -166,3 +166,8 @@
 "member_error_forbidden" = "Für den Erfolg sind meist Maintainer-Rechte am Projekt nötig. Du kannst diese Berechtigungen jederzeit erteilen, indem du die Einstellungen des Freigabelinks in Cospend (deiner Nextcloud-App) änderst.";
 "member_error_network" = "Keine Verbindung zum Server. Bitte Netzwerk prüfen und erneut versuchen.";
 "member_error_generic" = "Der Server hat die Anfrage abgelehnt (HTTP %d).";
+
+/* ProjectList.swift: auto category */
+"Categories" = "Kategorien";
+"Suggest category from title" = "Kategorie aus Titel vorschlagen";
+"Suggest a category from the bill title. Servers without categories keep them on this device only." = "Schlägt anhand des Rechnungstitels eine Kategorie vor. Auf Servern ohne Kategorien bleiben sie nur auf diesem Gerät.";

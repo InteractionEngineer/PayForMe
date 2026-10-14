@@ -18,6 +18,7 @@ class StorageService {
     }
 
     private let dbQueue: DatabaseQueue
+    let localCategories: LocalCategoryStore
 
     static func makeMigrator() -> DatabaseMigrator {
         var migrator = DatabaseMigrator()
@@ -49,6 +50,14 @@ class StorageService {
             })
             try db.execute(sql: "UPDATE storedProject SET projectId = token;")
         }
+        migrator.registerMigration("v5") { db in
+            try db.create(table: "localBillCategory", ifNotExists: true) { table in
+                table.column("projectKey", .text).notNull()
+                table.column("billId", .integer).notNull()
+                table.column("categoryId", .integer).notNull()
+                table.primaryKey(["projectKey", "billId"])
+            }
+        }
         // #if DEBUG
         //// Speed up development by nuking the database when migrations change
         // migrator.eraseDatabaseOnSchemaChange = true
@@ -60,6 +69,7 @@ class StorageService {
         do {
             dbQueue = try DatabaseQueue(path: databasePath.appendingPathComponent("payforme.sqlite").path)
             try Self.makeMigrator().migrate(dbQueue)
+            localCategories = LocalCategoryStore(dbQueue: dbQueue)
         } catch {
             print("Storage couldn't be initialized \(error.localizedDescription)")
             fatalError()

@@ -51,12 +51,12 @@ struct BillDetailView: View {
                     }
                 }
 
-                if !viewModel.currentProject.categories.isEmpty || !viewModel.currentProject.paymentModes.isEmpty {
+                if !viewModel.currentProject.pickableCategories.isEmpty || !viewModel.currentProject.paymentModes.isEmpty {
                     Section {
-                        if !viewModel.currentProject.categories.isEmpty {
+                        if !viewModel.currentProject.pickableCategories.isEmpty {
                             Picker("Category", selection: viewModel.categoryPickerSelection) {
                                 Text("No category").tag(0)
-                                ForEach(viewModel.currentProject.categories) { category in
+                                ForEach(viewModel.currentProject.pickableCategories) { category in
                                     Text(category.label).tag(category.id)
                                 }
                             }

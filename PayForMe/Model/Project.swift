@@ -19,6 +19,11 @@ class Project: Codable, Identifiable {
     var bills: [Bill]
     var categories: [CospendTag]
     var paymentModes: [CospendTag]
+    /// Capabilities announced by an iHateMoney category fork; empty otherwise. Not persisted,
+    /// refreshed with every tag load.
+    var features: Set<String> = []
+    /// bill id → category id, for servers without a category field. Loaded from the device.
+    var localCategories: [Int: Int] = [:]
     var me: Int?
 
     let projectId: String
@@ -86,8 +91,35 @@ struct StoredProject: Codable {
 }
 
 extension Project {
+    /// Whether bills of this project can be categorized: Cospend and category forks keep it on the
+    /// server, stock iHateMoney locally (see `usesLocalCategories`).
+    var supportsCategories: Bool {
+        backend == .cospend || backend == .iHateMoney
+    }
+
+    /// iHateMoney without a category field: categories are assigned and kept on this device.
+    var usesLocalCategories: Bool {
+        backend == .iHateMoney && !features.contains("categoryid")
+    }
+
+    /// The server's category wins; the local one only fills in where the server has none.
+    func categoryId(of bill: Bill) -> Int? {
+        bill.categoryid ?? (usesLocalCategories ? localCategories[bill.id] : nil)
+    }
+
+    var supportsPaymentModes: Bool {
+        backend == .cospend || features.contains("paymentmodes")
+    }
+
+    /// Categories offered in the bill form. iHateMoney (fork or stock) offers Cospend's built-in
+    /// ids on top of the project's own; Cospend lists only the project's own.
+    var pickableCategories: [CospendTag] {
+        guard backend == .iHateMoney else { return categories }
+        return CospendTag.globalCategories + categories
+    }
+
     func category(for bill: Bill) -> CospendTag? {
-        tag(id: bill.categoryid, in: categories)
+        tag(id: categoryId(of: bill), in: pickableCategories)
     }
 
     func paymentMode(for bill: Bill) -> CospendTag? {
@@ -99,7 +131,7 @@ extension Project {
         return tags.first { $0.id == id }
     }
 
-    func listedCategoryId(_ id: Int) -> Int { listedId(id, in: categories) }
+    func listedCategoryId(_ id: Int) -> Int { listedId(id, in: pickableCategories) }
 
     func listedPaymentModeId(_ id: Int) -> Int { listedId(id, in: paymentModes) }
 

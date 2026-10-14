@@ -38,25 +38,11 @@ struct BillCell: View {
 
     @ViewBuilder
     private var tagLine: some View {
-        if let tagText = tagText {
-            tagText
-                .font(.caption)
-                .foregroundColor(.secondary)
-                .lineLimit(2)
-                .fixedSize(horizontal: false, vertical: true)
-        }
-    }
-
-    private var tagText: Text? {
-        switch (category, paymentMode) {
-        case let (category?, paymentMode?):
-            return Text(category.label) + Text(verbatim: " · ") + Text(paymentMode.label)
-        case let (category?, nil):
-            return Text(category.label)
-        case let (nil, paymentMode?):
-            return Text(paymentMode.label)
-        case (nil, nil):
-            return nil
+        if category != nil || paymentMode != nil {
+            HStack(spacing: 6) {
+                if let category = category { CategoryChip(tag: category) }
+                if let paymentMode = paymentMode { CategoryChip(tag: paymentMode) }
+            }
         }
     }
 

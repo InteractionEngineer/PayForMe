@@ -39,6 +39,15 @@ class BillDetailViewModel: ObservableObject {
 
     var povm: PotentialOwersViewModel
 
+    /// Read at suggestion time so toggling the setting applies to the next keystroke.
+    var autoCategoryEnabled: () -> Bool = { AppSettings.autoCategoryEnabled }
+
+    /// Once the user picks a category themself, titles no longer change it.
+    private var categoryChosenByUser = false
+    /// The current selection came from a suggestion and may be replaced by a newer one.
+    private var categorySuggested = false
+    private var topicCancellable: AnyCancellable?
+
     init(currentBill: Bill) {
         self.currentBill = currentBill
         povm = PotentialOwersViewModel(members: ProjectManager.shared.currentProject.members)
@@ -46,6 +55,26 @@ class BillDetailViewModel: ObservableObject {
         manager.$currentProject.assign(to: &$currentProject)
 
         prefillData()
+
+        // Only new bills get suggestions; an existing bill keeps the category it was saved with.
+        if currentBill.id == -1 {
+            topicCancellable = $topic.dropFirst().removeDuplicates().sink { [weak self] in
+                self?.suggestCategory(for: $0)
+            }
+        }
+    }
+
+    func suggestCategory(for title: String) {
+        guard autoCategoryEnabled(), !categoryChosenByUser else { return }
+        let suggestion = CategoryClassifier.suggestCategoryId(title: title, in: currentProject.pickableCategories)
+        if let suggestion = suggestion {
+            selectedCategoryId = suggestion
+            categorySuggested = true
+        } else if categorySuggested {
+            // The title moved away from the keyword that triggered the suggestion.
+            selectedCategoryId = 0
+            categorySuggested = false
+        }
     }
 
     var validatedInput: AnyPublisher<Bool, Never> {
@@ -67,7 +96,10 @@ class BillDetailViewModel: ObservableObject {
     var categoryPickerSelection: Binding<Int> {
         Binding(
             get: { self.currentProject.listedCategoryId(self.selectedCategoryId) },
-            set: { self.selectedCategoryId = $0 }
+            set: {
+                self.categoryChosenByUser = true
+                self.selectedCategoryId = $0
+            }
         )
     }
 
@@ -110,7 +142,7 @@ class BillDetailViewModel: ObservableObject {
             }
         }
         billDate = currentBill.date
-        selectedCategoryId = currentBill.categoryid ?? 0
+        selectedCategoryId = currentProject.categoryId(of: currentBill) ?? 0
         selectedPaymentModeId = currentBill.paymentmodeid ?? 0
     }
 }

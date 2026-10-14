@@ -169,3 +169,8 @@
 "member_error_forbidden" = "This usually requires maintainer rights for the project. You can grant those at any time by changing the share-link's settings in Cospend (your Nextcloud-App).";
 "member_error_network" = "No connection to the server. Please check your network and try again.";
 "member_error_generic" = "The server rejected the request (HTTP %d).";
+
+/* ProjectList.swift: auto category */
+"Categories" = "Categories";
+"Suggest category from title" = "Suggest category from title";
+"Suggest a category from the bill title. Servers without categories keep them on this device only." = "Suggest a category from the bill title. Servers without categories keep them on this device only.";

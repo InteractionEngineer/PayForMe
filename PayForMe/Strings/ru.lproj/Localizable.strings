@@ -168,3 +168,8 @@
 "member_error_forbidden" = "Обычно для этого нужны права сопровождающего проекта. Пароль общего доступа может давать только права участника.";
 "member_error_network" = "Нет соединения с сервером. Проверьте сеть и повторите попытку.";
 "member_error_generic" = "Сервер отклонил запрос (HTTP %d).";
+
+/* ProjectList.swift: auto category */
+"Categories" = "Категории";
+"Suggest category from title" = "Предлагать категорию по названию";
+"Suggest a category from the bill title. Servers without categories keep them on this device only." = "Предлагает категорию по названию счёта. На серверах без категорий они хранятся только на этом устройстве.";
