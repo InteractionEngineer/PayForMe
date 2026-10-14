@@ -214,3 +214,46 @@ class AutoCategoryViewModelTests: XCTestCase {
         XCTAssertEqual(vm.selectedCategoryId, -6)
     }
 }
+
+class CategoryIconTests: XCTestCase {
+    func testTextDefaultEmojiGetsVariationSelector() {
+        // 🌩 and 🛍 would render as monochrome text glyphs without it.
+        XCTAssertEqual(CospendTag.emojiPresentation("🌩"), "🌩\u{FE0F}")
+        XCTAssertEqual(CospendTag.emojiPresentation("🛍"), "🛍\u{FE0F}")
+    }
+
+    func testColorEmojiAndSelectorAreLeftAlone() {
+        XCTAssertEqual(CospendTag.emojiPresentation("🛒"), "🛒")
+        XCTAssertEqual(CospendTag.emojiPresentation("🛍\u{FE0F}"), "🛍\u{FE0F}")
+        XCTAssertEqual(CospendTag.emojiPresentation("🐕"), "🐕")
+    }
+
+    func testPlainTextIconsAreUntouched() {
+        XCTAssertEqual(CospendTag.emojiPresentation("#"), "#")
+        XCTAssertEqual(CospendTag.emojiPresentation("1"), "1")
+        XCTAssertEqual(CospendTag.emojiPresentation("A"), "A")
+    }
+
+    func testEveryBuiltInCategoryLabelIsClean() {
+        for tag in CospendTag.globalCategories {
+            XCTAssertFalse(tag.label.hasPrefix(" "), tag.label)
+            XCTAssertTrue(tag.label.hasSuffix(tag.displayName), tag.label)
+        }
+    }
+}
+
+class CategoryColorTests: XCTestCase {
+    func testParsesHexWithAndWithoutHash() throws {
+        let a = try XCTUnwrap(CospendTag(id: 1, name: "a", color: "#ff0000", icon: nil, order: nil).rgb)
+        XCTAssertEqual(a.red, 1)
+        XCTAssertEqual(a.green, 0)
+        let b = try XCTUnwrap(CospendTag(id: 1, name: "a", color: "00FF00", icon: nil, order: nil).rgb)
+        XCTAssertEqual(b.green, 1)
+    }
+
+    func testEmptyOrMalformedColorIsNil() {
+        for value in [nil, "", "#12", "zzzzzz", "#1234567"] {
+            XCTAssertNil(CospendTag(id: 1, name: "a", color: value, icon: nil, order: nil).rgb, value ?? "nil")
+        }
+    }
+}
