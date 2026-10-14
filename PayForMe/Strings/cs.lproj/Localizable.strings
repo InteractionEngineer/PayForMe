@@ -166,4 +166,4 @@
 /* ProjectList.swift: auto category */
 "Categories" = "Kategorie";
 "Suggest category from title" = "Navrhnout kategorii podle názvu";
-"Suggest a category from the bill title. Needs a project whose server supports categories." = "Navrhne kategorii podle názvu účtu. Vyžaduje projekt, jehož server podporuje kategorie.";
+"Suggest a category from the bill title. Servers without categories keep them on this device only." = "Navrhne kategorii podle názvu účtu. Na serverech bez kategorií zůstanou jen v tomto zařízení.";

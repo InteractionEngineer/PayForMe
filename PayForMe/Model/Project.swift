@@ -22,6 +22,8 @@ class Project: Codable, Identifiable {
     /// Capabilities announced by an iHateMoney category fork; empty otherwise. Not persisted,
     /// refreshed with every tag load.
     var features: Set<String> = []
+    /// bill id → category id, for servers without a category field. Loaded from the device.
+    var localCategories: [Int: Int] = [:]
     var me: Int?
 
     let projectId: String
@@ -89,25 +91,35 @@ struct StoredProject: Codable {
 }
 
 extension Project {
-    /// Whether bills of this project carry a category. Cospend always does; iHateMoney only when
-    /// the server is a category fork (stock iHateMoney has no such field).
+    /// Whether bills of this project can be categorized: Cospend and category forks keep it on the
+    /// server, stock iHateMoney locally (see `usesLocalCategories`).
     var supportsCategories: Bool {
-        backend == .cospend || features.contains("categoryid")
+        backend == .cospend || backend == .iHateMoney
+    }
+
+    /// iHateMoney without a category field: categories are assigned and kept on this device.
+    var usesLocalCategories: Bool {
+        backend == .iHateMoney && !features.contains("categoryid")
+    }
+
+    /// The server's category wins; the local one only fills in where the server has none.
+    func categoryId(of bill: Bill) -> Int? {
+        bill.categoryid ?? (usesLocalCategories ? localCategories[bill.id] : nil)
     }
 
     var supportsPaymentModes: Bool {
         backend == .cospend || features.contains("paymentmodes")
     }
 
-    /// Categories offered in the bill form. An iHateMoney fork accepts Cospend's global ids on
-    /// top of the project's own; Cospend lists only the project's own.
+    /// Categories offered in the bill form. iHateMoney (fork or stock) offers Cospend's built-in
+    /// ids on top of the project's own; Cospend lists only the project's own.
     var pickableCategories: [CospendTag] {
-        guard backend == .iHateMoney, supportsCategories else { return categories }
+        guard backend == .iHateMoney else { return categories }
         return CospendTag.globalCategories + categories
     }
 
     func category(for bill: Bill) -> CospendTag? {
-        tag(id: bill.categoryid, in: pickableCategories)
+        tag(id: categoryId(of: bill), in: pickableCategories)
     }
 
     func paymentMode(for bill: Bill) -> CospendTag? {

@@ -72,10 +72,32 @@ class CategoryClassifierTests: XCTestCase {
 }
 
 class CategoryProjectModelTests: XCTestCase {
-    func testStockIHateMoney_hasNoCategories() {
+    func testStockIHateMoney_categorizesLocally() {
         let project = Project.makeIHateMoney()
-        XCTAssertFalse(project.supportsCategories)
-        XCTAssertTrue(project.pickableCategories.isEmpty)
+        XCTAssertTrue(project.supportsCategories)
+        XCTAssertTrue(project.usesLocalCategories)
+        XCTAssertEqual(project.pickableCategories.count, CospendTag.globalCategories.count)
+    }
+
+    func testStockIHateMoney_localCategoryFillsInWhereServerHasNone() {
+        let project = Project.makeIHateMoney()
+        project.localCategories = [7: -1]
+        XCTAssertEqual(project.categoryId(of: .make(id: 7)), -1)
+        XCTAssertEqual(project.category(for: .make(id: 7))?.name, "Grocery")
+        XCTAssertNil(project.categoryId(of: .make(id: 8)))
+    }
+
+    func testFork_serverCategoryWinsAndLocalIsIgnored() {
+        let project = Project.makeIHateMoney()
+        project.features = forkFeatures
+        project.localCategories = [7: -1]
+        XCTAssertFalse(project.usesLocalCategories)
+        XCTAssertNil(project.categoryId(of: .make(id: 7)))
+        XCTAssertEqual(project.categoryId(of: .make(id: 7, categoryid: -12)), -12)
+    }
+
+    func testCospend_neverUsesLocalCategories() {
+        XCTAssertFalse(Project.makeCospend().usesLocalCategories)
     }
 
     func testForkIHateMoney_offersGlobalPlusOwnCategories() {

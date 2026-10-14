@@ -173,4 +173,4 @@
 /* ProjectList.swift: auto category */
 "Categories" = "Categories";
 "Suggest category from title" = "Suggest category from title";
-"Suggest a category from the bill title. Needs a project whose server supports categories." = "Suggest a category from the bill title. Needs a project whose server supports categories.";
+"Suggest a category from the bill title. Servers without categories keep them on this device only." = "Suggest a category from the bill title. Servers without categories keep them on this device only.";

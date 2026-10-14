@@ -28,7 +28,7 @@ struct ProjectList: View {
                         }
                         .onDelete(perform: deleteProject)
                     }
-                    Section(header: Text("Categories"), footer: Text("Suggest a category from the bill title. Needs a project whose server supports categories.")) {
+                    Section(header: Text("Categories"), footer: Text("Suggest a category from the bill title. Servers without categories keep them on this device only.")) {
                         Toggle("Suggest category from title", isOn: $autoCategoryEnabled)
                             .disabled(!manager.currentProject.supportsCategories)
                     }

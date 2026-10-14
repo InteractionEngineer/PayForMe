@@ -142,7 +142,7 @@ class BillDetailViewModel: ObservableObject {
             }
         }
         billDate = currentBill.date
-        selectedCategoryId = currentBill.categoryid ?? 0
+        selectedCategoryId = currentProject.categoryId(of: currentBill) ?? 0
         selectedPaymentModeId = currentBill.paymentmodeid ?? 0
     }
 }

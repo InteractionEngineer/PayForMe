@@ -63,6 +63,7 @@ class ProjectManager: ObservableObject {
         let project = currentProject
 
         loadTags(for: project)
+        project.localCategories = storageService.localCategories.categories(projectKey: LocalCategoryStore.key(for: project))
 
         let billsPublisher = NetworkService.shared.loadBillsPublisher(project)
         let membersPublisher = NetworkService.shared.loadMembersPublisher(project)
@@ -114,8 +115,9 @@ class ProjectManager: ObservableObject {
         if update {
             cancellable = NetworkService.shared.updateBillPublisher(bill: bill)
                 .receive(on: DispatchQueue.main)
-                .sink { success in
+                .sink { [weak self] success in
                     if success {
+                        self?.storeLocalCategoryIfNeeded(bill, billId: bill.id)
                         print("Bill id\(bill.id) updated")
                     } else {
                         print("error updating bill id\(bill.id)")
@@ -123,10 +125,12 @@ class ProjectManager: ObservableObject {
                     completion()
                 }
         } else {
-            cancellable = NetworkService.shared.postBillPublisher(bill: bill)
+            cancellable = NetworkService.shared.postBillWithIdPublisher(bill: bill)
                 .receive(on: DispatchQueue.main)
-                .sink { success in
+                .sink { [weak self] result in
+                    let success = result.success
                     if success {
+                        if let id = result.id { self?.storeLocalCategoryIfNeeded(bill, billId: id) }
                         print("Bill posted")
                     } else {
                         print("Error posting bill")
@@ -136,14 +140,26 @@ class ProjectManager: ObservableObject {
         }
     }
 
+    /// For servers without a category field the choice stays on this device.
+    private func storeLocalCategoryIfNeeded(_ bill: Bill, billId: Int) {
+        let project = currentProject
+        guard project.usesLocalCategories else { return }
+        let category = bill.categoryid ?? 0
+        storageService.localCategories.set(categoryId: category, billId: billId, projectKey: LocalCategoryStore.key(for: project))
+        project.localCategories[billId] = category == 0 ? nil : category
+    }
+
     private func deleteBillFromServer(bill: Bill, completion: @escaping () -> Void) {
         cancellable?.cancel()
         cancellable = nil
 
         cancellable = NetworkService.shared.deleteBillPublisher(bill: bill)
             .receive(on: DispatchQueue.main)
-            .sink { success in
+            .sink { [weak self] success in
                 if success {
+                    if let self = self, self.currentProject.usesLocalCategories {
+                        self.storageService.localCategories.remove(billId: bill.id, projectKey: LocalCategoryStore.key(for: self.currentProject))
+                    }
                     print("Bill successfully deleted")
                 } else {
                     print("Error deleting bill")

@@ -170,4 +170,4 @@
 /* ProjectList.swift: auto category */
 "Categories" = "Kategorien";
 "Suggest category from title" = "Kategorie aus Titel vorschlagen";
-"Suggest a category from the bill title. Needs a project whose server supports categories." = "Schlägt anhand des Rechnungstitels eine Kategorie vor. Benötigt ein Projekt, dessen Server Kategorien unterstützt.";
+"Suggest a category from the bill title. Servers without categories keep them on this device only." = "Schlägt anhand des Rechnungstitels eine Kategorie vor. Auf Servern ohne Kategorien bleiben sie nur auf diesem Gerät.";

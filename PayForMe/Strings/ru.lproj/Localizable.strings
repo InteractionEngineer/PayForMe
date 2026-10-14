@@ -172,4 +172,4 @@
 /* ProjectList.swift: auto category */
 "Categories" = "Категории";
 "Suggest category from title" = "Предлагать категорию по названию";
-"Suggest a category from the bill title. Needs a project whose server supports categories." = "Предлагает категорию по названию счёта. Нужен проект, сервер которого поддерживает категории.";
+"Suggest a category from the bill title. Servers without categories keep them on this device only." = "Предлагает категорию по названию счёта. На серверах без категорий они хранятся только на этом устройстве.";

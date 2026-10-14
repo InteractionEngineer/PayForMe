@@ -46,6 +46,7 @@
 		65662A1D23D7353400303207 /* Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65662A1C23D7353400303207 /* Server.swift */; };
 		65662A2223D75C5F00303207 /* AddProjectManualView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65662A2123D75C5F00303207 /* AddProjectManualView.swift */; };
 		65662A2423D83ED100303207 /* StorageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65662A2323D83ED100303207 /* StorageService.swift */; };
+		F210835FF66EAB36C4EF24E5 /* LocalCategoryStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 16973AEB3337A370B125D368 /* LocalCategoryStore.swift */; };
 		65662A2623D8546900303207 /* ProjectList.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65662A2523D8546900303207 /* ProjectList.swift */; };
 		656A2AD7241BB4F300786A1E /* PayForMeUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656A2AD6241BB4F300786A1E /* PayForMeUITests.swift */; };
 		656A2ADF241BBAF200786A1E /* SnapshotHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 656A2ADE241BBAF200786A1E /* SnapshotHelper.swift */; };
@@ -69,6 +70,7 @@
 		65D225F32428038500C3F1EC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 65D225F52428038500C3F1EC /* Localizable.strings */; };
 		65D9094025581BE100351F4B /* AddFromURLView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65D9093F25581BE100351F4B /* AddFromURLView.swift */; };
 		A7089D0A97757AB90C9CB97E /* CategorySupportTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A391473E9D9DE0002A4D8F46 /* CategorySupportTests.swift */; };
+		27BA4EFA758D236CE23AEDA7 /* LocalCategoryStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBFD0B11814133F77ACBA4A3 /* LocalCategoryStoreTests.swift */; };
 		A9A3E941FF5A941B353C8928 /* AppSettings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2A5CE07E061AEA59F79C0E31 /* AppSettings.swift */; };
 		BF4D7AF265FC4A90B1AC5AEB /* JSONDecodingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8F4D55C3EF5EFCD925428041 /* JSONDecodingTests.swift */; };
 		D279295CFA25D9CC69C6F27C /* BillTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7EED3194A2342518B0E74079 /* BillTests.swift */; };
@@ -137,6 +139,7 @@
 		65662A1C23D7353400303207 /* Server.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Server.swift; sourceTree = "<group>"; };
 		65662A2123D75C5F00303207 /* AddProjectManualView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddProjectManualView.swift; sourceTree = "<group>"; };
 		65662A2323D83ED100303207 /* StorageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StorageService.swift; sourceTree = "<group>"; };
+		16973AEB3337A370B125D368 /* LocalCategoryStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCategoryStore.swift; sourceTree = "<group>"; };
 		65662A2523D8546900303207 /* ProjectList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProjectList.swift; sourceTree = "<group>"; };
 		656A2AD4241BB4F300786A1E /* PayForMeUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PayForMeUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		656A2AD6241BB4F300786A1E /* PayForMeUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PayForMeUITests.swift; sourceTree = "<group>"; };
@@ -170,6 +173,7 @@
 		8F4D55C3EF5EFCD925428041 /* JSONDecodingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = JSONDecodingTests.swift; sourceTree = "<group>"; };
 		92ABB02BEA28BEA7C8C64841 /* BillSortingTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = BillSortingTests.swift; sourceTree = "<group>"; };
 		A391473E9D9DE0002A4D8F46 /* CategorySupportTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategorySupportTests.swift; sourceTree = "<group>"; };
+		BBFD0B11814133F77ACBA4A3 /* LocalCategoryStoreTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalCategoryStoreTests.swift; sourceTree = "<group>"; };
 		B0DE3B9BA48181BBB1E6664F /* TextMatchUtils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextMatchUtils.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -245,6 +249,7 @@
 				0865D2DAF541B24078D1DC41 /* TestHelpers.swift */,
 				7EED3194A2342518B0E74079 /* BillTests.swift */,
 				A391473E9D9DE0002A4D8F46 /* CategorySupportTests.swift */,
+				BBFD0B11814133F77ACBA4A3 /* LocalCategoryStoreTests.swift */,
 				8F4D55C3EF5EFCD925428041 /* JSONDecodingTests.swift */,
 				143F41EE78329905894C8A29 /* BalanceCalculationTests.swift */,
 				92ABB02BEA28BEA7C8C64841 /* BillSortingTests.swift */,
@@ -320,6 +325,7 @@
 			children = (
 				65662A1A23D733B700303207 /* NetworkService.swift */,
 				65662A2323D83ED100303207 /* StorageService.swift */,
+				16973AEB3337A370B125D368 /* LocalCategoryStore.swift */,
 				481FB4FA23E964C8003BD108 /* ProjectManager.swift */,
 			);
 			path = Services;
@@ -566,6 +572,7 @@
 				57BC8D25B91CE40F4669650C /* TestHelpers.swift in Sources */,
 				D279295CFA25D9CC69C6F27C /* BillTests.swift in Sources */,
 				A7089D0A97757AB90C9CB97E /* CategorySupportTests.swift in Sources */,
+				27BA4EFA758D236CE23AEDA7 /* LocalCategoryStoreTests.swift in Sources */,
 				BF4D7AF265FC4A90B1AC5AEB /* JSONDecodingTests.swift in Sources */,
 				56E7DB46FDCDC5B46C475020 /* BalanceCalculationTests.swift in Sources */,
 				62C73597878BA5AD4572FE90 /* BillSortingTests.swift in Sources */,
@@ -620,6 +627,7 @@
 				658FC54B25272639004A49AA /* AddProjectQRView.swift in Sources */,
 				481FB4FD23EAD78F003BD108 /* AddProjectManualViewModel.swift in Sources */,
 				65662A2423D83ED100303207 /* StorageService.swift in Sources */,
+				F210835FF66EAB36C4EF24E5 /* LocalCategoryStore.swift in Sources */,
 				655DD2AE2993DACB00E06675 /* ProjectListEntry.swift in Sources */,
 				656E8CB823D9FDA300B3ED10 /* BillListViewModel.swift in Sources */,
 				62A13D412FA3AB760036EE34 /* ShareProjectQRCodeViewModel.swift in Sources */,
