@@ -33,7 +33,7 @@ Ways to contribute:
 * Clearing debt of single members
 * ~Creating new projects on iHateMoney~
 * Adding new members to a project
-* Bill categories and payment modes, also on iHateMoney servers that support them
+* Bill categories and payment modes, also on iHateMoney servers that support them; on servers without categories they are kept on the device
 
 
 ## How to contribute Localization
